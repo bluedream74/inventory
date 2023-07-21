@@ -1,9 +1,10 @@
 import { RouterProvider, createBrowserRouter, Navigate } from "react-router-dom";
 import { useAuth } from "../provider/authProvider";
 import { ProtectedRoute } from "./ProtectedRoute";
+import { Navigation } from "@mui/icons-material";
 import Login from '../pages/Auth/Login';
 import SignUp from "../pages/Auth/SIgnUp";
-import { Navigation } from "@mui/icons-material";
+import ProductRegister from "../pages/ProductRegister/ProductRegister";
 
 const Routes = () => {
 	const { token } = useAuth();
@@ -42,6 +43,10 @@ const Routes = () => {
 					path: "/logout",
 					element: <div>Logout</div>,
 				},
+				{
+					path: "/product_register",
+					element: <ProductRegister />
+				}
 			],
 		},
 	];

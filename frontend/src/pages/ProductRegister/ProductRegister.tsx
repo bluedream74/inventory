@@ -1,359 +1,388 @@
-import { useMemo, useState } from 'react';
-import {
-  MRT_EditActionButtons,
-  MantineReactTable,
-  // createRow,
-  type MRT_ColumnDef,
-  type MRT_Row,
-  type MRT_TableOptions,
-  useMantineReactTable,
-} from 'mantine-react-table';
-import {
-  ActionIcon,
-  Button,
-  Flex,
-  Stack,
-  Text,
-  Title,
-  Tooltip,
-} from '@mantine/core';
-import { ModalsProvider, modals } from '@mantine/modals';
-import { IconEdit, IconTrash } from '@tabler/icons-react';
-import {
-  QueryClient,
-  QueryClientProvider,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from '@tanstack/react-query';
-import { type User, fakeData, usStates } from './makeData';
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import './ProductRegister.scss';
+import React, { useState, useEffect, useMemo } from 'react';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { getProductList } from '../../store/productReducer';
+import downArrow from '../../assets/downArrow.svg';
+import upArrow from '../../assets/upArrow.svg';
+import ImageInput from '../../components/ImageInput';
+import axios from 'axios';
 
-const Example = () => {
-  const [validationErrors, setValidationErrors] = useState<
-    Record<string, string | undefined>
-  >({});
+export interface ProductInterface {
+  id: number;
+  image_url: string;
+  image_mode: string;
+  code: string;
+  part_number: string;
+  name: string;
+  ancient_time: string;
+  price: number;
+}
 
-  const columns = useMemo<MRT_ColumnDef<User>[]>(
-    () => [
-      {
-        accessorKey: 'id',
-        header: 'Id',
-        enableEditing: false,
-        size: 80,
-      },
-      {
-        accessorKey: 'firstName',
-        header: 'First Name',
-        mantineEditTextInputProps: {
-          type: 'email',
-          required: true,
-          error: validationErrors?.firstName,
-          //remove any previous validation errors when user focuses on the input
-          onFocus: () =>
-            setValidationErrors({
-              ...validationErrors,
-              firstName: undefined,
-            }),
-          //optionally add validation checking for onBlur or onChange
-        },
-      },
-      {
-        accessorKey: 'lastName',
-        header: 'Last Name',
-        mantineEditTextInputProps: {
-          type: 'email',
-          required: true,
-          error: validationErrors?.lastName,
-          //remove any previous validation errors when user focuses on the input
-          onFocus: () =>
-            setValidationErrors({
-              ...validationErrors,
-              lastName: undefined,
-            }),
-        },
-      },
-      {
-        accessorKey: 'email',
-        header: 'Email',
-        mantineEditTextInputProps: {
-          type: 'email',
-          required: true,
-          error: validationErrors?.email,
-          //remove any previous validation errors when user focuses on the input
-          onFocus: () =>
-            setValidationErrors({
-              ...validationErrors,
-              email: undefined,
-            }),
-        },
-      },
-      {
-        accessorKey: 'state',
-        header: 'State',
-        editVariant: 'select',
-        mantineEditSelectProps: {
-          data: usStates,
-          error: validationErrors?.state,
-        },
-      },
-    ],
-    [validationErrors],
+const ProductRegister: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const data = useAppSelector((state) => state.product.productList);
+  const [filter, setFilter] = useState<string>('');
+  const [sortColumn, setSortColumn] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [rowsPerPage] = useState<number>(10);
+  const [open, setOpen] = React.useState(false);
+  const [imageFile, setImageFile] = useState<File>();
+  const [modalData, setModalData] = useState<ProductInterface>({
+    id: 0,
+    image_mode: "",
+    image_url: "",
+    name: "",
+    part_number: "",
+    ancient_time: "",
+    code: "",
+    price: 0
+  });
+  const [deleteOpen, setDeleteOpen] = useState(false);
+
+  useEffect(() => {
+    void dispatch(getProductList());
+  }, [dispatch]);
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+  
+  const handleImageSelect = (file: File)  => {
+    setImageFile(file);
+  }
+
+  const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFilter(event.target.value);
+  };
+
+  const handleSort = (column: string) => {
+    if (column === sortColumn) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  }
+
+  const handleAddRow = () => {
+    setModalData({
+      id: 0,
+      image_mode: "",
+      image_url: "",
+      name: "",
+      part_number: "",
+      ancient_time: "",
+      code: "",
+      price: 0
+    });
+    setOpen(true);
+  };
+
+  const handleEditRow = (id: number) => {
+    const selectedRow = data.filter((row) => row.id === id);
+    setModalData(selectedRow[0]);
+    setOpen(true);
+  };
+
+  const handleModalSubmit = () => {
+    if(modalData.id) {
+      axios
+        .put(`/api/product_register/${modalData.id}/`, modalData)
+        .then(res => {
+          handleClose();
+          void dispatch(getProductList());
+        })
+        .catch(err => {
+          console.log(err);
+        })
+    } else {
+      axios
+      .post("/api/product_register/", modalData)
+      .then(res => {
+        handleClose();
+        void dispatch(getProductList());
+      })
+      .catch(err => {
+        console.log(err);
+      })
+    }
+  };
+
+  const handleDeleteRow = (id: number) => {
+    axios
+      .delete(`/api/product_register/${id}/`)
+      .then(res => {
+        void dispatch(getProductList());
+      })
+      .catch(err => {
+        console.log(err);
+      })
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleCloseDelete = () => {
+    setDeleteOpen(false);
+  }
+
+  const handleOpenDelete = (id: number) => {
+    const selectedRow = data.filter((row) => row.id === id);
+    setModalData(selectedRow[0]);
+    setDeleteOpen(true);
+  }
+
+  const filteredData = useMemo(() => {
+    return data.filter(
+      (row) => row.name.toLowerCase().includes(filter.toLowerCase())
+    )
+  }, [data, filter]);
+
+  const sortedData = useMemo(() => {
+    return [...filteredData].sort((a, b) => {
+      if (sortColumn) {
+        const aValue = a[sortColumn];
+        const bValue = b[sortColumn];
+        if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+      }
+      return 0;
+    })
+  }, [filteredData, sortDirection, sortColumn]);
+
+  const currentRows = useMemo(() => {
+    const indexOfLastRow = currentPage * rowsPerPage;
+    const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+    return sortedData.slice(indexOfFirstRow, indexOfLastRow)
+  }, [currentPage, rowsPerPage, sortedData]);
+  const totalPages = useMemo(() => { 
+    return Math.ceil(sortedData.length / rowsPerPage);
+  }, [sortedData, rowsPerPage]);
+
+  const ModalSection = (
+    <Dialog open={open}>
+      <DialogTitle textAlign="center">Create New Product</DialogTitle>
+      <DialogContent>
+        <form onSubmit={(e) => e.preventDefault()}>
+          <Stack
+            sx={{
+              width: '100%',
+              minWidth: { xs: '300px', sm: '360px', md: '400px' },
+              gap: '1.5rem',
+              paddingTop: '1rem'
+            }}
+          >
+            {modalData.id !== 0 &&
+              <TextField
+                key="id"
+                label="ID"
+                name="id"
+                value={modalData.id}
+                onChange={(e) =>
+                  setModalData({ ...modalData, [e.target.name]: e.target.value })
+                }
+                disabled
+              />
+            }
+            <ImageInput onImageSelect={handleImageSelect} />
+            <TextField
+              key="image_mode"
+              label="絵型"
+              name="image_mode"
+              value={modalData.image_mode}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setModalData({ ...modalData, [e.target.name]: e.target.value })
+              }
+            />
+            <TextField
+              key="code"
+              label="商品コード"
+              name="code"
+              value={modalData.code}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setModalData({ ...modalData, [e.target.name]: e.target.value })
+              }
+            />
+            <TextField
+              key="part_number"
+              label="仮品番"
+              name="part_number"
+              value={modalData.part_number}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setModalData({ ...modalData, [e.target.name]: e.target.value })
+              }
+            />
+            <TextField
+              key="name"
+              label="商品名"
+              name="name"
+              value={modalData.name}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setModalData({ ...modalData, [e.target.name]: e.target.value })
+              }
+            />
+            <TextField
+              key="ancient_time"
+              label="上代"
+              name="ancient_time"
+              defaultValue={modalData.ancient_time}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setModalData({ ...modalData, [e.target.name]: e.target.value })
+              }
+            />
+            <TextField
+              key="price"
+              label="原価"
+              name="price"
+              type='number'
+              defaultValue={modalData.price}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setModalData({ ...modalData, [e.target.name]: e.target.value })
+              }
+            />
+          </Stack>
+        </form>
+      </DialogContent>
+      <DialogActions sx={{ p: '1.25rem' }}>
+        <Button onClick={handleClose}>Cancel</Button>
+        <Button color="secondary" onClick={handleModalSubmit} variant="contained">
+          {modalData.id === 0 ? "Create" : "Update"}
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 
-  //call CREATE hook
-  const { mutateAsync: createUser, isLoading: isCreatingUser } =
-    useCreateUser();
-  //call READ hook
-  const {
-    data: fetchedUsers = [],
-    isError: isLoadingUsersError,
-    isFetching: isFetchingUsers,
-    isLoading: isLoadingUsers,
-  } = useGetUsers();
-  //call UPDATE hook
-  const { mutateAsync: updateUser, isLoading: isUpdatingUser } =
-    useUpdateUser();
-  //call DELETE hook
-  const { mutateAsync: deleteUser, isLoading: isDeletingUser } =
-    useDeleteUser();
+  const DeleteModal = (
+    <Dialog open={deleteOpen}>
+      <DialogTitle textAlign="center">Delete Product</DialogTitle>
+      <DialogContent>
+        Delete Row {modalData.id}
+      </DialogContent>
+      <DialogActions sx={{ p: '1.25rem' }}>
+        <Button onClick={handleCloseDelete}>Cancel</Button>
+        <Button color="secondary" onClick={() => handleDeleteRow(modalData.id)} variant="contained">
+          Delete
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
 
-  //CREATE action
-  const handleCreateUser: MRT_TableOptions<User>['onCreatingRowSave'] = async ({
-    values,
-    exitCreatingMode,
-  }) => {
-    const newValidationErrors = validateUser(values);
-    if (Object.values(newValidationErrors).some((error) => error)) {
-      setValidationErrors(newValidationErrors);
-      return;
-    }
-    setValidationErrors({});
-    await createUser(values);
-    exitCreatingMode();
-  };
+  return (
+    <div className='product_register'>
+      <div className="toolbar">
+        <div>
+          <button className='product_add' onClick={handleAddRow}>Add Row</button>
+          { ModalSection }
+          { DeleteModal }
+        </div>
+        <input className='filter_input' type="text" value={filter} onChange={handleFilterChange} placeholder="Filter" />
+      </div>
 
-  //UPDATE action
-  const handleSaveUser: MRT_TableOptions<User>['onEditingRowSave'] = async ({
-    values,
-    exitEditingMode,
-  }) => {
-    const newValidationErrors = validateUser(values);
-    if (Object.values(newValidationErrors).some((error) => error)) {
-      setValidationErrors(newValidationErrors);
-      return;
-    }
-    setValidationErrors({});
-    await updateUser(values);
-    exitEditingMode();
-  };
+      <div className="table-wrap">
+        <table className='styled-table'>
+          <thead>
+            <tr>
+              <th className='id' onClick={() => handleSort('id')}>ID</th>
+              <th className='image_url' >商品画像</th>
+              <th className='image_mode' onClick={() => handleSort('image_mode')}>
+                絵型
+                {sortColumn === "image_mode" &&
+                  (sortDirection === "asc"
+                    ? <img className='sort-icon' src={upArrow} />
+                    : <img className='sort-icon' src={downArrow} />
+                  )
+                }
+              </th>
+              <th onClick={() => handleSort('code')}>
+                商品コード
+                {sortColumn === "code" &&
+                  (sortDirection === "asc"
+                    ? <img className='sort-icon' src={upArrow} />
+                    : <img className='sort-icon' src={downArrow} />
+                  )
+                }
+              </th>
+              <th onClick={() => handleSort('part_number')}>
+                仮品番
+                {sortColumn === "part_number" &&
+                  (sortDirection === "asc"
+                    ? <img className='sort-icon' src={upArrow} />
+                    : <img className='sort-icon' src={downArrow} />
+                  )
+                }
+              </th>
+              <th onClick={() => handleSort('name')}>
+                商品名
+                {sortColumn === "name" &&
+                  (sortDirection === "asc"
+                    ? <img className='sort-icon' src={upArrow} />
+                    : <img className='sort-icon' src={downArrow} />
+                  )
+                }
+              </th>
+              <th onClick={() => handleSort('ancient_time')}>
+                上代
+                {sortColumn === "ancient_time" &&
+                  (sortDirection === "asc"
+                    ? <img className='sort-icon' src={upArrow} />
+                    : <img className='sort-icon' src={downArrow} />
+                  )
+                }
+              </th>
+              <th onClick={() => handleSort('price')}>
+                原価
+                {sortColumn === "price" &&
+                  (sortDirection === "asc"
+                    ? <img className='sort-icon' src={upArrow} />
+                    : <img className='sort-icon' src={downArrow} />
+                  )
+                }
+              </th>
+              <th className='row_action'></th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentRows.map((row) => (
+              <tr key={row.id}>
+                <td>{row.id}</td>
+                <td>{row.image_url}</td>
+                <td>{row.image_mode}</td>
+                <td>{row.code}</td>
+                <td>{row.part_number}</td>
+                <td>{row.name}</td>
+                <td>{row.ancient_time}</td>
+                <td>{row.price}</td>
+                <td className='row_action'>
+                  <button className='edit_button' onClick={() => handleEditRow(row.id)}>
+                    Edit
+                  </button>
+                  <button className='delete_button' onClick={() => handleOpenDelete(row.id)}>Delete</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-  //DELETE action
-  const openDeleteConfirmModal = (row: MRT_Row<User>) =>
-    modals.openConfirmModal({
-      title: 'Are you sure you want to delete this user?',
-      children: (
-        <Text>
-          Are you sure you want to delete {row.original.firstName}{' '}
-          {row.original.lastName}? This action cannot be undone.
-        </Text>
-      ),
-      labels: { confirm: 'Delete', cancel: 'Cancel' },
-      confirmProps: { color: 'red' },
-      onConfirm: () => deleteUser(row.original.id),
-    });
-
-  const table = useMantineReactTable({
-    columns,
-    data: fetchedUsers,
-    createDisplayMode: 'modal', //default ('row', and 'custom' are also available)
-    editDisplayMode: 'modal', //default ('row', 'cell', 'table', and 'custom' are also available)
-    enableEditing: true,
-    getRowId: (row) => row.id,
-    mantineToolbarAlertBannerProps: isLoadingUsersError
-      ? {
-          color: 'red',
-          children: 'Error loading data',
-        }
-      : undefined,
-    mantineTableContainerProps: {
-      sx: {
-        minHeight: '500px',
-      },
-    },
-    onCreatingRowCancel: () => setValidationErrors({}),
-    onCreatingRowSave: handleCreateUser,
-    onEditingRowCancel: () => setValidationErrors({}),
-    onEditingRowSave: handleSaveUser,
-    renderCreateRowModalContent: ({ table, row, internalEditComponents }) => (
-      <Stack>
-        <Title order={3}>Create New User</Title>
-        {internalEditComponents}
-        <Flex justify="flex-end" mt="xl">
-          <MRT_EditActionButtons variant="text" table={table} row={row} />
-        </Flex>
-      </Stack>
-    ),
-    renderEditRowModalContent: ({ table, row, internalEditComponents }) => (
-      <Stack>
-        <Title order={3}>Edit User</Title>
-        {internalEditComponents}
-        <Flex justify="flex-end" mt="xl">
-          <MRT_EditActionButtons variant="text" table={table} row={row} />
-        </Flex>
-      </Stack>
-    ),
-    renderRowActions: ({ row, table }) => (
-      <Flex gap="md">
-        <Tooltip label="Edit">
-          <ActionIcon onClick={() => table.setEditingRow(row)}>
-            <IconEdit />
-          </ActionIcon>
-        </Tooltip>
-        <Tooltip label="Delete">
-          <ActionIcon color="red" onClick={() => openDeleteConfirmModal(row)}>
-            <IconTrash />
-          </ActionIcon>
-        </Tooltip>
-      </Flex>
-    ),
-    renderTopToolbarCustomActions: ({ table }) => (
-      <Button
-        onClick={() => {
-          table.setCreatingRow(true); //simplest way to open the create row modal with no default values
-          //or you can pass in a row object to set default values with the `createRow` helper function
-          // table.setCreatingRow(
-          //   createRow(table, {
-          //     //optionally pass in default values for the new row, useful for nested data or other complex scenarios
-          //   }),
-          // );
-        }}
-      >
-        Create New User
-      </Button>
-    ),
-    state: {
-      isLoading: isLoadingUsers,
-      isSaving: isCreatingUser || isUpdatingUser || isDeletingUser,
-      showAlertBanner: isLoadingUsersError,
-      showProgressBars: isFetchingUsers,
-    },
-  });
-
-  return <MantineReactTable table={table} />;
+      <div>
+        {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
+          <button key={page} onClick={() => handlePageChange(page)}>
+            {page}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
 };
 
-//CREATE hook (post new user to api)
-function useCreateUser() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (user: User) => {
-      //send api update request here
-      await new Promise((resolve) => setTimeout(resolve, 1000)); //fake api call
-      return Promise.resolve();
-    },
-    //client side optimistic update
-    onMutate: (newUserInfo: User) => {
-      queryClient.setQueryData(
-        ['users'],
-        (prevUsers: any) =>
-          [
-            ...prevUsers,
-            {
-              ...newUserInfo,
-              id: (Math.random() + 1).toString(36).substring(7),
-            },
-          ] as User[],
-      );
-    },
-    // onSettled: () => queryClient.invalidateQueries({ queryKey: ['users'] }), //refetch users after mutation, disabled for demo
-  });
-}
-
-//READ hook (get users from api)
-function useGetUsers() {
-  return useQuery<User[]>({
-    queryKey: ['users'],
-    queryFn: async () => {
-      //send api request here
-      await new Promise((resolve) => setTimeout(resolve, 1000)); //fake api call
-      return Promise.resolve(fakeData);
-    },
-    refetchOnWindowFocus: false,
-  });
-}
-
-//UPDATE hook (put user in api)
-function useUpdateUser() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (user: User) => {
-      //send api update request here
-      await new Promise((resolve) => setTimeout(resolve, 1000)); //fake api call
-      return Promise.resolve();
-    },
-    //client side optimistic update
-    onMutate: (newUserInfo: User) => {
-      queryClient.setQueryData(
-        ['users'],
-        (prevUsers: any) =>
-          prevUsers?.map((prevUser: User) =>
-            prevUser.id === newUserInfo.id ? newUserInfo : prevUser,
-          ),
-      );
-    },
-    // onSettled: () => queryClient.invalidateQueries({ queryKey: ['users'] }), //refetch users after mutation, disabled for demo
-  });
-}
-
-//DELETE hook (delete user in api)
-function useDeleteUser() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (userId: string) => {
-      //send api update request here
-      await new Promise((resolve) => setTimeout(resolve, 1000)); //fake api call
-      return Promise.resolve();
-    },
-    //client side optimistic update
-    onMutate: (userId: string) => {
-      queryClient.setQueryData(
-        ['users'],
-        (prevUsers: any) =>
-          prevUsers?.filter((user: User) => user.id !== userId),
-      );
-    },
-    // onSettled: () => queryClient.invalidateQueries({ queryKey: ['users'] }), //refetch users after mutation, disabled for demo
-  });
-}
-
-const queryClient = new QueryClient();
-
-const ExampleWithProviders = () => (
-  //Put this with your other react-query providers near root of your app
-  <QueryClientProvider client={queryClient}>
-    <ModalsProvider>
-      <Example />
-    </ModalsProvider>
-  </QueryClientProvider>
-);
-
-export default ExampleWithProviders;
-
-const validateRequired = (value: string) => !!value.length;
-const validateEmail = (email: string) =>
-  !!email.length &&
-  email
-    .toLowerCase()
-    .match(
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-    );
-
-function validateUser(user: User) {
-  return {
-    firstName: !validateRequired(user.firstName)
-      ? 'First Name is Required'
-      : '',
-    lastName: !validateRequired(user.lastName) ? 'Last Name is Required' : '',
-    email: !validateEmail(user.email) ? 'Incorrect Email Format' : '',
-  };
-}
+export default ProductRegister;
