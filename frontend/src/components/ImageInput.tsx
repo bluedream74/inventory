@@ -19,8 +19,8 @@ const ImageInput: React.FC<ImageInputProps> = ({ onImageSelect }) => {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    setSelectedImage(file || null);
-    if (file && onImageSelect) {
+    if(file) {
+      setSelectedImage(file);
       onImageSelect(file);
     }
   };
@@ -31,8 +31,14 @@ const ImageInput: React.FC<ImageInputProps> = ({ onImageSelect }) => {
     }
   };
 
+  const removeSelectedImage = () => {
+    if(inputRef.current) inputRef.current.value = '';
+    setSelectedImage(null); 
+    setImageUrl(""); 
+  }
+
   return (
-    <div>
+    <div className='img-wrap'>
       <input
         type="file"
         accept="image/*"
@@ -40,14 +46,17 @@ const ImageInput: React.FC<ImageInputProps> = ({ onImageSelect }) => {
         ref={inputRef}
         onChange={handleFileChange}
       />
-      <Button variant="contained" color="primary" onClick={handleButtonClick}>
-        Select Image
-      </Button>
-      {imageUrl && selectedImage && (
-        <Box mt={2} textAlign="center">
-          <img src={imageUrl} alt={selectedImage.name} height="100px" />
-        </Box>
-      )}
+      <div className='image_select_wrap'>
+        {imageUrl !== "" &&
+          <img className='show_img'  src={imageUrl} alt="" />
+        }
+        {imageUrl !== "" && selectedImage &&
+          <button className='close_btn' onClick={removeSelectedImage}></button>
+        }
+        {imageUrl === "" &&
+          <button className='select_btn' onClick={handleButtonClick}></button>
+        }
+      </div>
     </div>
   );
 };

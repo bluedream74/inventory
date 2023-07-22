@@ -14,6 +14,8 @@ import downArrow from '../../assets/downArrow.svg';
 import upArrow from '../../assets/upArrow.svg';
 import ImageInput from '../../components/ImageInput';
 import axios from 'axios';
+import cookie from "react-cookies";
+import { LocalConvenienceStoreOutlined } from '@mui/icons-material';
 
 export interface ProductInterface {
   id: number;
@@ -46,17 +48,18 @@ const ProductRegister: React.FC = () => {
     code: "",
     price: 0
   });
+
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   useEffect(() => {
-    void dispatch(getProductList());
+    // void dispatch(getProductList());
   }, [dispatch]);
 
   const handleClose = () => {
     setOpen(false);
   };
-  
-  const handleImageSelect = (file: File)  => {
+
+  const handleImageSelect = (file: File) => {
     setImageFile(file);
   }
 
@@ -74,6 +77,14 @@ const ProductRegister: React.FC = () => {
   }
 
   const handleAddRow = () => {
+    axios
+      .post(`/api/product_register/`, {name: "dasf"})
+      .then(res => {
+        console.log(res);
+      })
+      .catch(err => {
+        console.log(err);
+      });
     setModalData({
       id: 0,
       image_mode: "",
@@ -93,8 +104,23 @@ const ProductRegister: React.FC = () => {
     setOpen(true);
   };
 
+  //   function getCookie(name) {
+  //     var cookieValue = null;
+  //     if (document.cookie && document.cookie !== '') {
+  //         var cookies = document.cookie.split(';');
+  //         for (var i = 0; i < cookies.length; i++) {
+  //             var cookie = jQuery.trim(cookies[i]);
+  //             if (cookie.substring(0, name.length + 1) === (name + '=')) {
+  //                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+  //                 break;
+  //             }
+  //         }
+  //     }
+  //     return cookieValue;
+  // }
+
   const handleModalSubmit = () => {
-    if(modalData.id) {
+    if (modalData.id) {
       axios
         .put(`/api/product_register/${modalData.id}/`, modalData)
         .then(res => {
@@ -105,27 +131,49 @@ const ProductRegister: React.FC = () => {
           console.log(err);
         })
     } else {
+      const formData = new FormData();
+      Object.keys(modalData).forEach((key) => {
+        formData.append(key, modalData[key]);
+      });
       axios
-      .post("/api/product_register/", modalData)
-      .then(res => {
-        handleClose();
-        void dispatch(getProductList());
-      })
-      .catch(err => {
-        console.log(err);
-      })
+        .post("/api/product_register/", formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'X-CSRFToken': "{% csrf_token %}"
+          },
+        })
+        .then(res => {
+          handleClose();
+          void dispatch(getProductList());
+        })
+        .catch(err => {
+          console.log(err);
+        })
     }
   };
 
   const handleDeleteRow = (id: number) => {
     axios
-      .delete(`/api/product_register/${id}/`)
+      .post(`/api/product_register/`, {name: "dasf"})
       .then(res => {
-        void dispatch(getProductList());
+        console.log(res);
       })
       .catch(err => {
         console.log(err);
       })
+    // const config = {
+    //   headers: {
+    //     'content-type': 'application/json',
+    //   }
+    // }
+    // axios
+    //   .delete(`/api/product_register/${id}/`, config)
+    //   .then(res => {
+    //     void dispatch(getProductList());
+    //   })
+    //   .catch(err => {
+    //     console.log(err);
+    //   })
   };
 
   const handlePageChange = (page: number) => {
@@ -165,7 +213,7 @@ const ProductRegister: React.FC = () => {
     const indexOfFirstRow = indexOfLastRow - rowsPerPage;
     return sortedData.slice(indexOfFirstRow, indexOfLastRow)
   }, [currentPage, rowsPerPage, sortedData]);
-  const totalPages = useMemo(() => { 
+  const totalPages = useMemo(() => {
     return Math.ceil(sortedData.length / rowsPerPage);
   }, [sortedData, rowsPerPage]);
 
@@ -282,8 +330,8 @@ const ProductRegister: React.FC = () => {
       <div className="toolbar">
         <div>
           <button className='product_add' onClick={handleAddRow}>Add Row</button>
-          { ModalSection }
-          { DeleteModal }
+          {ModalSection}
+          {DeleteModal}
         </div>
         <input className='filter_input' type="text" value={filter} onChange={handleFilterChange} placeholder="Filter" />
       </div>
@@ -355,7 +403,9 @@ const ProductRegister: React.FC = () => {
             {currentRows.map((row) => (
               <tr key={row.id}>
                 <td>{row.id}</td>
-                <td>{row.image_url}</td>
+                <td>
+                  <img src={row.image_url} width="150" alt="" />
+                </td>
                 <td>{row.image_mode}</td>
                 <td>{row.code}</td>
                 <td>{row.part_number}</td>
