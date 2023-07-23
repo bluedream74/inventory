@@ -1,14 +1,14 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Button, Box } from '@mui/material';
 
 interface ImageInputProps {
+  originImageUrl?: string;
   onImageSelect: (file: File) => void;
 }
 
-const ImageInput: React.FC<ImageInputProps> = ({ onImageSelect }) => {
+const ImageInput: React.FC<ImageInputProps> = ({ originImageUrl, onImageSelect }) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imageUrl, setImageUrl] = useState<string>("");
+  const [imageUrl, setImageUrl] = useState<string>(originImageUrl ?? "");
 
   useEffect(() => {
     if (selectedImage) {
@@ -50,7 +50,7 @@ const ImageInput: React.FC<ImageInputProps> = ({ onImageSelect }) => {
         {imageUrl !== "" &&
           <img className='show_img'  src={imageUrl} alt="" />
         }
-        {imageUrl !== "" && selectedImage &&
+        {imageUrl !== "" &&
           <button className='close_btn' onClick={removeSelectedImage}></button>
         }
         {imageUrl === "" &&

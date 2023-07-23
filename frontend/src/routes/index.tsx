@@ -1,10 +1,19 @@
 import { RouterProvider, createBrowserRouter, Navigate } from "react-router-dom";
 import { useAuth } from "../provider/authProvider";
 import { ProtectedRoute } from "./ProtectedRoute";
-import { Navigation } from "@mui/icons-material";
 import Login from '../pages/Auth/Login';
 import SignUp from "../pages/Auth/SIgnUp";
 import ProductRegister from "../pages/ProductRegister/ProductRegister";
+import ColorRegister from "../pages/ColorRegister/ColorRegister";
+import SizeRegister from "../pages/SizeRegister/SizeRegister";
+import SeasonRegister from "../pages/SeasonRegister/SeasonRegister";
+import BrandRegister from "../pages/BrandRegister/BrandRegister";
+import ItemRegister from "../pages/ItemRegister/ItemRegister";
+import MaterialRegister from "../pages/MaterialRegister/MaterialRegister";
+import DeliveryRegister from "../pages/DeliveryRegister/DeliveryRegister";
+import ChargerRegister from "../pages/ChargerRegister/ChargerRegister";
+import DealerRegister from "../pages/DealerRegister/DealerRegister";
+import ExhibitionRegister from "../pages/ExhibitionRegister/ExhibitionRegister";
 
 const Routes = () => {
 	const { token } = useAuth();
@@ -46,7 +55,47 @@ const Routes = () => {
 				{
 					path: "/product_register",
 					element: <ProductRegister />
-				}
+				},
+				{
+					path: "/color_register",
+					element: <ColorRegister />
+				},
+				{
+					path: "/size_register",
+					element: <SizeRegister />
+				},
+				{
+					path: "/season_register",
+					element: <SeasonRegister />
+				},
+				{
+					path: "/brand_register",
+					element: <BrandRegister />
+				},
+				{
+					path: "/item_register",
+					element: <ItemRegister />
+				},
+				{
+					path: "/material_register",
+					element: <MaterialRegister />
+				},
+				{
+					path: "/delivery_register",
+					element: <DeliveryRegister />
+				},
+				{
+					path: "/charger_register",
+					element: <ChargerRegister />
+				},
+				{
+					path: "/dealer_register",
+					element: <DealerRegister />
+				},
+				{
+					path: "/exhibition_register",
+					element: <ExhibitionRegister />
+				},
 			],
 		},
 	];

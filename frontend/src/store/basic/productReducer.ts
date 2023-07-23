@@ -1,7 +1,7 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RootState, AppThunk } from "./index";
-import axios, { AxiosResponse } from 'axios';
-import { ProductInterface } from "../pages/ProductRegister/ProductRegister";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { AxiosResponse } from 'axios';
+import { ProductInterface } from "../../pages/ProductRegister/ProductRegister";
+import axiosApi from "../../utilities/axios";
 
 export interface ProductStateType {
   productList: ProductInterface[],
@@ -16,7 +16,7 @@ const initialState: ProductStateType = {
 export const getProductList = createAsyncThunk<ProductInterface[]>(
   "product/getProductList",
   async () => {
-    const response: AxiosResponse<ProductInterface[]> = await axios.get("/api/product_register");
+    const response: AxiosResponse<ProductInterface[]> = await axiosApi.get("basic/product/");
     return response.data;
   }
 )

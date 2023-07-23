@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import './ProductRegister.scss';
+import './BrandRegister.scss';
 import React, { useState, useEffect, useMemo } from 'react';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -9,57 +9,43 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { getProductList } from '../../store/basic/productReducer';
+import { getBrandList } from '../../store/basic/brandReducer';
 import downArrow from '../../assets/downArrow.svg';
 import upArrow from '../../assets/upArrow.svg';
-import ImageInput from '../../components/ImageInput';
 import axiosApi from '../../utilities/axios';
 
-export interface ProductInterface {
+export interface BrandInterface {
   id: number;
-  image_url: string;
-  image_mode: string;
   code: string;
-  part_number: string;
   name: string;
-  ancient_time: string;
-  price: number;
+  name_export: string;
 }
 
-const ProductRegister: React.FC = () => {
+const BrandRegister: React.FC = () => {
   const dispatch = useAppDispatch();
-  const data = useAppSelector((state) => state.product.productList);
+  const data = useAppSelector((state) => state.brand.brandList);
   const [filter, setFilter] = useState<string>('');
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [rowsPerPage] = useState<number>(10);
   const [open, setOpen] = React.useState(false);
-  const [imageFile, setImageFile] = useState<File>();
-  const [modalData, setModalData] = useState<ProductInterface>({
+  const [modalData, setModalData] = useState<BrandInterface>({
     id: 0,
-    image_mode: "",
-    image_url: "",
     name: "",
-    part_number: "",
-    ancient_time: "",
     code: "",
-    price: 0
+    name_export: ""
   });
 
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   useEffect(() => {
-    void dispatch(getProductList());
+    void dispatch(getBrandList());
   }, [dispatch]);
 
   const handleClose = () => {
     setOpen(false);
   };
-
-  const handleImageSelect = (file: File) => {
-    setImageFile(file);
-  }
 
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFilter(event.target.value);
@@ -77,13 +63,9 @@ const ProductRegister: React.FC = () => {
   const handleAddRow = () => {
     setModalData({
       id: 0,
-      image_mode: "",
-      image_url: "",
       name: "",
-      part_number: "",
-      ancient_time: "",
       code: "",
-      price: 0
+      name_export: ""
     });
     setOpen(true);
   };
@@ -96,40 +78,21 @@ const ProductRegister: React.FC = () => {
 
   const handleModalSubmit = () => {
     if (modalData.id) {
-      const formData = new FormData();
-      Object.keys(modalData).forEach((key) => {
-        formData.append(key, modalData[key]);
-      });
-      if(imageFile) formData.set('image_url', imageFile);
       axiosApi
-        .put(`basic/product/${modalData.id}`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        })
+        .put(`basic/brand/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
-          void dispatch(getProductList());
+          void dispatch(getBrandList());
         })
         .catch(err => {
           console.log(err);
         })
     } else {
-      const formData = new FormData();
-      Object.keys(modalData).forEach((key) => {
-        formData.append(key, modalData[key]);
-      });
-      if(imageFile) formData.set('image_url', imageFile);
-
       axiosApi
-        .post("basic/product/", formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        })
+        .post("basic/brand/", modalData)
         .then(res => {
           handleClose();
-          void dispatch(getProductList());
+          void dispatch(getBrandList());
         })
         .catch(err => {
           console.log(err);
@@ -139,9 +102,9 @@ const ProductRegister: React.FC = () => {
 
   const handleDeleteRow = (id: number) => {
     axiosApi
-      .delete(`basic/product/${id}`)
+      .delete(`basic/brand/${id}`)
       .then(res => {
-        void dispatch(getProductList());
+        void dispatch(getBrandList());
         handleCloseDelete();
       })
       .catch(err => {
@@ -192,7 +155,7 @@ const ProductRegister: React.FC = () => {
 
   const ModalSection = (
     <Dialog open={open}>
-      <DialogTitle textAlign="center">書品追加</DialogTitle>
+      <DialogTitle textAlign="center">ブランド追加</DialogTitle>
       <DialogContent>
         <form onSubmit={(e) => e.preventDefault()}>
           <Stack
@@ -215,19 +178,9 @@ const ProductRegister: React.FC = () => {
                 disabled
               />
             }
-            <ImageInput onImageSelect={handleImageSelect} originImageUrl={modalData.image_url} />
-            <TextField
-              key="image_mode"
-              label="絵型"
-              name="image_mode"
-              value={modalData.image_mode}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setModalData({ ...modalData, [e.target.name]: e.target.value })
-              }
-            />
             <TextField
               key="code"
-              label="商品コード"
+              label="ブランドコード"
               name="code"
               value={modalData.code}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -235,17 +188,8 @@ const ProductRegister: React.FC = () => {
               }
             />
             <TextField
-              key="part_number"
-              label="仮品番"
-              name="part_number"
-              value={modalData.part_number}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setModalData({ ...modalData, [e.target.name]: e.target.value })
-              }
-            />
-            <TextField
               key="name"
-              label="商品名"
+              label="ブランド名"
               name="name"
               value={modalData.name}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -253,20 +197,10 @@ const ProductRegister: React.FC = () => {
               }
             />
             <TextField
-              key="ancient_time"
-              label="上代"
-              name="ancient_time"
-              defaultValue={modalData.ancient_time}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setModalData({ ...modalData, [e.target.name]: e.target.value })
-              }
-            />
-            <TextField
-              key="price"
-              label="原価"
-              name="price"
-              type='number'
-              defaultValue={modalData.price}
+              key="name_export"
+              label="ブランド名(輸出用)"
+              name="name_export"
+              value={modalData.name_export}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setModalData({ ...modalData, [e.target.name]: e.target.value })
               }
@@ -285,7 +219,7 @@ const ProductRegister: React.FC = () => {
 
   const DeleteModal = (
     <Dialog open={deleteOpen}>
-      <DialogTitle textAlign="center">書品削除</DialogTitle>
+      <DialogTitle textAlign="center">ブランド削除</DialogTitle>
       <DialogContent>
         削除しましょか？
       </DialogContent>
@@ -299,10 +233,10 @@ const ProductRegister: React.FC = () => {
   );
 
   return (
-    <div className='product_register'>
+    <div className='brand_register'>
       <div className="toolbar">
         <div>
-          <button className='product_add' onClick={handleAddRow}>書品追加</button>
+          <button className='brand_add' onClick={handleAddRow}>ブランド追加</button>
           {ModalSection}
           {DeleteModal}
         </div>
@@ -313,11 +247,9 @@ const ProductRegister: React.FC = () => {
         <table className='styled-table'>
           <thead>
             <tr>
-              <th className='id' onClick={() => handleSort('id')}>ID</th>
-              <th className='image_url' >商品画像</th>
-              <th className='image_mode' onClick={() => handleSort('image_mode')}>
-                絵型
-                {sortColumn === "image_mode" &&
+              <th className='id' onClick={() => handleSort('id')}>
+                ID
+                {sortColumn === "id" &&
                   (sortDirection === "asc"
                     ? <img className='sort-icon' src={upArrow} />
                     : <img className='sort-icon' src={downArrow} />
@@ -325,7 +257,7 @@ const ProductRegister: React.FC = () => {
                 }
               </th>
               <th onClick={() => handleSort('code')}>
-                商品コード
+                ブランドコード
                 {sortColumn === "code" &&
                   (sortDirection === "asc"
                     ? <img className='sort-icon' src={upArrow} />
@@ -333,17 +265,8 @@ const ProductRegister: React.FC = () => {
                   )
                 }
               </th>
-              <th onClick={() => handleSort('part_number')}>
-                仮品番
-                {sortColumn === "part_number" &&
-                  (sortDirection === "asc"
-                    ? <img className='sort-icon' src={upArrow} />
-                    : <img className='sort-icon' src={downArrow} />
-                  )
-                }
-              </th>
               <th onClick={() => handleSort('name')}>
-                商品名
+                ブランド名
                 {sortColumn === "name" &&
                   (sortDirection === "asc"
                     ? <img className='sort-icon' src={upArrow} />
@@ -351,18 +274,9 @@ const ProductRegister: React.FC = () => {
                   )
                 }
               </th>
-              <th onClick={() => handleSort('ancient_time')}>
-                上代
-                {sortColumn === "ancient_time" &&
-                  (sortDirection === "asc"
-                    ? <img className='sort-icon' src={upArrow} />
-                    : <img className='sort-icon' src={downArrow} />
-                  )
-                }
-              </th>
-              <th onClick={() => handleSort('price')}>
-                原価
-                {sortColumn === "price" &&
+              <th onClick={() => handleSort('name_export')}>
+                ブランド名(輸出用)
+                {sortColumn === "name_export" &&
                   (sortDirection === "asc"
                     ? <img className='sort-icon' src={upArrow} />
                     : <img className='sort-icon' src={downArrow} />
@@ -376,15 +290,9 @@ const ProductRegister: React.FC = () => {
             {currentRows.map((row) => (
               <tr key={row.id}>
                 <td>{row.id}</td>
-                <td>
-                  <img src={row.image_url} width="150" alt="" />
-                </td>
-                <td>{row.image_mode}</td>
                 <td>{row.code}</td>
-                <td>{row.part_number}</td>
                 <td>{row.name}</td>
-                <td>{row.ancient_time}</td>
-                <td>{row.price}</td>
+                <td>{row.name_export}</td>
                 <td className='row_action'>
                   <button className='edit_button' onClick={() => handleEditRow(row.id)}>
                     編集
@@ -408,4 +316,4 @@ const ProductRegister: React.FC = () => {
   );
 };
 
-export default ProductRegister;
+export default BrandRegister;

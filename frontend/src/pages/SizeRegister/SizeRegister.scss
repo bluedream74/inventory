@@ -1,4 +1,4 @@
-.product_register {
+.size_register {
   height: 100%;
   min-height: 100vh;
   .toolbar {
@@ -12,7 +12,9 @@
 
 .table-wrap {
   overflow-x:auto;
-  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: max-content;
   height: calc(100vh - 130px);
 }
 
@@ -45,15 +47,12 @@
   tbody {
     tr {
       border-bottom: 1px solid #dddddd;
-
       &:nth-of-type(even) {
         background-color: #f3f3f3;
       }
-
       &:last-of-type {
         border-bottom: 2px solid #009879;
       }
-
       &.active-row {
         font-weight: bold;
         color: #009879;
@@ -69,7 +68,7 @@
   }
 }
 
-.product_add {
+.size_add {
   box-shadow: none;
   text-transform: none;
   font-size: 16px;
