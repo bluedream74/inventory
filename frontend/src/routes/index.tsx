@@ -14,6 +14,12 @@ import DeliveryRegister from "../pages/DeliveryRegister/DeliveryRegister";
 import ChargerRegister from "../pages/ChargerRegister/ChargerRegister";
 import DealerRegister from "../pages/DealerRegister/DealerRegister";
 import ExhibitionRegister from "../pages/ExhibitionRegister/ExhibitionRegister";
+import IncomingDepartmentRegister from "../pages/IncomingDepartmentRegister/IncomingDepartmentRegister";
+import OriginCountryRegister from "../pages/OriginCountry/OriginCountryRegister";
+import StorehouseRegister from "../pages/StorehouseRegister/StorehouseRegister";
+import CustomerRegister from "../pages/CustomerRegister/CustomerRegister";
+import DeposittypeRegister from "../pages/DeposittypeRegister/DeposittypeRegister";
+import OrderSlip from "../pages/OrderSlip/OrderSlip";
 
 const Routes = () => {
 	const { token } = useAuth();
@@ -96,6 +102,30 @@ const Routes = () => {
 					path: "/exhibition_register",
 					element: <ExhibitionRegister />
 				},
+				{
+					path: "/incoming_department_register",
+					element: <IncomingDepartmentRegister />
+				},
+				{
+					path: "/origin_country_register",
+					element: <OriginCountryRegister />
+				},
+				{
+					path: "/storehouse_register",
+					element: <StorehouseRegister />
+				},
+				{
+					path: "/customer_register",
+					element: <CustomerRegister />
+				},
+				{
+					path: "/deposittype_register",
+					element: <DeposittypeRegister />
+				},
+				{
+					path: "/order_slip",
+					element: <OrderSlip />
+				}
 			],
 		},
 	];

@@ -92,7 +92,7 @@ class Dealer(models.Model):
 class IncomingDepartment(models.Model):
     name = models.CharField(max_length=30)
     code = models.CharField(max_length=30)
-    due_data = models.CharField(max_length=30)
+    due_date = models.CharField(max_length=30)
     phone = models.CharField(max_length=20)
     address = models.CharField(max_length=100)
 
@@ -102,6 +102,31 @@ class IncomingDepartment(models.Model):
 class OriginCountry(models.Model):
     name = models.CharField(max_length=50)
     code = models.CharField(max_length=50)
+
+    def __str__(self) -> str:
+        return self.name
+    
+class Storehouse(models.Model):
+    code = models.CharField(max_length=30)
+    name = models.CharField(max_length=30)
+    phone = models.CharField(max_length=20)
+    address = models.CharField(max_length=100)
+
+    def __str__(self) -> str:
+        return self.name
+    
+class Customer(models.Model):
+    code = models.CharField(max_length=30)
+    name = models.CharField(max_length=30)
+    phone = models.CharField(max_length=20)
+    address = models.CharField(max_length=100)
+
+    def __str__(self) -> str:
+        return self.name
+
+class Deposittype(models.Model):
+    code = models.CharField(max_length=30)
+    name = models.CharField(max_length=30)
 
     def __str__(self) -> str:
         return self.name

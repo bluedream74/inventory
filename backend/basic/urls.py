@@ -1,5 +1,6 @@
 from .views import ColorView, ColorItemView, ProductView, SizeView, SeasonView, BrandView, ItemView, \
-MaterialView, DeliveryView, ChargerView, ExhibitionView, DealerView, IncomingDepartmentView, OriginCountryView
+MaterialView, DeliveryView, ChargerView, ExhibitionView, DealerView, IncomingDepartmentView, OriginCountryView, \
+StorehouseView, CustomerView, DeposittypeView
 from django.urls import path
 from rest_framework import routers
 
@@ -30,4 +31,10 @@ urlpatterns = [
     path('incoming_department/<int:pk>', IncomingDepartmentView.as_view({'get': 'retrieve', 'put': 'partial_update', 'delete': 'destroy'})),
     path('origin_country/', OriginCountryView.as_view({'get': 'list', 'post': 'create'})),
     path('origin_country/<int:pk>', OriginCountryView.as_view({'get': 'retrieve', 'put': 'partial_update', 'delete': 'destroy'})),
+    path('storehouse/', StorehouseView.as_view({'get': 'list', 'post': 'create'})),
+    path('storehouse/<int:pk>', StorehouseView.as_view({'get': 'retrieve', 'put': 'partial_update', 'delete': 'destroy'})),
+    path('customer/', CustomerView.as_view({'get': 'list', 'post': 'create'})),
+    path('customer/<int:pk>', CustomerView.as_view({'get': 'retrieve', 'put': 'partial_update', 'delete': 'destroy'})),
+    path('deposittype/', DeposittypeView.as_view({'get': 'list', 'post': 'create'})),
+    path('deposittype/<int:pk>', DeposittypeView.as_view({'get': 'retrieve', 'put': 'partial_update', 'delete': 'destroy'})),
 ]

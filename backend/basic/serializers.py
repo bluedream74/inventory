@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Product, Size, Color, Season, Brand, Item, Material, Delivery, Charger, Exhibition, \
-Dealer, IncomingDepartment, OriginCountry
+Dealer, IncomingDepartment, OriginCountry, Storehouse, Customer, Deposittype
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
@@ -75,3 +75,18 @@ class OriginCountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = OriginCountry
         fields = ('id', 'name', 'code')
+
+class StorehouseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Storehouse
+        fields = ('id', 'code', 'name', 'phone', 'address')
+
+class CustomerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Customer
+        fields = ('id', 'code', 'name', 'phone', 'address')
+
+class DeposittypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Deposittype
+        fields = ('id', 'code', 'name')

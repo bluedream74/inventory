@@ -2,10 +2,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status, viewsets
 from .models import Product, Size, Color, Season, Brand, Item, Material, Delivery, Charger, Exhibition, \
-Dealer, IncomingDepartment, OriginCountry
+Dealer, IncomingDepartment, OriginCountry, Storehouse, Customer, Deposittype
 from .serializers import ProductSerializer, ColorSerializer, SizeSerializer, SeasonSerializer, \
 BrandSerializer, ItemSerializer, MaterialSerializer, DeliverySerializer, ChargerSerializer, \
-ExhibitionSerializer, DealerSerializer, IncomingDepartmentSerializer, OriginCountrySerializer
+ExhibitionSerializer, DealerSerializer, IncomingDepartmentSerializer, OriginCountrySerializer, \
+StorehouseSerializer, CustomerSerializer, DeposittypeSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.shortcuts import get_object_or_404
 
@@ -124,3 +125,18 @@ class OriginCountryView(viewsets.ModelViewSet):
     permission_classes = (AllowAny, )
     serializer_class = OriginCountrySerializer
     queryset = OriginCountry.objects.all()
+
+class StorehouseView(viewsets.ModelViewSet):
+    permission_classes = (AllowAny, )
+    serializer_class = StorehouseSerializer
+    queryset = Storehouse.objects.all()
+
+class CustomerView(viewsets.ModelViewSet):
+    permission_classes = (AllowAny, )
+    serializer_class = CustomerSerializer
+    queryset = Customer.objects.all()
+
+class DeposittypeView(viewsets.ModelViewSet):
+    permission_classes = (AllowAny, )
+    serializer_class = DeposittypeSerializer
+    queryset = Deposittype.objects.all()

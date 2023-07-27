@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import './DealerRegister.scss';
+import './StorehouseRegister.scss';
 import React, { useState, useEffect, useMemo } from 'react';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -9,42 +9,40 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { getDealerList } from '../../store/basic/dealerReducer';
+import { getStorehouseList } from '../../store/basic/storehouseReducer';
 import downArrow from '../../assets/downArrow.svg';
 import upArrow from '../../assets/upArrow.svg';
 import axiosApi from '../../utilities/axios';
 
-export interface DealerInterface {
+export interface StorehouseInterface {
   id: number;
   code: string;
   name: string;
   phone: string;
   address: string;
-  due_date: string;
 }
 
-const DealerRegister: React.FC = () => {
+const StorehouseRegister: React.FC = () => {
   const dispatch = useAppDispatch();
-  const data = useAppSelector((state) => state.dealer.dealerList);
+  const data = useAppSelector((state) => state.storehouse.storehouseList);
   const [filter, setFilter] = useState<string>('');
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [rowsPerPage] = useState<number>(10);
   const [open, setOpen] = React.useState(false);
-  const [modalData, setModalData] = useState<DealerInterface>({
+  const [modalData, setModalData] = useState<StorehouseInterface>({
     id: 0,
     name: "",
     code: "",
     phone: "",
-    address: "",
-    due_date: ""
+    address: ""
   });
 
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   useEffect(() => {
-    void dispatch(getDealerList());
+    void dispatch(getStorehouseList());
   }, [dispatch]);
 
   const handleClose = () => {
@@ -70,8 +68,7 @@ const DealerRegister: React.FC = () => {
       name: "",
       code: "",
       phone: "",
-      address: "",
-      due_date: ""
+      address: ""
     });
     setOpen(true);
   };
@@ -85,20 +82,20 @@ const DealerRegister: React.FC = () => {
   const handleModalSubmit = () => {
     if (modalData.id) {
       axiosApi
-        .put(`basic/dealer/${modalData.id}`, modalData)
+        .put(`basic/storehouse/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
-          void dispatch(getDealerList());
+          void dispatch(getStorehouseList());
         })
         .catch(err => {
           console.log(err);
         })
     } else {
       axiosApi
-        .post("basic/dealer/", modalData)
+        .post("basic/storehouse/", modalData)
         .then(res => {
           handleClose();
-          void dispatch(getDealerList());
+          void dispatch(getStorehouseList());
         })
         .catch(err => {
           console.log(err);
@@ -108,9 +105,9 @@ const DealerRegister: React.FC = () => {
 
   const handleDeleteRow = (id: number) => {
     axiosApi
-      .delete(`basic/dealer/${id}`)
+      .delete(`basic/storehouse/${id}`)
       .then(res => {
-        void dispatch(getDealerList());
+        void dispatch(getStorehouseList());
         handleCloseDelete();
       })
       .catch(err => {
@@ -161,7 +158,7 @@ const DealerRegister: React.FC = () => {
 
   const ModalSection = (
     <Dialog open={open}>
-      <DialogTitle textAlign="center">得意先追加</DialogTitle>
+      <DialogTitle textAlign="center">店舗・倉庫追加</DialogTitle>
       <DialogContent>
         <form onSubmit={(e) => e.preventDefault()}>
           <Stack
@@ -186,7 +183,7 @@ const DealerRegister: React.FC = () => {
             }
             <TextField
               key="code"
-              label="得意先コード"
+              label="店舗・倉庫コード"
               name="code"
               value={modalData.code}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -195,18 +192,9 @@ const DealerRegister: React.FC = () => {
             />
             <TextField
               key="name"
-              label="得意先名"
+              label="店舗・倉庫名"
               name="name"
               value={modalData.name}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setModalData({ ...modalData, [e.target.name]: e.target.value })
-              }
-            />
-            <TextField
-              key="due_date"
-              label="締日"
-              name="due_date"
-              value={modalData.due_date}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setModalData({ ...modalData, [e.target.name]: e.target.value })
               }
@@ -243,7 +231,7 @@ const DealerRegister: React.FC = () => {
 
   const DeleteModal = (
     <Dialog open={deleteOpen}>
-      <DialogTitle textAlign="center">得意先削除</DialogTitle>
+      <DialogTitle textAlign="center">店舗・倉庫削除</DialogTitle>
       <DialogContent>
         削除しましょか？
       </DialogContent>
@@ -257,10 +245,10 @@ const DealerRegister: React.FC = () => {
   );
 
   return (
-    <div className='dealer_register'>
+    <div className='storehouse_register'>
       <div className="toolbar">
         <div>
-          <button className='dealer_add' onClick={handleAddRow}>得意先追加</button>
+          <button className='storehouse_add' onClick={handleAddRow}>店舗・倉庫追加</button>
           {ModalSection}
           {DeleteModal}
         </div>
@@ -281,7 +269,7 @@ const DealerRegister: React.FC = () => {
                 }
               </th>
               <th onClick={() => handleSort('code')}>
-                得意先コード
+                店舗・倉庫コード
                 {sortColumn === "code" &&
                   (sortDirection === "asc"
                     ? <img className='sort-icon' src={upArrow} />
@@ -290,17 +278,8 @@ const DealerRegister: React.FC = () => {
                 }
               </th>
               <th onClick={() => handleSort('name')}>
-                得意先名
+                店舗・倉庫名
                 {sortColumn === "name" &&
-                  (sortDirection === "asc"
-                    ? <img className='sort-icon' src={upArrow} />
-                    : <img className='sort-icon' src={downArrow} />
-                  )
-                }
-              </th>
-              <th onClick={() => handleSort('due_date')}>
-                締日
-                {sortColumn === "due_date" &&
                   (sortDirection === "asc"
                     ? <img className='sort-icon' src={upArrow} />
                     : <img className='sort-icon' src={downArrow} />
@@ -334,7 +313,6 @@ const DealerRegister: React.FC = () => {
                 <td>{row.id}</td>
                 <td>{row.code}</td>
                 <td>{row.name}</td>
-                <td>{row.due_date}</td>
                 <td>{row.phone}</td>
                 <td>{row.address}</td>
                 <td className='row_action'>
@@ -360,4 +338,4 @@ const DealerRegister: React.FC = () => {
   );
 };
 
-export default DealerRegister;
+export default StorehouseRegister;

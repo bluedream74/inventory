@@ -10,6 +10,11 @@ import deliveryReducer from "./basic/deliveryReducer";
 import chargerReducer from "./basic/chargerReducer";
 import dealerReducer from "./basic/dealerReducer";
 import exhibitionReducer from "./basic/exhibitionReducer";
+import incomingDepartmentReducer from "./basic/incomingDepartmentReducer";
+import originCountryReducer from "./basic/originCountryReducer";
+import storehouseReducer from "./basic/storehouseReducer";
+import customerReducer from "./basic/customerReducer";
+import deposittypeReducer from "./basic/deposittypeReducer";
 
 export const store = configureStore({
   reducer: {
@@ -24,6 +29,11 @@ export const store = configureStore({
     charger: chargerReducer,
     dealer: dealerReducer,
     exhibition: exhibitionReducer,
+    incomingDepartment: incomingDepartmentReducer,
+    originCountry: originCountryReducer,
+    storehouse: storehouseReducer,
+    customer: customerReducer,
+    deposittype: deposittypeReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
