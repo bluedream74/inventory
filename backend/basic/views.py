@@ -22,7 +22,6 @@ class ColorView(APIView):
 
     def post(self, request):
         serializer = ColorSerializer(data=request.data)
-        print("post")
         if serializer.is_valid():
             serializer.save()
             return Response({
