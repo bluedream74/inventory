@@ -2,6 +2,12 @@ from django.db import models
 
 # Create your models here.
 class OrderSlip(models.Model):
+    STATUS_CHOICES = (
+        ('発注済み', '発注済み'),
+        ('売上転送済み', '売上転送済み'),
+        ('取置転送済み', '取置転送済み'),
+    )
+
     no = models.CharField(max_length=30)
     slip_date = models.DateField()
     delivery_date = models.DateField()
@@ -12,7 +18,7 @@ class OrderSlip(models.Model):
     charger_code = models.CharField(max_length=30)
     receiver_code = models.CharField(max_length=30)
     exhibition_code = models.CharField(max_length=30)
-    status = models.CharField(max_length=10)
+    status = models.CharField(choices=STATUS_CHOICES, max_length=10)
     product_code = models.CharField(max_length=30)
     product_name = models.CharField(max_length=30)
     product_part_number = models.CharField(max_length=30)
@@ -28,6 +34,10 @@ class OrderSlip(models.Model):
     cost = models.FloatField(default=0)
     price = models.FloatField(default=0)
     profit = models.FloatField(default=0)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+    class Meta:
+        ordering=['-date_created']
 
 
   

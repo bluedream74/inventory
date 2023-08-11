@@ -77,6 +77,12 @@
             padding: 0 4px;
             border: 1px solid gray;
           }
+          &__input-left-date {
+            width: 150px;
+            .MuiOutlinedInput-root {
+              border-radius: 0px;
+            }
+          }
         }
         &__alert {
           color: red;

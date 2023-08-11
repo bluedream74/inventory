@@ -15,6 +15,8 @@ import originCountryReducer from "./basic/originCountryReducer";
 import storehouseReducer from "./basic/storehouseReducer";
 import customerReducer from "./basic/customerReducer";
 import deposittypeReducer from "./basic/deposittypeReducer";
+// slip
+import orderSlipReducer from "./slip/orderSlipReducer";
 
 export const store = configureStore({
   reducer: {
@@ -34,6 +36,8 @@ export const store = configureStore({
     storehouse: storehouseReducer,
     customer: customerReducer,
     deposittype: deposittypeReducer,
+    //slip
+    orderSlip: orderSlipReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
