@@ -75,8 +75,16 @@ const ItemRegister: React.FC = () => {
 
   const handleModalSubmit = () => {
     if (modalData.id) {
+      const formData = new FormData();
+         Object.keys(modalData).forEach((key) => {
+        formData.append(key, modalData[key]);
+      });
       axiosApi
-        .put(`basic/item/${modalData.id}`, modalData)
+        .put(`item_register/${modalData.id}`,formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        })
         .then(res => {
           handleClose();
           void dispatch(getItemList());
@@ -85,8 +93,16 @@ const ItemRegister: React.FC = () => {
           console.log(err);
         })
     } else {
+      const formData = new FormData();
+      Object.keys(modalData).forEach((key) => {
+        formData.append(key, modalData[key]);
+      });
       axiosApi
-        .post("basic/item/", modalData)
+        .post("item_register", formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        })
         .then(res => {
           handleClose();
           void dispatch(getItemList());
@@ -99,7 +115,7 @@ const ItemRegister: React.FC = () => {
 
   const handleDeleteRow = (id: number) => {
     axiosApi
-      .delete(`basic/item/${id}`)
+      .delete(`item_register/${id}`)
       .then(res => {
         void dispatch(getItemList());
         handleCloseDelete();
@@ -152,7 +168,7 @@ const ItemRegister: React.FC = () => {
 
   const ModalSection = (
     <Dialog open={open}>
-      <DialogTitle textAlign="center">アイテム追加</DialogTitle>
+      <DialogTitle textAlign="center">アイテム登録</DialogTitle>
       <DialogContent>
         <form onSubmit={(e) => e.preventDefault()}>
           <Stack
@@ -199,7 +215,7 @@ const ItemRegister: React.FC = () => {
       <DialogActions sx={{ p: '1.25rem' }}>
         <Button onClick={handleClose}>キャンセル</Button>
         <Button color="secondary" onClick={handleModalSubmit} variant="contained">
-          {modalData.id === 0 ? "追加" : "変更"}
+          {modalData.id === 0 ? "登録" : "変更"}
         </Button>
       </DialogActions>
     </Dialog>
@@ -224,7 +240,7 @@ const ItemRegister: React.FC = () => {
     <div className='item_register'>
       <div className="toolbar">
         <div>
-          <button className='item_add' onClick={handleAddRow}>アイテム追加</button>
+          <button className='item_add' onClick={handleAddRow}>アイテム登録</button>
           {ModalSection}
           {DeleteModal}
         </div>

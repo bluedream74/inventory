@@ -16,8 +16,8 @@ const initialState: OriginCountryStateType = {
 export const getOriginCountryList = createAsyncThunk<OriginCountryInterface[]>(
   "originCountry/getOriginCountryList",
   async () => {
-    const response: AxiosResponse<OriginCountryInterface[]> = await axiosApi.get("basic/origin_country/");
-    return response.data;
+    const response: AxiosResponse<OriginCountryInterface[]> = await axiosApi.get("origin_country_register/");
+    return response.data.origincountries;
   }
 )
 

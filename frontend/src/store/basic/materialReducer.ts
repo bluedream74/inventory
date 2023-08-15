@@ -16,8 +16,8 @@ const initialState: MaterialStateType = {
 export const getMaterialList = createAsyncThunk<MaterialInterface[]>(
   "material/getMaterialList",
   async () => {
-    const response: AxiosResponse<MaterialInterface[]> = await axiosApi.get("basic/material/");
-    return response.data;
+    const response: AxiosResponse<MaterialInterface[]> = await axiosApi.get("material_register/");
+    return response.data?.materials;
   }
 )
 

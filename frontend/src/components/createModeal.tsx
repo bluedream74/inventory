@@ -36,7 +36,7 @@ const CreateModal = ({
   onSubmit,
   title
 }: CreateModalProps) => {
-  const [values, setValues] = useState<any>(() =>
+  const [values, setValues] = useState<Array<String>>(() =>
     columns.reduce((acc, column) => {
       acc[column.id] = '';
       return acc;

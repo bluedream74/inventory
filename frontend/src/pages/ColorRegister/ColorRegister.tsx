@@ -76,7 +76,7 @@ const ColorRegister: React.FC = () => {
   const handleModalSubmit = () => {
     if (modalData.id) {
       axiosApi
-        .put(`basic/color/${modalData.id}`, modalData)
+        .put(`color_register/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
           void dispatch(getColorList());
@@ -86,7 +86,7 @@ const ColorRegister: React.FC = () => {
         })
     } else {
       axiosApi
-        .post("basic/color/", modalData)
+        .post("color_register/", modalData)
         .then(res => {
           handleClose();
           void dispatch(getColorList());
@@ -99,7 +99,7 @@ const ColorRegister: React.FC = () => {
 
   const handleDeleteRow = (id: number) => {
     axiosApi
-      .delete(`basic/color/${id}`)
+      .delete(`color_register/${id}`)
       .then(res => {
         void dispatch(getColorList());
         handleCloseDelete();
@@ -152,7 +152,7 @@ const ColorRegister: React.FC = () => {
 
   const ModalSection = (
     <Dialog open={open}>
-      <DialogTitle textAlign="center">色追加</DialogTitle>
+      <DialogTitle textAlign="center">色登録</DialogTitle>
       <DialogContent>
         <form onSubmit={(e) => e.preventDefault()}>
           <Stack
@@ -199,7 +199,7 @@ const ColorRegister: React.FC = () => {
       <DialogActions sx={{ p: '1.25rem' }}>
         <Button onClick={handleClose}>キャンセル</Button>
         <Button color="secondary" onClick={handleModalSubmit} variant="contained">
-          {modalData.id === 0 ? "追加" : "変更"}
+          {modalData.id === 0 ? "登録" : "変更"}
         </Button>
       </DialogActions>
     </Dialog>
@@ -224,7 +224,7 @@ const ColorRegister: React.FC = () => {
     <div className='color_register'>
       <div className="toolbar">
         <div>
-          <button className='color_add' onClick={handleAddRow}>色追加</button>
+          <button className='color_add' onClick={handleAddRow}>色登録</button>
           {ModalSection}
           {DeleteModal}
         </div>

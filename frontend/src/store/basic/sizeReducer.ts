@@ -16,8 +16,8 @@ const initialState: SizeStateType = {
 export const getSizeList = createAsyncThunk<SizeInterface[]>(
   "size/getSizeList",
   async () => {
-    const response: AxiosResponse<SizeInterface[]> = await axiosApi.get("basic/size/");
-    return response.data;
+    const response: AxiosResponse<SizeInterface[]> = await axiosApi.get("size_register/");
+    return response.data?.sizes;
   }
 )
 

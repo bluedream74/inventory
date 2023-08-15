@@ -16,8 +16,8 @@ const initialState: DeliveryStateType = {
 export const getDeliveryList = createAsyncThunk<DeliveryInterface[]>(
   "delivery/getDeliveryList",
   async () => {
-    const response: AxiosResponse<DeliveryInterface[]> = await axiosApi.get("basic/delivery/");
-    return response.data;
+    const response: AxiosResponse<DeliveryInterface[]> = await axiosApi.get("delivery_register/");
+    return response.data?.deliveries;
   }
 )
 

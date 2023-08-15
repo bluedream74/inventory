@@ -161,7 +161,7 @@ const IncomingDepartmentRegister: React.FC = () => {
 
   const ModalSection = (
     <Dialog open={open}>
-      <DialogTitle textAlign="center">仕入先追加</DialogTitle>
+      <DialogTitle textAlign="center">仕入先登録</DialogTitle>
       <DialogContent>
         <form onSubmit={(e) => e.preventDefault()}>
           <Stack
@@ -235,7 +235,7 @@ const IncomingDepartmentRegister: React.FC = () => {
       <DialogActions sx={{ p: '1.25rem' }}>
         <Button onClick={handleClose}>キャンセル</Button>
         <Button color="secondary" onClick={handleModalSubmit} variant="contained">
-          {modalData.id === 0 ? "追加" : "変更"}
+          {modalData.id === 0 ? "登録" : "変更"}
         </Button>
       </DialogActions>
     </Dialog>
@@ -260,7 +260,7 @@ const IncomingDepartmentRegister: React.FC = () => {
     <div className='incomingDepartment'>
       <div className="toolbar">
         <div>
-          <button className='incomingDepartment_add' onClick={handleAddRow}>仕入先追加</button>
+          <button className='incomingDepartment_add' onClick={handleAddRow}>仕入先登録</button>
           {ModalSection}
           {DeleteModal}
         </div>

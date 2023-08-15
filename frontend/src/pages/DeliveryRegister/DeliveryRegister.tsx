@@ -76,7 +76,7 @@ const DeliveryRegister: React.FC = () => {
   const handleModalSubmit = () => {
     if (modalData.id) {
       axiosApi
-        .put(`basic/delivery/${modalData.id}`, modalData)
+        .put(`delivery_register/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
           void dispatch(getDeliveryList());
@@ -86,7 +86,7 @@ const DeliveryRegister: React.FC = () => {
         })
     } else {
       axiosApi
-        .post("basic/delivery/", modalData)
+        .post("delivery_register/", modalData)
         .then(res => {
           handleClose();
           void dispatch(getDeliveryList());
@@ -99,7 +99,7 @@ const DeliveryRegister: React.FC = () => {
 
   const handleDeleteRow = (id: number) => {
     axiosApi
-      .delete(`basic/delivery/${id}`)
+      .delete(`delivery_register/${id}`)
       .then(res => {
         void dispatch(getDeliveryList());
         handleCloseDelete();
@@ -152,7 +152,7 @@ const DeliveryRegister: React.FC = () => {
 
   const ModalSection = (
     <Dialog open={open}>
-      <DialogTitle textAlign="center">納期追加</DialogTitle>
+      <DialogTitle textAlign="center">納期登録</DialogTitle>
       <DialogContent>
         <form onSubmit={(e) => e.preventDefault()}>
           <Stack
@@ -199,7 +199,7 @@ const DeliveryRegister: React.FC = () => {
       <DialogActions sx={{ p: '1.25rem' }}>
         <Button onClick={handleClose}>キャンセル</Button>
         <Button color="secondary" onClick={handleModalSubmit} variant="contained">
-          {modalData.id === 0 ? "追加" : "変更"}
+          {modalData.id === 0 ? "登録" : "変更"}
         </Button>
       </DialogActions>
     </Dialog>
@@ -224,7 +224,7 @@ const DeliveryRegister: React.FC = () => {
     <div className='delivery_register'>
       <div className="toolbar">
         <div>
-          <button className='delivery_add' onClick={handleAddRow}>納期追加</button>
+          <button className='delivery_add' onClick={handleAddRow}>納期登録</button>
           {ModalSection}
           {DeleteModal}
         </div>

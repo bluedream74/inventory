@@ -86,7 +86,7 @@ function EditToolbar(props: EditToolbarProps) {
   return (
     <GridToolbarContainer>
       <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-        明細追加
+        明細登録
       </Button>
     </GridToolbarContainer>
   );
@@ -135,7 +135,7 @@ const OrderSlip = () => {
   });
   const noList: string[]  = useAppSelector((state) => {
     const ret = state.orderSlip.slips.map(slip => slip.no ?? "");
-    return ["新規追加", ...ret];
+    return ["新規登録", ...ret];
   });
   const [btnStatus, setBtnStatus] = useState<BtnStatusInterface>({
     first: 'disable',
@@ -182,11 +182,11 @@ const OrderSlip = () => {
   };
 
   const handleNoChange = (event: any, newValue: string | null) => {
-    btnStatus.first = ((newValue === "新規追加" || newValue === noList[noList.length - 1]) ? 'disable' : 'active');
-    btnStatus.prev = ((newValue === "新規追加" || newValue === noList[noList.length - 1]) ? 'disable' : 'active');
-    btnStatus.next = ((newValue === "新規追加" || newValue === noList[1]) ? 'disable' : 'active');
-    btnStatus.last = ((newValue === "新規追加" || newValue === noList[1]) ? 'disable' : 'active');
-    btnStatus.delete = (newValue === "新規追加" ? 'disable' : 'active');
+    btnStatus.first = ((newValue === "新規登録" || newValue === noList[noList.length - 1]) ? 'disable' : 'active');
+    btnStatus.prev = ((newValue === "新規登録" || newValue === noList[noList.length - 1]) ? 'disable' : 'active');
+    btnStatus.next = ((newValue === "新規登録" || newValue === noList[1]) ? 'disable' : 'active');
+    btnStatus.last = ((newValue === "新規登録" || newValue === noList[1]) ? 'disable' : 'active');
+    btnStatus.delete = (newValue === "新規登録" ? 'disable' : 'active');
     btnStatus.cancel = 'disable';
     btnStatus.save = 'disable';
     setSlipCommon({...slipCommon, No: newValue});
@@ -410,7 +410,7 @@ const OrderSlip = () => {
 
   const handleCancel = () => {
     setSlipCommon({
-      No: "新規追加",
+      No: "新規登録",
       slipDate: dayjs('2022-01-01'),
       deliveryDate: dayjs('2022-01-01'),
       shoppingDate: dayjs('2022-01-01'),

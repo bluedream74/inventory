@@ -76,7 +76,7 @@ const OriginCountryRegister: React.FC = () => {
   const handleModalSubmit = () => {
     if (modalData.id) {
       axiosApi
-        .put(`basic/origin_country/${modalData.id}`, modalData)
+        .put(`origin_country_register/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
           void dispatch(getOriginCountryList());
@@ -86,7 +86,7 @@ const OriginCountryRegister: React.FC = () => {
         })
     } else {
       axiosApi
-        .post("basic/origin_country/", modalData)
+        .post("origin_country_register/", modalData)
         .then(res => {
           handleClose();
           void dispatch(getOriginCountryList());
@@ -99,7 +99,7 @@ const OriginCountryRegister: React.FC = () => {
 
   const handleDeleteRow = (id: number) => {
     axiosApi
-      .delete(`basic/origin_country/${id}`)
+      .delete(`origin_country_register/${id}`)
       .then(res => {
         void dispatch(getOriginCountryList());
         handleCloseDelete();
@@ -152,7 +152,7 @@ const OriginCountryRegister: React.FC = () => {
 
   const ModalSection = (
     <Dialog open={open}>
-      <DialogTitle textAlign="center">原産国追加</DialogTitle>
+      <DialogTitle textAlign="center">原産国登録</DialogTitle>
       <DialogContent>
         <form onSubmit={(e) => e.preventDefault()}>
           <Stack
@@ -199,7 +199,7 @@ const OriginCountryRegister: React.FC = () => {
       <DialogActions sx={{ p: '1.25rem' }}>
         <Button onClick={handleClose}>キャンセル</Button>
         <Button color="secondary" onClick={handleModalSubmit} variant="contained">
-          {modalData.id === 0 ? "追加" : "変更"}
+          {modalData.id === 0 ? "登録" : "変更"}
         </Button>
       </DialogActions>
     </Dialog>
@@ -224,7 +224,7 @@ const OriginCountryRegister: React.FC = () => {
     <div className='origin_country_register'>
       <div className="toolbar">
         <div>
-          <button className='origin_country_add' onClick={handleAddRow}>原産国追加</button>
+          <button className='origin_country_add' onClick={handleAddRow}>原産国登録</button>
           {ModalSection}
           {DeleteModal}
         </div>

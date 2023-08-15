@@ -76,7 +76,7 @@ const MaterialRegister: React.FC = () => {
   const handleModalSubmit = () => {
     if (modalData.id) {
       axiosApi
-        .put(`basic/material/${modalData.id}`, modalData)
+        .put(`material_register/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
           void dispatch(getMaterialList());
@@ -86,7 +86,7 @@ const MaterialRegister: React.FC = () => {
         })
     } else {
       axiosApi
-        .post("basic/material/", modalData)
+        .post("material_register/", modalData)
         .then(res => {
           handleClose();
           void dispatch(getMaterialList());
@@ -99,7 +99,7 @@ const MaterialRegister: React.FC = () => {
 
   const handleDeleteRow = (id: number) => {
     axiosApi
-      .delete(`basic/material/${id}`)
+      .delete(`material_register/${id}`)
       .then(res => {
         void dispatch(getMaterialList());
         handleCloseDelete();
@@ -152,7 +152,7 @@ const MaterialRegister: React.FC = () => {
 
   const ModalSection = (
     <Dialog open={open}>
-      <DialogTitle textAlign="center">素材追加</DialogTitle>
+      <DialogTitle textAlign="center">素材登録</DialogTitle>
       <DialogContent>
         <form onSubmit={(e) => e.preventDefault()}>
           <Stack
@@ -199,7 +199,7 @@ const MaterialRegister: React.FC = () => {
       <DialogActions sx={{ p: '1.25rem' }}>
         <Button onClick={handleClose}>キャンセル</Button>
         <Button color="secondary" onClick={handleModalSubmit} variant="contained">
-          {modalData.id === 0 ? "追加" : "変更"}
+          {modalData.id === 0 ? "登録" : "変更"}
         </Button>
       </DialogActions>
     </Dialog>
@@ -224,7 +224,7 @@ const MaterialRegister: React.FC = () => {
     <div className='material_register'>
       <div className="toolbar">
         <div>
-          <button className='material_add' onClick={handleAddRow}>素材追加</button>
+          <button className='material_add' onClick={handleAddRow}>素材登録</button>
           {ModalSection}
           {DeleteModal}
         </div>

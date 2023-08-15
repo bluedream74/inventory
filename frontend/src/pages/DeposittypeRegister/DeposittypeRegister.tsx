@@ -152,7 +152,7 @@ const DeposittypeRegister: React.FC = () => {
 
   const ModalSection = (
     <Dialog open={open}>
-      <DialogTitle textAlign="center">入金支払追加</DialogTitle>
+      <DialogTitle textAlign="center">入金支払登録</DialogTitle>
       <DialogContent>
         <form onSubmit={(e) => e.preventDefault()}>
           <Stack
@@ -199,7 +199,7 @@ const DeposittypeRegister: React.FC = () => {
       <DialogActions sx={{ p: '1.25rem' }}>
         <Button onClick={handleClose}>キャンセル</Button>
         <Button color="secondary" onClick={handleModalSubmit} variant="contained">
-          {modalData.id === 0 ? "追加" : "変更"}
+          {modalData.id === 0 ? "登録" : "変更"}
         </Button>
       </DialogActions>
     </Dialog>
@@ -224,7 +224,7 @@ const DeposittypeRegister: React.FC = () => {
     <div className='deposittype_register'>
       <div className="toolbar">
         <div>
-          <button className='deposittype_add' onClick={handleAddRow}>入金支払追加</button>
+          <button className='deposittype_add' onClick={handleAddRow}>入金支払登録</button>
           {ModalSection}
           {DeleteModal}
         </div>

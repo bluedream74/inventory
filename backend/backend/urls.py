@@ -16,11 +16,21 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+# from rest_framework import routers
+from product_register import views
 from django.conf import settings
 from django.conf.urls.static import static
 
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/basic/', include('basic.urls')),
-    path('api/slip/', include('slip.urls')),
+    path('product_register/', include('product_register.urls')),
+    path('color_register/', include('color_register.urls')),
+    path('season_register/', include('season_register.urls')),
+    path('brand_register/', include('brand_register.urls')),
+    path('material_register/', include('material_register.urls')),
+    path('size_register/', include('size_register.urls')),
+    path('delivery_register/', include('delivery_register.urls')),
+    path('origin_country_register/', include('origin_country_register.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -158,7 +158,7 @@ const ChargerRegister: React.FC = () => {
 
   const ModalSection = (
     <Dialog open={open}>
-      <DialogTitle textAlign="center">担当者追加</DialogTitle>
+      <DialogTitle textAlign="center">担当者登録</DialogTitle>
       <DialogContent>
         <form onSubmit={(e) => e.preventDefault()}>
           <Stack
@@ -223,7 +223,7 @@ const ChargerRegister: React.FC = () => {
       <DialogActions sx={{ p: '1.25rem' }}>
         <Button onClick={handleClose}>キャンセル</Button>
         <Button color="secondary" onClick={handleModalSubmit} variant="contained">
-          {modalData.id === 0 ? "追加" : "変更"}
+          {modalData.id === 0 ? "登録" : "変更"}
         </Button>
       </DialogActions>
     </Dialog>
@@ -248,7 +248,7 @@ const ChargerRegister: React.FC = () => {
     <div className='charger_register'>
       <div className="toolbar">
         <div>
-          <button className='charger_add' onClick={handleAddRow}>担当者追加</button>
+          <button className='charger_add' onClick={handleAddRow}>担当者登録</button>
           {ModalSection}
           {DeleteModal}
         </div>

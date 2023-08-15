@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import { AxiosResponse } from 'axios';
 import { BrandInterface } from "../../pages/BrandRegister/BrandRegister";
 import axiosApi from "../../utilities/axios";
@@ -16,8 +16,8 @@ const initialState: BrandStateType = {
 export const getBrandList = createAsyncThunk<BrandInterface[]>(
   "brand/getBrandList",
   async () => {
-    const response: AxiosResponse<BrandInterface[]> = await axiosApi.get("basic/brand/");
-    return response.data;
+    const response: AxiosResponse<BrandInterface[]> = await axiosApi.get("brand_register/");
+    return response.data?.brands;
   }
 )
 
