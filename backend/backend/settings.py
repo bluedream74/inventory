@@ -45,8 +45,9 @@ INSTALLED_APPS = [
     'size_register',
     'delivery_register',
     'origin_country_register',
-    'django_extensions',
     'item_register',
+    'storehouse_register',
+    'django_extensions',
     # 'rest_framework_simplejwt'
     
 ]

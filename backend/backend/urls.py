@@ -33,4 +33,7 @@ urlpatterns = [
     path('size_register/', include('size_register.urls')),
     path('delivery_register/', include('delivery_register.urls')),
     path('origin_country_register/', include('origin_country_register.urls')),
+
+    path('storehouse_register/', include('storehouse_register.urls')),
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

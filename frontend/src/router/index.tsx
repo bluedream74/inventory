@@ -170,10 +170,6 @@ export const Router = () => {
       <Route path="" element={<DefaultLayout />}>
         <Route index element={<Home />} />
         <Route path='home' element={<Home />} />
-        {/* <Route path="booking">
-                <Route index element={<Home />} />
-                <Route path="steps/:step" element={<ProgressSteps />} />
-              </Route> */}
         <Route path="product_register" element={<ProductRegister />} />
         <Route path="color_register" element={<ColorRegister />} />
         <Route path="size_register" element={<SizeRegister />} />
@@ -183,7 +179,9 @@ export const Router = () => {
         <Route path="size_register" element={<SizeRegister />} />      
         <Route path="delivery_register" element={<DeliveryRegister />} />   
         <Route path="origin_country_register" element={<OriginCountryRegister />} />
-        <Route path="season_register" element={<ItemRegister />} />
+        <Route path="item_register" element={<ItemRegister />} />
+
+        <Route path="storehouse_register" element={<StorehouseRegister />} />
 
       </Route>
 

@@ -82,7 +82,7 @@ const StorehouseRegister: React.FC = () => {
   const handleModalSubmit = () => {
     if (modalData.id) {
       axiosApi
-        .put(`basic/storehouse/${modalData.id}`, modalData)
+        .put(`storehouse_register/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
           void dispatch(getStorehouseList());
@@ -92,7 +92,7 @@ const StorehouseRegister: React.FC = () => {
         })
     } else {
       axiosApi
-        .post("basic/storehouse/", modalData)
+        .post("storehouse_register/", modalData)
         .then(res => {
           handleClose();
           void dispatch(getStorehouseList());
@@ -105,7 +105,7 @@ const StorehouseRegister: React.FC = () => {
 
   const handleDeleteRow = (id: number) => {
     axiosApi
-      .delete(`basic/storehouse/${id}`)
+      .delete(`storehouse_register/${id}`)
       .then(res => {
         void dispatch(getStorehouseList());
         handleCloseDelete();

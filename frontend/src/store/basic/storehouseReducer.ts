@@ -16,8 +16,8 @@ const initialState: StorehouseStateType = {
 export const getStorehouseList = createAsyncThunk<StorehouseInterface[]>(
   "storehouse/getStorehouseList",
   async () => {
-    const response: AxiosResponse<StorehouseInterface[]> = await axiosApi.get("basic/storehouse/");
-    return response.data;
+    const response: AxiosResponse<StorehouseInterface[]> = await axiosApi.get("storehouse_register/");
+    return response.data?.storehouses;
   }
 )
 

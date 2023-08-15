@@ -133,8 +133,8 @@ export const RegisterDropDown = () => {
 
                 <Divider sx={{ my: 0.5 }} />
                 <MenuItem onClick={handleClose} disableRipple>
-                    <ArchiveIcon />
-                    Archive
+                    <FileCopyIcon />
+                    <Link to='/storehouse_register'>店舗/倉庫登録 </Link>
                 </MenuItem>
                 <MenuItem onClick={handleClose} disableRipple>
                     <MoreHorizIcon />
