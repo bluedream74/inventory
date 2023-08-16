@@ -82,7 +82,7 @@ const ChargerRegister: React.FC = () => {
   const handleModalSubmit = () => {
     if (modalData.id) {
       axiosApi
-        .put(`basic/charger/${modalData.id}`, modalData)
+        .put(`charger_register/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
           void dispatch(getChargerList());
@@ -92,7 +92,7 @@ const ChargerRegister: React.FC = () => {
         })
     } else {
       axiosApi
-        .post("basic/charger/", modalData)
+        .post("charger_register/", modalData)
         .then(res => {
           handleClose();
           void dispatch(getChargerList());
@@ -105,7 +105,7 @@ const ChargerRegister: React.FC = () => {
 
   const handleDeleteRow = (id: number) => {
     axiosApi
-      .delete(`basic/charger/${id}`)
+      .delete(`charger_register/${id}`)
       .then(res => {
         void dispatch(getChargerList());
         handleCloseDelete();

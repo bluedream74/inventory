@@ -76,7 +76,7 @@ const ExhibitionRegister: React.FC = () => {
   const handleModalSubmit = () => {
     if (modalData.id) {
       axiosApi
-        .put(`basic/exhibition/${modalData.id}`, modalData)
+        .put(`exhibition_register/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
           void dispatch(getExhibitionList());
@@ -86,7 +86,7 @@ const ExhibitionRegister: React.FC = () => {
         })
     } else {
       axiosApi
-        .post("basic/exhibition/", modalData)
+        .post("exhibition_register/", modalData)
         .then(res => {
           handleClose();
           void dispatch(getExhibitionList());
@@ -99,7 +99,7 @@ const ExhibitionRegister: React.FC = () => {
 
   const handleDeleteRow = (id: number) => {
     axiosApi
-      .delete(`basic/exhibition/${id}`)
+      .delete(`exhibition_register/${id}`)
       .then(res => {
         void dispatch(getExhibitionList());
         handleCloseDelete();

@@ -35,8 +35,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders',
-    'rest_framework',
+    # 'corsheaders',
+    # 'rest_framework',
     'product_register',
     'color_register',
     'season_register',
@@ -47,6 +47,10 @@ INSTALLED_APPS = [
     'origin_country_register',
     'item_register',
     'storehouse_register',
+    'charger_register',
+    'dealer_register',
+    'exhibition_register',
+    'slip.order_slip',
     'django_extensions',
     # 'rest_framework_simplejwt'
     

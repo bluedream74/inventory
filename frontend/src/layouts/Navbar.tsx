@@ -12,6 +12,8 @@ import { Link } from "react-router-dom";
 import { DrawerComponent } from "./Drawer";
 import { Theme } from "@mui/material";
 import { RegisterDropDown } from "./RegisterDropDown";
+import { SlipDropDown } from "./SlipDropDown";
+import { ExhibitionSaleDropDown } from "./ExhibitionSaleDropDown";
 
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -31,13 +33,20 @@ const useStyles = makeStyles((theme: Theme) => ({
     link: {
       textDecoration: "none",
       color: "white",
-      fontSize: "20px",
+      marginLeft: theme.spacing(5),
+      borderBottom: "1px solid transparent",
+    },
+    initlink : {
+      marginTop: "8px",
+      fontSize: "14px",
+      textDecoration: "none",
+      color: "white",
       marginLeft: theme.spacing(5),
       borderBottom: "1px solid transparent",
       "&:hover": {
         color: "yellow",
       },
-    },
+    }
     
   }));
 
@@ -51,20 +60,21 @@ export const Navbar : React.FC = () => {
       <CssBaseline />
       <Toolbar className = {classes.navbar}>
         <Typography variant="h4" className={classes.logo}>
-          <Link to='/home' className="text-white hover:text-gray-200">Navbar</Link>
+          <Link to='/home' className="text-white hover:text-gray-200">Strawberry Jam</Link>
           
         </Typography>
         {isMobile ? (
           <DrawerComponent />
         ) : (
           <div className={classes.navlinks}>
-            <Link to="/" className={classes.link}>
-              Home
+            <Link to="/" className={classes.initlink}>
+            ホーム
             </Link>
             <div className={classes.link}><RegisterDropDown/></div>
+            <div className={classes.link}><ExhibitionSaleDropDown/></div>
             <div className={classes.link}><SlipDropDown/></div>
-            <Link to="/auth/login" className={classes.link}>
-              Login
+            <Link to="/auth/login" className={classes.initlink}>
+              ログイン
             </Link>
           </div>
         )}

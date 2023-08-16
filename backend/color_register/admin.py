@@ -5,4 +5,3 @@ class ColorAdmin(admin.ModelAdmin):
     list_display =('code', 'name')
 
 admin.site.register(Color, ColorAdmin)
-# Register your models here.

@@ -16,8 +16,8 @@ const initialState: ChargerStateType = {
 export const getChargerList = createAsyncThunk<ChargerInterface[]>(
   "charger/getChargerList",
   async () => {
-    const response: AxiosResponse<ChargerInterface[]> = await axiosApi.get("basic/charger/");
-    return response.data;
+    const response: AxiosResponse<ChargerInterface[]> = await axiosApi.get("charger_register/");
+    return response.data?.chargers;
   }
 )
 

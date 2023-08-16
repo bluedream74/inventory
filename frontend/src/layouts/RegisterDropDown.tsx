@@ -81,6 +81,12 @@ export const RegisterDropDown = () => {
                 disableElevation
                 onClick={handleClick}
                 endIcon={<KeyboardArrowDownIcon />}
+                sx={{
+                    backgroundColor: '#204060', // set the default button color
+                    '&:hover': {
+                        backgroundColor: '#264d73', // set the button color on hover
+                    },
+                }}
             >
                 登録
             </Button>
@@ -94,12 +100,14 @@ export const RegisterDropDown = () => {
                 onClose={handleClose}
             >
                 <MenuItem onClick={handleClose} disableRipple>
-                    <EditIcon />
+                    <FileCopyIcon />
                     <Link to='/product_register'>商品登録</Link>
                 </MenuItem>
                 <MenuItem onClick={handleClose} disableRipple>
-                    <FileCopyIcon />
-                    <Link to='/color_register'>色登録</Link>
+                    <Link to='/color_register'>
+                        <FileCopyIcon />
+                        色登録
+                    </Link>
                 </MenuItem>
 
                 <MenuItem onClick={handleClose} disableRipple>

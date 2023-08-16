@@ -13,14 +13,19 @@ import { getDealerList } from '../../store/basic/dealerReducer';
 import downArrow from '../../assets/downArrow.svg';
 import upArrow from '../../assets/upArrow.svg';
 import axiosApi from '../../utilities/axios';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers';
+import dayjs, { Dayjs } from 'dayjs';
+import { jaJP as jaJP1 } from '@mui/x-date-pickers/locales';
 
 export interface DealerInterface {
   id: number;
   code: string;
   name: string;
+  due_date : Dayjs | null;
   phone: string;
   address: string;
-  due_date: string;
 }
 
 const DealerRegister: React.FC = () => {
@@ -38,7 +43,7 @@ const DealerRegister: React.FC = () => {
     code: "",
     phone: "",
     address: "",
-    due_date: ""
+    due_date: dayjs('2023-01-01')
   });
 
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -71,21 +76,21 @@ const DealerRegister: React.FC = () => {
       code: "",
       phone: "",
       address: "",
-      due_date: ""
+      due_date: dayjs('2023-01-01')
     });
     setOpen(true);
   };
 
   const handleEditRow = (id: number) => {
     const selectedRow = data.filter((row) => row.id === id);
-    setModalData(selectedRow[0]);
+    setModalData({...selectedRow[0], due_date: dayjs(selectedRow[0]?.due_date)});
     setOpen(true);
   };
 
   const handleModalSubmit = () => {
     if (modalData.id) {
       axiosApi
-        .put(`basic/dealer/${modalData.id}`, modalData)
+        .put(`dealer_register/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
           void dispatch(getDealerList());
@@ -95,7 +100,7 @@ const DealerRegister: React.FC = () => {
         })
     } else {
       axiosApi
-        .post("basic/dealer/", modalData)
+        .post("dealer_register/", modalData)
         .then(res => {
           handleClose();
           void dispatch(getDealerList());
@@ -108,7 +113,7 @@ const DealerRegister: React.FC = () => {
 
   const handleDeleteRow = (id: number) => {
     axiosApi
-      .delete(`basic/dealer/${id}`)
+      .delete(`dealer_register/${id}`)
       .then(res => {
         void dispatch(getDealerList());
         handleCloseDelete();
@@ -202,7 +207,7 @@ const DealerRegister: React.FC = () => {
                 setModalData({ ...modalData, [e.target.name]: e.target.value })
               }
             />
-            <TextField
+            {/* <TextField
               key="due_date"
               label="締日"
               name="due_date"
@@ -210,7 +215,16 @@ const DealerRegister: React.FC = () => {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setModalData({ ...modalData, [e.target.name]: e.target.value })
               }
-            />
+            /> */}
+            <DatePicker
+                className='common-item__small__input-left-date'
+                slotProps={{ textField: { size: 'small' } }}
+                format="YYYY-MM-DD"
+                value={modalData.due_date}
+                onChange={(newValue) =>
+                  setModalData({ ...modalData, due_date: newValue })
+                }
+              />
             <TextField
               key="phone"
               label="Tel"
@@ -257,6 +271,7 @@ const DealerRegister: React.FC = () => {
   );
 
   return (
+    <LocalizationProvider dateAdapter={AdapterDayjs} localeText={jaJP1.components.MuiLocalizationProvider.defaultProps.localeText}>
     <div className='dealer_register'>
       <div className="toolbar">
         <div>
@@ -357,6 +372,7 @@ const DealerRegister: React.FC = () => {
         ))}
       </div>
     </div>
+    </LocalizationProvider>
   );
 };
 

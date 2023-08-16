@@ -35,5 +35,11 @@ urlpatterns = [
     path('origin_country_register/', include('origin_country_register.urls')),
 
     path('storehouse_register/', include('storehouse_register.urls')),
+    
+    path('storehouse_register/', include('storehouse_register.urls')),
+    path('charger_register/', include('charger_register.urls')),
+    path('dealer_register/', include('dealer_register.urls')),
+    path('exhibition_register/', include('exhibition_register.urls')),
 
+    path('slip/', include('slip.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

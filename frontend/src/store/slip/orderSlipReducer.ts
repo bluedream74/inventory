@@ -3,6 +3,7 @@ import { AxiosResponse } from 'axios';
 import { BrandInterface } from "../../pages/BrandRegister/BrandRegister";
 import axiosApi from "../../utilities/axios";
 import { resolveDateFormat } from "@mui/x-date-pickers/internals/utils/date-utils";
+import { IOrderSlip } from "../../pages/OrderSlip/OrderSlip";
 
 export interface OrderSlipInterface {
   id: number;
@@ -35,7 +36,7 @@ export interface OrderSlipInterface {
 }
 
 export interface OrderSlipStateType {
-  slips: OrderSlipInterface[];
+  slips: IOrderSlip[];
   status: 'idle' | 'loading' | 'failed'
 }
 
@@ -48,7 +49,7 @@ export const getSlipList = createAsyncThunk<OrderSlipInterface[]>(
   'orderSlip/getOrderSlipList',
   async () => {
     const response: AxiosResponse<OrderSlipInterface[]> = await axiosApi.get("slip/order_slip/")
-    return response.data
+    return response.data?.orders
   }
 )
 
