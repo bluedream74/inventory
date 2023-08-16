@@ -78,8 +78,12 @@ const BrandRegister: React.FC = () => {
 
   const handleModalSubmit = () => {
     if (modalData.id) {
+      const formData = new FormData();
+         Object.keys(modalData).forEach((key) => {
+        formData.append(key, modalData[key]);
+      });
       axiosApi
-        .put(`basic/brand/${modalData.id}`, modalData)
+        .put(`brand_register/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
           void dispatch(getBrandList());
@@ -88,8 +92,12 @@ const BrandRegister: React.FC = () => {
           console.log(err);
         })
     } else {
+      const formData = new FormData();
+      Object.keys(modalData).forEach((key) => {
+        formData.append(key, modalData[key]);
+      });
       axiosApi
-        .post("basic/brand/", modalData)
+        .post("brand_register/", modalData)
         .then(res => {
           handleClose();
           void dispatch(getBrandList());
@@ -102,7 +110,7 @@ const BrandRegister: React.FC = () => {
 
   const handleDeleteRow = (id: number) => {
     axiosApi
-      .delete(`basic/brand/${id}`)
+      .delete(`brand_register/${id}`)
       .then(res => {
         void dispatch(getBrandList());
         handleCloseDelete();
@@ -155,7 +163,7 @@ const BrandRegister: React.FC = () => {
 
   const ModalSection = (
     <Dialog open={open}>
-      <DialogTitle textAlign="center">ブランド追加</DialogTitle>
+      <DialogTitle textAlign="center">ブランド登録</DialogTitle>
       <DialogContent>
         <form onSubmit={(e) => e.preventDefault()}>
           <Stack
@@ -211,7 +219,7 @@ const BrandRegister: React.FC = () => {
       <DialogActions sx={{ p: '1.25rem' }}>
         <Button onClick={handleClose}>キャンセル</Button>
         <Button color="secondary" onClick={handleModalSubmit} variant="contained">
-          {modalData.id === 0 ? "追加" : "変更"}
+          {modalData.id === 0 ? "登録" : "変更"}
         </Button>
       </DialogActions>
     </Dialog>
@@ -236,7 +244,7 @@ const BrandRegister: React.FC = () => {
     <div className='brand_register'>
       <div className="toolbar">
         <div>
-          <button className='brand_add' onClick={handleAddRow}>ブランド追加</button>
+          <button className='brand_add' onClick={handleAddRow}>ブランド登録</button>
           {ModalSection}
           {DeleteModal}
         </div>

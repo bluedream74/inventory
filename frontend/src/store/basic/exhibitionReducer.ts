@@ -16,8 +16,8 @@ const initialState: ExhibitionStateType = {
 export const getExhibitionList = createAsyncThunk<ExhibitionInterface[]>(
   "exhibition/getExhibitionList",
   async () => {
-    const response: AxiosResponse<ExhibitionInterface[]> = await axiosApi.get("basic/exhibition/");
-    return response.data;
+    const response: AxiosResponse<ExhibitionInterface[]> = await axiosApi.get("exhibition_register/");
+    return response.data?.exhibitions;
   }
 )
 

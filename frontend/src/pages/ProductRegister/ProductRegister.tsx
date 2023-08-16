@@ -13,7 +13,7 @@ import { getProductList } from '../../store/basic/productReducer';
 import downArrow from '../../assets/downArrow.svg';
 import upArrow from '../../assets/upArrow.svg';
 import ImageInput from '../../components/ImageInput';
-import axiosApi from '../../utilities/axios';
+import axiosApi, { BASE_URL } from '../../utilities/axios';
 
 export interface ProductInterface {
   id: number;
@@ -48,9 +48,9 @@ const ProductRegister: React.FC = () => {
   });
 
   const [deleteOpen, setDeleteOpen] = useState(false);
-
+  console.log(data);
   useEffect(() => {
-    void dispatch(getProductList());
+    dispatch(getProductList());
   }, [dispatch]);
 
   const handleClose = () => {
@@ -102,14 +102,14 @@ const ProductRegister: React.FC = () => {
       });
       if(imageFile) formData.set('image_url', imageFile);
       axiosApi
-        .put(`basic/product/${modalData.id}`, formData, {
+        .put(`product_register/${modalData.id}`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         })
         .then(res => {
           handleClose();
-          void dispatch(getProductList());
+          dispatch(getProductList());
         })
         .catch(err => {
           console.log(err);
@@ -122,12 +122,13 @@ const ProductRegister: React.FC = () => {
       if(imageFile) formData.set('image_url', imageFile);
 
       axiosApi
-        .post("basic/product/", formData, {
+        .post("product_register/", formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         })
         .then(res => {
+          console.log(res.data)
           handleClose();
           void dispatch(getProductList());
         })
@@ -139,9 +140,9 @@ const ProductRegister: React.FC = () => {
 
   const handleDeleteRow = (id: number) => {
     axiosApi
-      .delete(`basic/product/${id}`)
+      .delete(`product_register/${id}`)
       .then(res => {
-        void dispatch(getProductList());
+        dispatch(getProductList());
         handleCloseDelete();
       })
       .catch(err => {
@@ -192,7 +193,7 @@ const ProductRegister: React.FC = () => {
 
   const ModalSection = (
     <Dialog open={open}>
-      <DialogTitle textAlign="center">書品追加</DialogTitle>
+      <DialogTitle textAlign="center">商品登録</DialogTitle>
       <DialogContent>
         <form onSubmit={(e) => e.preventDefault()}>
           <Stack
@@ -215,7 +216,7 @@ const ProductRegister: React.FC = () => {
                 disabled
               />
             }
-            <ImageInput onImageSelect={handleImageSelect} originImageUrl={modalData.image_url} />
+            <ImageInput onImageSelect={handleImageSelect} originImageUrl={ modalData.id ? BASE_URL + modalData.image_url : "" } />
             <TextField
               key="image_mode"
               label="絵型"
@@ -277,7 +278,7 @@ const ProductRegister: React.FC = () => {
       <DialogActions sx={{ p: '1.25rem' }}>
         <Button onClick={handleClose}>キャンセル</Button>
         <Button color="secondary" onClick={handleModalSubmit} variant="contained">
-          {modalData.id === 0 ? "追加" : "変更"}
+          {modalData.id === 0 ? "登録" : "変更"}
         </Button>
       </DialogActions>
     </Dialog>
@@ -302,7 +303,7 @@ const ProductRegister: React.FC = () => {
     <div className='product_register'>
       <div className="toolbar">
         <div>
-          <button className='product_add' onClick={handleAddRow}>書品追加</button>
+          <button className='product_add' onClick={handleAddRow}>書品登録</button>
           {ModalSection}
           {DeleteModal}
         </div>
@@ -377,7 +378,7 @@ const ProductRegister: React.FC = () => {
               <tr key={row.id}>
                 <td>{row.id}</td>
                 <td>
-                  <img src={row.image_url} width="150" alt="" />
+                  <img src={BASE_URL + row.image_url} width="150" alt="" />
                 </td>
                 <td>{row.image_mode}</td>
                 <td>{row.code}</td>

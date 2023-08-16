@@ -16,8 +16,8 @@ const initialState: ColorStateType = {
 export const getColorList = createAsyncThunk<ColorInterface[]>(
   "color/getColorList",
   async () => {
-    const response: AxiosResponse<ColorInterface[]> = await axiosApi.get("basic/color/");
-    return response.data;
+    const response: AxiosResponse<ColorInterface[]> = await axiosApi.get("color_register/");
+    return response.data?.colors;
   }
 )
 

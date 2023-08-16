@@ -76,7 +76,7 @@ const ExhibitionRegister: React.FC = () => {
   const handleModalSubmit = () => {
     if (modalData.id) {
       axiosApi
-        .put(`basic/exhibition/${modalData.id}`, modalData)
+        .put(`exhibition_register/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
           void dispatch(getExhibitionList());
@@ -86,7 +86,7 @@ const ExhibitionRegister: React.FC = () => {
         })
     } else {
       axiosApi
-        .post("basic/exhibition/", modalData)
+        .post("exhibition_register/", modalData)
         .then(res => {
           handleClose();
           void dispatch(getExhibitionList());
@@ -99,7 +99,7 @@ const ExhibitionRegister: React.FC = () => {
 
   const handleDeleteRow = (id: number) => {
     axiosApi
-      .delete(`basic/exhibition/${id}`)
+      .delete(`exhibition_register/${id}`)
       .then(res => {
         void dispatch(getExhibitionList());
         handleCloseDelete();
@@ -152,7 +152,7 @@ const ExhibitionRegister: React.FC = () => {
 
   const ModalSection = (
     <Dialog open={open}>
-      <DialogTitle textAlign="center">展示会追加</DialogTitle>
+      <DialogTitle textAlign="center">展示会登録</DialogTitle>
       <DialogContent>
         <form onSubmit={(e) => e.preventDefault()}>
           <Stack
@@ -199,7 +199,7 @@ const ExhibitionRegister: React.FC = () => {
       <DialogActions sx={{ p: '1.25rem' }}>
         <Button onClick={handleClose}>キャンセル</Button>
         <Button color="secondary" onClick={handleModalSubmit} variant="contained">
-          {modalData.id === 0 ? "追加" : "変更"}
+          {modalData.id === 0 ? "登録" : "変更"}
         </Button>
       </DialogActions>
     </Dialog>
@@ -224,7 +224,7 @@ const ExhibitionRegister: React.FC = () => {
     <div className='exhibition_register'>
       <div className="toolbar">
         <div>
-          <button className='exhibition_add' onClick={handleAddRow}>展示会追加</button>
+          <button className='exhibition_add' onClick={handleAddRow}>展示会登録</button>
           {ModalSection}
           {DeleteModal}
         </div>

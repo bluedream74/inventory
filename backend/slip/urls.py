@@ -1,10 +1,5 @@
-from .views import OrderSlipView
-from django.urls import path
-from rest_framework.routers import DefaultRouter
-
-router = DefaultRouter()
-router.register(r'order_slip', OrderSlipView, basename='order_slip')
+from django.urls import path, include
 
 urlpatterns = [
-    
-] + router.urls
+    path('order_slip/', include('slip.order_slip.urls'))
+]

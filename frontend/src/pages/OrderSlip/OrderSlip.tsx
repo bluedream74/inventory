@@ -45,6 +45,12 @@ import {
 import axiosApi from '../../utilities/axios';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { getSlipList } from '../../store/slip/orderSlipReducer';
+import { getStorehouseList } from '../../store/basic/storehouseReducer';
+import { getDeliveryList } from '../../store/basic/deliveryReducer';
+import { getChargerList } from '../../store/basic/chargerReducer';
+import { getExhibitionList } from '../../store/basic/exhibitionReducer';
+import { getProductList } from '../../store/basic/productReducer';
+import { ProductInterface } from '../ProductRegister/ProductRegister';
 
 const StyledIconButton = styled(IconButton)({
   border: '1px solid black',
@@ -61,8 +67,7 @@ const NonBorderRadiusButton = styled(Button)({
 
 const roles = ['Market', 'Finance', 'Development'];
 
-const initialRows: GridRowsProp = [
-];
+const initialRows: GridRowsProp = [];
 
 interface EditToolbarProps {
   setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
@@ -71,38 +76,33 @@ interface EditToolbarProps {
   ) => void;
 }
 
-function EditToolbar(props: EditToolbarProps) {
-  const { setRows, setRowModesModel } = props;
 
-  const handleClick = () => {
-    const id = randomId();
-    setRows((oldRows) => [...oldRows, { id, isNew: true }]);
-    setRowModesModel((oldModel) => ({
-      ...oldModel,
-      [id]: { mode: GridRowModes.Edit, fieldToFocus: 'productCode' },
-    }));
-  };
-
-  return (
-    <GridToolbarContainer>
-      <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-        明細追加
-      </Button>
-    </GridToolbarContainer>
-  );
+export interface IOrderSlip {
+  id : number;
+  no : string;
+  slip_date : string;
+  delivery_date : string;
+  shopping_date : string;
+  delivery_place_code : string;
+  storehouse_code : string;
+  global_rate : string;
+  charger_code : string;
+  receiver_code :string;
+  exhibition_code : string;
+  status : string;
+  items : Array<any>;
 }
-
 export interface OrderSlipCommon {
   No: string | null;
   slipDate: Dayjs | null;
   deliveryDate: Dayjs | null;
   shoppingDate: Dayjs | null;
-  deliveryPlaceCode: string;
-  storehouseCode: string;
+  deliveryPlaceCode: string | null;
+  storehouseCode: string | null;
   globalRate: string;
-  chargerCode: string;
+  chargerCode: string | null;
   receiverCode: string;
-  exhibitionCode: string;
+  exhibitionCode: string | null;
   status: string;
 }
 
@@ -116,15 +116,23 @@ export interface BtnStatusInterface {
   save: 'active' | 'disable';
 }
 
+export interface OrderProductInterfact {
+  product_code: Array<string>;
+  product_name : string;
+  part_number : string;
+  price : string;
+}
 const OrderSlip = () => {
   const dispatch = useAppDispatch();
+  const currentDate = new Date();
+  const formattedDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}`;
   const [rows, setRows] = React.useState(initialRows);
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
   const [slipCommon, setSlipCommon] = useState<OrderSlipCommon>({
     No: "",
-    slipDate: dayjs('2022-01-01'),
-    deliveryDate: dayjs('2022-01-01'),
-    shoppingDate: dayjs('2022-01-01'),
+    slipDate: dayjs(formattedDate),
+    deliveryDate: dayjs(formattedDate),
+    shoppingDate: dayjs(formattedDate),
     deliveryPlaceCode: "",
     storehouseCode: "",
     globalRate: "100.0%",
@@ -133,10 +141,69 @@ const OrderSlip = () => {
     exhibitionCode: "",
     status: "発注済み",
   });
+  const orderSlipList : Array<IOrderSlip> = useAppSelector(state=>state.orderSlip.slips);
   const noList: string[]  = useAppSelector((state) => {
     const ret = state.orderSlip.slips.map(slip => slip.no ?? "");
-    return ["新規追加", ...ret];
+    return ["新規登録", ...ret];
   });
+  const storehouseList : string[] = useAppSelector((state) => {
+    const shl = state.storehouse.storehouseList.map(item=>item.code??"");
+    return shl;
+  });
+  const deliveryList : string[] = useAppSelector((state) => {
+    const lists = state.delivery.deliveryList.map(item=>item.code??"");
+    return lists;
+  });
+  const chargerList : string[] = useAppSelector((state) => {
+    const lists = state.charger.chargerList.map(item=>item.code??"");
+    return lists;
+  });
+  const exhibitionList : string[] = useAppSelector((state) => {
+    const lists = state.exhibition.exhibitionList.map(item=>item.code??"");
+    return lists;
+  });
+  const productList : Array<ProductInterface> = useAppSelector(state => state.product.productList);
+  const proList : string[] = useAppSelector((state) => {
+    const lists = state.product.productList.map(item=>item.code??"");
+    return lists;
+  });
+  // const [addRow, setAddRow] = useState({
+  //   product_code : '',
+  //   product_name : '',
+  //   product_part_number : '',
+  //   size_code : '',
+  //   color_code : '',
+  //   quantity : '',
+  //   unit : '',
+  //   rate : '',
+  //   max_cost : '',
+  //   max_price : '',
+  //   min_price : '',
+  //   min_cost : '',
+  //   cost : '',
+  //   price : '',
+  //   profit : ''
+  // });
+  function EditToolbar(props: EditToolbarProps) {
+    const { setRows, setRowModesModel } = props;
+  
+    const handleClick = () => {
+      const id = randomId();
+      setRows((oldRows) => [...oldRows, { id, isNew: true }]);
+      setRowModesModel((oldModel) => ({
+        ...oldModel,
+        [id]: { mode: GridRowModes.Edit, fieldToFocus: 'product_code' },
+      }));
+    };
+  
+    return (
+      <GridToolbarContainer>
+        <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
+          明細登録
+        </Button>
+      </GridToolbarContainer>
+    );
+  }
   const [btnStatus, setBtnStatus] = useState<BtnStatusInterface>({
     first: 'disable',
     prev: 'disable',
@@ -148,6 +215,7 @@ const OrderSlip = () => {
   });
 
   const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
+    console.log('asassass')
     if (params.reason === GridRowEditStopReasons.rowFocusOut) {
       event.defaultMuiPrevented = true;
     }
@@ -160,7 +228,13 @@ const OrderSlip = () => {
   const handleSaveClick = (id: GridRowId) => () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
   };
-
+  const handleSaveRows = () => {
+    const slip_id = orderSlipList.filter(item=>item.no === slipCommon.No)[0]?.id;
+    console.log(rows)
+    axiosApi
+      .post(`slip/order_slip/saveRows/${slip_id}`, rows)
+      .then(res=> console.log(res));
+  }
   const handleDeleteClick = (id: GridRowId) => () => {
     setRows(rows.filter((row) => row.id !== id));
   };
@@ -182,18 +256,50 @@ const OrderSlip = () => {
   };
 
   const handleNoChange = (event: any, newValue: string | null) => {
-    btnStatus.first = ((newValue === "新規追加" || newValue === noList[noList.length - 1]) ? 'disable' : 'active');
-    btnStatus.prev = ((newValue === "新規追加" || newValue === noList[noList.length - 1]) ? 'disable' : 'active');
-    btnStatus.next = ((newValue === "新規追加" || newValue === noList[1]) ? 'disable' : 'active');
-    btnStatus.last = ((newValue === "新規追加" || newValue === noList[1]) ? 'disable' : 'active');
-    btnStatus.delete = (newValue === "新規追加" ? 'disable' : 'active');
+    btnStatus.first = ((newValue === "新規登録" || newValue === noList[noList.length - 1]) ? 'disable' : 'active');
+    btnStatus.prev = ((newValue === "新規登録" || newValue === noList[noList.length - 1]) ? 'disable' : 'active');
+    btnStatus.next = ((newValue === "新規登録" || newValue === noList[1]) ? 'disable' : 'active');
+    btnStatus.last = ((newValue === "新規登録" || newValue === noList[1]) ? 'disable' : 'active');
+    btnStatus.delete = (newValue === "新規登録" ? 'disable' : 'active');
     btnStatus.cancel = 'disable';
-    btnStatus.save = 'disable';
-    setSlipCommon({...slipCommon, No: newValue});
+    btnStatus.save = 'active';
+    if(newValue === "新規登録")
+      setSlipCommon({
+        No: "新規登録",
+        slipDate: dayjs(formattedDate),
+        deliveryDate: dayjs(formattedDate),
+        shoppingDate: dayjs(formattedDate),
+        deliveryPlaceCode: "",
+        storehouseCode: "",
+        globalRate: "100.0%",
+        chargerCode: "",
+        receiverCode: "",
+        exhibitionCode: "",
+        status: "1"
+      });
+    else {
+      const newSlip = orderSlipList.filter(item=>item.no===newValue)[0];
+      setSlipCommon({
+        No: newSlip.no,
+        slipDate: dayjs(newSlip.slip_date),
+        deliveryDate: dayjs(newSlip.delivery_date),
+        shoppingDate: dayjs(newSlip.shopping_date),
+        deliveryPlaceCode: newSlip.delivery_place_code,
+        storehouseCode: newSlip.storehouse_code,
+        globalRate: newSlip.global_rate,
+        chargerCode: newSlip.charger_code,
+        receiverCode: newSlip.receiver_code,
+        exhibitionCode: newSlip.exhibition_code,
+        status: newSlip.status,
+      })
+      setRows(newSlip.items)
+    }
+      
   };
 
   const processRowUpdate = (newRow: GridRowModel) => {
     const updatedRow = { ...newRow, isNew: false };
+    console.log(rows)
     setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
     return updatedRow;
   };
@@ -201,18 +307,29 @@ const OrderSlip = () => {
   const handleRowModesModelChange = (newRowModesModel: GridRowModesModel) => {
     setRowModesModel(newRowModesModel);
   };
-
+  const handleEditCellChange = (params: any) => {
+    console.log(params)
+    const { id, field, value } = params;
+    setRows((prevRows) =>
+      prevRows.map((row) =>
+        row.id === id ? { ...row, [field]: value } : row
+      )
+    );
+  };
+  
   const columns: GridColDef[] = [
     {
-      field: 'productCode',
+      field: 'product_code',
       headerName: '商品コード ',
-      minWidth: 100,
-      align: 'left',
-      headerAlign: 'left',
-      editable: true
+      minWidth: 150,
+      align: 'center',
+      // headerAlign: 'left',
+      type: 'singleSelect',
+      valueOptions: proList,
+      editable: true,
     },
     {
-      field: 'productName',
+      field: 'product_name',
       headerName: '商品名',
       minWidth: 150,
       align: 'left',
@@ -220,7 +337,7 @@ const OrderSlip = () => {
       editable: true,
     },
     {
-      field: 'ProductPartnumber',
+      field: 'product_part_number',
       headerName: '仮品番',
       minWidth: 100,
       align: 'left',
@@ -228,7 +345,7 @@ const OrderSlip = () => {
       editable: true,
     },
     {
-      field: 'size',
+      field: 'size_code',
       headerName: 'サイズ',
       minWidth: 100,
       align: 'left',
@@ -236,7 +353,7 @@ const OrderSlip = () => {
       editable: true,
     },
     {
-      field: 'color',
+      field: 'color_code',
       headerName: '色',
       minWidth: 100,
       align: 'left',
@@ -261,7 +378,7 @@ const OrderSlip = () => {
       editable: true,
     },
     {
-      field: 'maxCost',
+      field: 'max_cost',
       headerName: '上代単価',
       minWidth: 120,
       align: 'right',
@@ -279,7 +396,7 @@ const OrderSlip = () => {
       editable: true,
     },
     {
-      field: 'maxPrice',
+      field: 'max_price',
       headerName: '上代金額',
       minWidth: 120,
       align: 'right',
@@ -288,7 +405,7 @@ const OrderSlip = () => {
       editable: true,
     },
     {
-      field: 'minCost',
+      field: 'min_cost',
       headerName: '下代単価 ',
       minWidth: 120,
       align: 'right',
@@ -306,7 +423,7 @@ const OrderSlip = () => {
       editable: true,
     },
     {
-      field: 'minPrice',
+      field: 'min_price',
       headerName: '下代金額 ',
       minWidth: 120,
       align: 'right',
@@ -410,10 +527,10 @@ const OrderSlip = () => {
 
   const handleCancel = () => {
     setSlipCommon({
-      No: "新規追加",
-      slipDate: dayjs('2022-01-01'),
-      deliveryDate: dayjs('2022-01-01'),
-      shoppingDate: dayjs('2022-01-01'),
+      No: "新規登録",
+      slipDate: dayjs(formattedDate),
+      deliveryDate: dayjs(formattedDate),
+      shoppingDate: dayjs(formattedDate),
       deliveryPlaceCode: "",
       storehouseCode: "",
       globalRate: "100.0",
@@ -423,20 +540,49 @@ const OrderSlip = () => {
       status: "発注済み",
     });
   }
-
-  const handleSave = () => {
+  const deleteOrder = () => {
+    const slip_id = orderSlipList.filter(item=>item.no === slipCommon.No)[0]?.id;
     axiosApi
-      .post('slip/order_slip/', { common: slipCommon, content: rows })
+      .delete(`slip/order_slip/${slip_id}`)
       .then(res => {
-        console.log(res);
+        dispatch(getSlipList())
       })
       .catch(err => {
         console.log(err);
       })
   }
+  const handleSave = () => {
+    if(slipCommon.No === "新規登録") {
+      axiosApi
+      .post(`slip/order_slip/`, slipCommon)
+      .then(res => {
+        dispatch(getSlipList())
+      })
+      .catch(err => {
+        console.log(err);
+      })
+    }
+    else {
+      const slip_id = orderSlipList.filter(item=>item.no === slipCommon.No)[0]?.id;
+      axiosApi
+      .put(`slip/order_slip/${slip_id}`, slipCommon)
+      .then(res => {
+        dispatch(getSlipList())
+      })
+      .catch(err => {
+        console.log(err);
+      })
+    }
+    
+  }
 
   useEffect(() => {
     void dispatch(getSlipList());
+    void dispatch(getStorehouseList());
+    void dispatch(getDeliveryList());
+    void dispatch(getChargerList());
+    void dispatch(getExhibitionList());
+    void dispatch(getProductList());
   }, [dispatch]);
 
   useEffect(() => {
@@ -475,7 +621,7 @@ const OrderSlip = () => {
             </StyledIconButton>
           </div>
           <div className="action-btn">
-            <NonBorderRadiusButton variant="outlined" disabled={btnStatus.delete === 'disable'}>削除</NonBorderRadiusButton>
+            <NonBorderRadiusButton variant="outlined" disabled={btnStatus.delete === 'disable'} onClick={deleteOrder}>削除</NonBorderRadiusButton>
             <NonBorderRadiusButton variant="outlined" disabled={btnStatus.cancel === 'disable'} onClick={handleCancel}>キャンセル</NonBorderRadiusButton>
             <NonBorderRadiusButton variant="outlined" disabled={btnStatus.save === 'disable'} onClick={handleSave} >保存</NonBorderRadiusButton>
           </div>
@@ -548,26 +694,56 @@ const OrderSlip = () => {
               <div className="common-item">
                 <div className="common-item__small">
                   <p className="common-item__title">納品先コード</p>
-                  <InputBase
+                  {/* <InputBase
                     className='common-item__small__input-left'
                     name='deliveryPlaceCode'
                     value={slipCommon.deliveryPlaceCode}
                     onChange={(e) =>
                       setSlipCommon({ ...slipCommon, [e.target.name]: e.target.value })
                     }
+                  /> */}
+                  <Autocomplete
+                    disablePortal
+                    id="deliveryList"
+                    size='small'
+                    value={slipCommon.deliveryPlaceCode}
+                    onChange={(event: any, newValue: string | null)=>
+                      setSlipCommon({ ...slipCommon, deliveryPlaceCode: newValue })}
+                    options={deliveryList}
+                    sx={{ width: 300 }}
+                    renderInput={(params) => <TextField {...params} label="" 
+                      sx={{
+                        borderRadius: "0px", 
+                        "& .MuiAutocomplete-inputRoot": {
+                          // paddingLeft: "20px !important",
+                          borderRadius: "0px"
+                        },
+                      }} 
+                    />}
                   />
                 </div>
               </div>
               <div className="common-item">
                 <div className="common-item__small">
-                  <p className="common-item__small__title-first">店舗コード</p>
-                  <InputBase
-                    className='common-item__small__input-left'
-                    name='storehouseCode'
+                  <p className="common-item__small__title-first">店舗コード</p> 
+                  <Autocomplete
+                    disablePortal
+                    id="storehouseList"
+                    size='small'
                     value={slipCommon.storehouseCode}
-                    onChange={(e) =>
-                      setSlipCommon({ ...slipCommon, [e.target.name]: e.target.value })
-                    }
+                    onChange={(event: any, newValue: string | null)=>
+                      setSlipCommon({ ...slipCommon, storehouseCode: newValue })}
+                    options={storehouseList}
+                    sx={{ width: 300 }}
+                    renderInput={(params) => <TextField {...params} label="" 
+                      sx={{
+                        borderRadius: "0px", 
+                        "& .MuiAutocomplete-inputRoot": {
+                          // paddingLeft: "20px !important",
+                          borderRadius: "0px"
+                        },
+                      }} 
+                    />}
                   />
                 </div>
                 <div className="common-item__small">
@@ -591,13 +767,24 @@ const OrderSlip = () => {
               <div className="common-item">
                 <div className="common-item__small">
                   <p className="common-item__title">担当者コード </p>
-                  <InputBase
-                    className='common-item__small__input-left'
-                    name='chargerCode'
+                  <Autocomplete
+                    disablePortal
+                    id="chargerList"
+                    size='small'
                     value={slipCommon.chargerCode}
-                    onChange={(e) =>
-                      setSlipCommon({ ...slipCommon, [e.target.name]: e.target.value })
-                    }
+                    onChange={(event: any, newValue: string | null)=>
+                      setSlipCommon({ ...slipCommon, chargerCode: newValue })}
+                    options={chargerList}
+                    sx={{ width: 300 }}
+                    renderInput={(params) => <TextField {...params} label="" 
+                      sx={{
+                        borderRadius: "0px", 
+                        "& .MuiAutocomplete-inputRoot": {
+                          // paddingLeft: "20px !important",
+                          borderRadius: "0px"
+                        },
+                      }} 
+                    />}
                   />
                 </div>
                 <div className="common-item__small">
@@ -606,9 +793,9 @@ const OrderSlip = () => {
                     control={
                       <Checkbox 
                         color="default" 
-                        checked={slipCommon.status === "発注済み"}
+                        checked={slipCommon.status === "1"}
                         onChange={handleStatusChange}
-                        value="発注済み"
+                        value="1"
                       />
                     }
                     label="発注済み"
@@ -619,7 +806,7 @@ const OrderSlip = () => {
                 <div className="common-item__small">
                   <p className="common-item__small__title-first">記入者コード </p>
                   <InputBase
-                    className='common-item__small__input-left'
+                    className='border-2 w-[300px] border-gray-300'
                     name='receiverCode'
                     value={slipCommon.receiverCode}
                     onChange={(e) =>
@@ -634,9 +821,9 @@ const OrderSlip = () => {
                     control={
                       <Checkbox 
                         color="default" 
-                        checked={slipCommon.status === "売上転送済み"}
+                        checked={slipCommon.status === "2"}
                         onChange={handleStatusChange}
-                        value="売上転送済み"
+                        value="2"
                       />
                     }
                     label="売上転送済み"
@@ -646,13 +833,24 @@ const OrderSlip = () => {
               <div className="common-item">
                 <div className="common-item__small">
                   <p className="common-item__small__title-first">展示会コード</p>
-                  <InputBase
-                    className='common-item__small__input-left'
-                    name='exhibitionCode'
+                  <Autocomplete
+                    disablePortal
+                    id="exhibitionList"
+                    size='small'
                     value={slipCommon.exhibitionCode}
-                    onChange={(e) =>
-                      setSlipCommon({ ...slipCommon, [e.target.name]: e.target.value })
-                    }
+                    onChange={(event: any, newValue: string | null)=>
+                      setSlipCommon({ ...slipCommon, exhibitionCode: newValue })}
+                    options={exhibitionList}
+                    sx={{ width: 300 }}
+                    renderInput={(params) => <TextField {...params} label="" 
+                      sx={{
+                        borderRadius: "0px", 
+                        "& .MuiAutocomplete-inputRoot": {
+                          // paddingLeft: "20px !important",
+                          borderRadius: "0px"
+                        },
+                      }} 
+                    />}
                   />
                 </div>
                 <div className="common-item__small">
@@ -661,9 +859,9 @@ const OrderSlip = () => {
                     control={
                       <Checkbox 
                         color="default" 
-                        checked={slipCommon.status === "取置転送済み"}
+                        checked={slipCommon.status === "3"}
                         onChange={handleStatusChange}
-                        value="取置転送済み"
+                        value="3"
                       />
                     }
                     label="取置転送済み"
@@ -672,7 +870,12 @@ const OrderSlip = () => {
               </div>
             </div>
           </div>
+          {(slipCommon.No !== '新規登録' && slipCommon.No !== "" ) &&
           <div className="slip-content">
+            <div className='flex justify-end pb-3'>
+              <NonBorderRadiusButton variant="outlined" onClick={handleSaveRows} className='bg-red-300' >明細保存</NonBorderRadiusButton>
+            </div>
+            
             <DataGrid
               rows={rows}
               columns={columns}
@@ -689,8 +892,11 @@ const OrderSlip = () => {
               }}
               localeText={jaJP.components.MuiDataGrid.defaultProps.localeText}
             />
+            
+            
             {CustomFooter()}
           </div>
+          }
         </div>
       </div>
     </LocalizationProvider>

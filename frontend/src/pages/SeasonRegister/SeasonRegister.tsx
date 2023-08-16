@@ -75,8 +75,16 @@ const SeasonRegister: React.FC = () => {
 
   const handleModalSubmit = () => {
     if (modalData.id) {
+            const formData = new FormData();
+         Object.keys(modalData).forEach((key) => {
+        formData.append(key, modalData[key]);
+      });
       axiosApi
-        .put(`basic/season/${modalData.id}`, modalData)
+        .put(`season_register/${modalData.id}`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        })
         .then(res => {
           handleClose();
           void dispatch(getSeasonList());
@@ -85,8 +93,17 @@ const SeasonRegister: React.FC = () => {
           console.log(err);
         })
     } else {
+            const formData = new FormData();
+      Object.keys(modalData).forEach((key) => {
+        formData.append(key, modalData[key]);
+      });
+
       axiosApi
-        .post("basic/season/", modalData)
+        .post("season_register/", formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        })
         .then(res => {
           handleClose();
           void dispatch(getSeasonList());
@@ -99,7 +116,7 @@ const SeasonRegister: React.FC = () => {
 
   const handleDeleteRow = (id: number) => {
     axiosApi
-      .delete(`basic/season/${id}`)
+      .delete(`season_register/${id}`)
       .then(res => {
         void dispatch(getSeasonList());
         handleCloseDelete();
@@ -152,7 +169,7 @@ const SeasonRegister: React.FC = () => {
 
   const ModalSection = (
     <Dialog open={open}>
-      <DialogTitle textAlign="center">シーズン追加</DialogTitle>
+      <DialogTitle textAlign="center">シーズン登録</DialogTitle>
       <DialogContent>
         <form onSubmit={(e) => e.preventDefault()}>
           <Stack
@@ -199,7 +216,7 @@ const SeasonRegister: React.FC = () => {
       <DialogActions sx={{ p: '1.25rem' }}>
         <Button onClick={handleClose}>キャンセル</Button>
         <Button color="secondary" onClick={handleModalSubmit} variant="contained">
-          {modalData.id === 0 ? "追加" : "変更"}
+          {modalData.id === 0 ? "登録" : "変更"}
         </Button>
       </DialogActions>
     </Dialog>
@@ -224,7 +241,7 @@ const SeasonRegister: React.FC = () => {
     <div className='season_register'>
       <div className="toolbar">
         <div>
-          <button className='season_add' onClick={handleAddRow}>シーズン追加</button>
+          <button className='season_add' onClick={handleAddRow}>シーズン登録</button>
           {ModalSection}
           {DeleteModal}
         </div>

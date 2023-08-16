@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { AxiosResponse } from 'axios';
 import { SeasonInterface } from "../../pages/SeasonRegister/SeasonRegister";
 import axiosApi from "../../utilities/axios";
@@ -16,8 +16,8 @@ const initialState: SeasonStateType = {
 export const getSeasonList = createAsyncThunk<SeasonInterface[]>(
   "season/getSeasonList",
   async () => {
-    const response: AxiosResponse<SeasonInterface[]> = await axiosApi.get("basic/season/");
-    return response.data;
+    const response: AxiosResponse<SeasonInterface[]> = await axiosApi.get("season_register/");
+    return response.data?.seasons;
   }
 )
 

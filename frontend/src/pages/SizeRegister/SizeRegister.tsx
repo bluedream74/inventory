@@ -76,7 +76,7 @@ const SizeRegister: React.FC = () => {
   const handleModalSubmit = () => {
     if (modalData.id) {
       axiosApi
-        .put(`basic/size/${modalData.id}`, modalData)
+        .put(`size_register/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
           void dispatch(getSizeList());
@@ -86,7 +86,7 @@ const SizeRegister: React.FC = () => {
         })
     } else {
       axiosApi
-        .post("basic/size/", modalData)
+        .post("size_register/", modalData)
         .then(res => {
           handleClose();
           void dispatch(getSizeList());
@@ -99,7 +99,7 @@ const SizeRegister: React.FC = () => {
 
   const handleDeleteRow = (id: number) => {
     axiosApi
-      .delete(`basic/size/${id}`)
+      .delete(`size_register/${id}`)
       .then(res => {
         void dispatch(getSizeList());
         handleCloseDelete();
@@ -152,7 +152,7 @@ const SizeRegister: React.FC = () => {
 
   const ModalSection = (
     <Dialog open={open}>
-      <DialogTitle textAlign="center">サイズ追加</DialogTitle>
+      <DialogTitle textAlign="center">サイズ登録</DialogTitle>
       <DialogContent>
         <form onSubmit={(e) => e.preventDefault()}>
           <Stack
@@ -199,7 +199,7 @@ const SizeRegister: React.FC = () => {
       <DialogActions sx={{ p: '1.25rem' }}>
         <Button onClick={handleClose}>キャンセル</Button>
         <Button color="secondary" onClick={handleModalSubmit} variant="contained">
-          {modalData.id === 0 ? "追加" : "変更"}
+          {modalData.id === 0 ? "登録" : "変更"}
         </Button>
       </DialogActions>
     </Dialog>
@@ -224,7 +224,7 @@ const SizeRegister: React.FC = () => {
     <div className='size_register'>
       <div className="toolbar">
         <div>
-          <button className='size_add' onClick={handleAddRow}>サイズ追加</button>
+          <button className='size_add' onClick={handleAddRow}>サイズ登録</button>
           {ModalSection}
           {DeleteModal}
         </div>

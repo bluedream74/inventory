@@ -82,7 +82,7 @@ const StorehouseRegister: React.FC = () => {
   const handleModalSubmit = () => {
     if (modalData.id) {
       axiosApi
-        .put(`basic/storehouse/${modalData.id}`, modalData)
+        .put(`storehouse_register/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
           void dispatch(getStorehouseList());
@@ -92,7 +92,7 @@ const StorehouseRegister: React.FC = () => {
         })
     } else {
       axiosApi
-        .post("basic/storehouse/", modalData)
+        .post("storehouse_register/", modalData)
         .then(res => {
           handleClose();
           void dispatch(getStorehouseList());
@@ -105,7 +105,7 @@ const StorehouseRegister: React.FC = () => {
 
   const handleDeleteRow = (id: number) => {
     axiosApi
-      .delete(`basic/storehouse/${id}`)
+      .delete(`storehouse_register/${id}`)
       .then(res => {
         void dispatch(getStorehouseList());
         handleCloseDelete();
@@ -158,7 +158,7 @@ const StorehouseRegister: React.FC = () => {
 
   const ModalSection = (
     <Dialog open={open}>
-      <DialogTitle textAlign="center">店舗・倉庫追加</DialogTitle>
+      <DialogTitle textAlign="center">店舗・倉庫登録</DialogTitle>
       <DialogContent>
         <form onSubmit={(e) => e.preventDefault()}>
           <Stack
@@ -223,7 +223,7 @@ const StorehouseRegister: React.FC = () => {
       <DialogActions sx={{ p: '1.25rem' }}>
         <Button onClick={handleClose}>キャンセル</Button>
         <Button color="secondary" onClick={handleModalSubmit} variant="contained">
-          {modalData.id === 0 ? "追加" : "変更"}
+          {modalData.id === 0 ? "登録" : "変更"}
         </Button>
       </DialogActions>
     </Dialog>
@@ -248,7 +248,7 @@ const StorehouseRegister: React.FC = () => {
     <div className='storehouse_register'>
       <div className="toolbar">
         <div>
-          <button className='storehouse_add' onClick={handleAddRow}>店舗・倉庫追加</button>
+          <button className='storehouse_add' onClick={handleAddRow}>店舗・倉庫登録</button>
           {ModalSection}
           {DeleteModal}
         </div>

@@ -16,7 +16,7 @@ const initialState: ItemStateType = {
 export const getItemList = createAsyncThunk<ItemInterface[]>(
   "item/getItemList",
   async () => {
-    const response: AxiosResponse<ItemInterface[]> = await axiosApi.get("basic/item/");
+    const response: AxiosResponse<ItemInterface[]> = await axiosApi.get("item_register/");
     return response.data;
   }
 )

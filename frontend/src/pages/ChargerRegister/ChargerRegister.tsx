@@ -82,7 +82,7 @@ const ChargerRegister: React.FC = () => {
   const handleModalSubmit = () => {
     if (modalData.id) {
       axiosApi
-        .put(`basic/charger/${modalData.id}`, modalData)
+        .put(`charger_register/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
           void dispatch(getChargerList());
@@ -92,7 +92,7 @@ const ChargerRegister: React.FC = () => {
         })
     } else {
       axiosApi
-        .post("basic/charger/", modalData)
+        .post("charger_register/", modalData)
         .then(res => {
           handleClose();
           void dispatch(getChargerList());
@@ -105,7 +105,7 @@ const ChargerRegister: React.FC = () => {
 
   const handleDeleteRow = (id: number) => {
     axiosApi
-      .delete(`basic/charger/${id}`)
+      .delete(`charger_register/${id}`)
       .then(res => {
         void dispatch(getChargerList());
         handleCloseDelete();
@@ -158,7 +158,7 @@ const ChargerRegister: React.FC = () => {
 
   const ModalSection = (
     <Dialog open={open}>
-      <DialogTitle textAlign="center">担当者追加</DialogTitle>
+      <DialogTitle textAlign="center">担当者登録</DialogTitle>
       <DialogContent>
         <form onSubmit={(e) => e.preventDefault()}>
           <Stack
@@ -223,7 +223,7 @@ const ChargerRegister: React.FC = () => {
       <DialogActions sx={{ p: '1.25rem' }}>
         <Button onClick={handleClose}>キャンセル</Button>
         <Button color="secondary" onClick={handleModalSubmit} variant="contained">
-          {modalData.id === 0 ? "追加" : "変更"}
+          {modalData.id === 0 ? "登録" : "変更"}
         </Button>
       </DialogActions>
     </Dialog>
@@ -248,7 +248,7 @@ const ChargerRegister: React.FC = () => {
     <div className='charger_register'>
       <div className="toolbar">
         <div>
-          <button className='charger_add' onClick={handleAddRow}>担当者追加</button>
+          <button className='charger_add' onClick={handleAddRow}>担当者登録</button>
           {ModalSection}
           {DeleteModal}
         </div>

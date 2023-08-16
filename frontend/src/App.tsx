@@ -1,12 +1,18 @@
 import AuthProvider from "./provider/authProvider";
-import Routes from "./routes";
+
 import './assets/css/App.scss';
+import { store } from "./store";
+import { Provider } from "react-redux";
+import { Router } from "./router";
 
 function App() {
   return (
-    <AuthProvider>
-      <Routes />
-    </AuthProvider>
+    <div>
+      <Provider store={store}>
+        <Router/>
+      </Provider>
+    </div>
+    
   );
 }
 
