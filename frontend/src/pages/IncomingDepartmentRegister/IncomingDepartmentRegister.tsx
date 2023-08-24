@@ -85,7 +85,7 @@ const IncomingDepartmentRegister: React.FC = () => {
   const handleModalSubmit = () => {
     if (modalData.id) {
       axiosApi
-        .put(`basic/incoming_department/${modalData.id}`, modalData)
+        .put(`incomingDepartment_register/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
           void dispatch(getIncomingDepartmentList());
@@ -95,7 +95,7 @@ const IncomingDepartmentRegister: React.FC = () => {
         })
     } else {
       axiosApi
-        .post("basic/incoming_department/", modalData)
+        .post("incomingDepartment_register/", modalData)
         .then(res => {
           handleClose();
           void dispatch(getIncomingDepartmentList());
@@ -108,7 +108,7 @@ const IncomingDepartmentRegister: React.FC = () => {
 
   const handleDeleteRow = (id: number) => {
     axiosApi
-      .delete(`basic/incoming_department/${id}`)
+      .delete(`incomingDepartment_register/${id}`)
       .then(res => {
         void dispatch(getIncomingDepartmentList());
         handleCloseDelete();

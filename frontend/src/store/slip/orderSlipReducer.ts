@@ -18,21 +18,7 @@ export interface OrderSlipInterface {
   receiverCode: string;
   exhibitionCode:string;
   status: string;
-  productCode: string;
-  productName: string;
-  productPartNumber: string;
-  sizeCode: string;
-  colorCode: string;
-  quantity: number;
-  unit: string;
-  rate: number;
-  maxCost: number;
-  maxPrice: number;
-  minCost: number;
-  minPrice: number;
-  cost: number;
-  price: number;
-  profit: number;
+  other: string;
 }
 
 export interface OrderSlipStateType {

@@ -17,146 +17,19 @@ import ExhibitionRegister from "../pages/ExhibitionRegister/ExhibitionRegister";
 import IncomingDepartmentRegister from "../pages/IncomingDepartmentRegister/IncomingDepartmentRegister";
 import OriginCountryRegister from "../pages/OriginCountry/OriginCountryRegister";
 import StorehouseRegister from "../pages/StorehouseRegister/StorehouseRegister";
-import CustomerRegister from "../pages/CustomerRegister/CustomerRegister";
+import EntrustRegister from "../pages/EntrustRegister/EntrustRegister";
 import DeposittypeRegister from "../pages/DeposittypeRegister/DeposittypeRegister";
 import OrderSlip from "../pages/OrderSlip/OrderSlip";
 import { AuthLayout } from "../layouts/AuthLayout";
 import { DefaultLayout } from "../layouts/DefaultLayout";
 import { Home } from "../pages/Home";
+import { ConsignmentSlip } from "../pages/ConsignmentSlip";
+import { DepositSlip } from "../pages/DepositSlip";
+import { PurchaseOrderSlip } from "../pages/purchaseOrderSlip";
+import { PurchaseSlip } from "../pages/purchaseSlip";
+import { CollectionSlip } from "../pages/CollectionSlip";
+import { PaymentSlip } from "../pages/PaymentSlip";
 
-// const Routes = () => {
-// 	const { token } = useAuth();
-
-// 	// Define public routes accessible to all users
-// 	const routesForPublic = [
-// 		{
-// 			path: "/service",
-// 			element: <div>Service Page</div>,
-// 		},
-// 		{
-// 			path: "/about-us",
-// 			element: <div>About Us</div>,
-// 		},
-// 		// "Not Found" route
-// 		{
-// 		path: "*",
-// 		element: <Navigate to="/home" />,
-// 		},
-// 	];
-
-// 	// Define routes accessible only to authenticated users
-// 	const routesForAuthenticatedOnly = [
-// 		{
-// 			element: <ProtectedRoute />, // Wrap the component in ProtectedRoute
-// 			children: [
-// 				{
-// 					path: "/home",
-// 					element: <ItemRegister />,
-// 				},
-// 				{
-// 					path: "/profile",
-// 					element: <div>User Profile</div>,
-// 				},
-// 				{
-// 					path: "/logout",
-// 					element: <div>Logout</div>,
-// 				},
-// 				{
-// 					path: "/product_register",
-// 					element: <ProductRegister />
-// 				},
-// 				{
-// 					path: "/color_register",
-// 					element: <ColorRegister />
-// 				},
-// 				{
-// 					path: "/size_register",
-// 					element: <SizeRegister />
-// 				},
-// 				{
-// 					path: "/season_register",
-// 					element: <SeasonRegister />
-// 				},
-// 				{
-// 					path: "/brand_register",
-// 					element: <BrandRegister />
-// 				},
-// 				{
-// 					path: "/item_register",
-// 					element: <ItemRegister />
-// 				},
-// 				{
-// 					path: "/material_register",
-// 					element: <MaterialRegister />
-// 				},
-// 				{
-// 					path: "/delivery_register",
-// 					element: <DeliveryRegister />
-// 				},
-// 				{
-// 					path: "/charger_register",
-// 					element: <ChargerRegister />
-// 				},
-// 				{
-// 					path: "/dealer_register",
-// 					element: <DealerRegister />
-// 				},
-// 				{
-// 					path: "/exhibition_register",
-// 					element: <ExhibitionRegister />
-// 				},
-// 				{
-// 					path: "/incoming_department_register",
-// 					element: <IncomingDepartmentRegister />
-// 				},
-// 				{
-// 					path: "/origin_country_register",
-// 					element: <OriginCountryRegister />
-// 				},
-// 				{
-// 					path: "/storehouse_register",
-// 					element: <StorehouseRegister />
-// 				},
-// 				{
-// 					path: "/customer_register",
-// 					element: <CustomerRegister />
-// 				},
-// 				{
-// 					path: "/deposittype_register",
-// 					element: <DeposittypeRegister />
-// 				},
-// 				{
-// 					path: "/order_slip",
-// 					element: <OrderSlip />
-// 				}
-// 			],
-// 		},
-// 	];
-
-// 	// Define routes accessible only to non-authenticated users
-// 	const routesForNotAuthenticatedOnly = [
-// 		{
-// 			path: "/login",
-// 			element: <Login />,
-// 		},
-// 		{
-// 			path: "/signup",
-// 			element: <SignUp />
-// 		}
-// 	];
-
-// 	// Combine and conditionally include routes based on authentication status
-// 	const router = createBrowserRouter([
-// 		...routesForPublic,
-// 		...(!token ? routesForNotAuthenticatedOnly : []),
-// 		...routesForAuthenticatedOnly,
-// 	]);
-
-// 	// Provide the router configuration using RouterProvider
-// 	return <RouterProvider router={router} />;
-// };
-
-// export default Routes;
 
 export const Router = () => {
   return (
@@ -181,17 +54,23 @@ export const Router = () => {
         <Route path="delivery_register" element={<DeliveryRegister />} />   
         <Route path="origin_country_register" element={<OriginCountryRegister />} />
         <Route path="item_register" element={<ItemRegister />} />
-
+        <Route path="entrust_register" element={<EntrustRegister />} />
         <Route path="storehouse_register" element={<StorehouseRegister />} />
 
         {/* begin Exhibition Sales  */}
         <Route path="charger_register" element={<ChargerRegister />} />
         <Route path="dealer_register" element={<DealerRegister />} />
         <Route path="exhibition_register" element={<ExhibitionRegister />} />
-
+        <Route path="incomingdepartment_register" element={<IncomingDepartmentRegister />} />
+        <Route path="deposittype_register" element={<DeposittypeRegister/>}/>
         {/* begin slip */}
         <Route path="order_slip" element={<OrderSlip />} />
-
+        <Route path="consignment_slip" element={<ConsignmentSlip />} />
+        <Route path="deposit_slip" element={<DepositSlip />} />
+        <Route path="purchase_order_slip" element={<PurchaseOrderSlip />} />
+        <Route path="purchase_slip" element={<PurchaseSlip />} />
+        <Route path="collection_slip" element={<CollectionSlip />} />
+        <Route path="payment_slip" element={<PaymentSlip />} />
       </Route>
 
     </Routes>

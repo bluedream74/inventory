@@ -20,6 +20,7 @@ import StorehouseRegister from "../pages/StorehouseRegister/StorehouseRegister";
 import CustomerRegister from "../pages/CustomerRegister/CustomerRegister";
 import DeposittypeRegister from "../pages/DeposittypeRegister/DeposittypeRegister";
 import OrderSlip from "../pages/OrderSlip/OrderSlip";
+import { ConsignmentSlip } from "../pages/ConsignmentSlip";
 
 const Routes = () => {
 	const { token } = useAuth();
@@ -125,6 +126,10 @@ const Routes = () => {
 				{
 					path: "/order_slip",
 					element: <OrderSlip />
+				},
+				{
+					path: "/consignment_slip",
+					element: <ConsignmentSlip />
 				}
 			],
 		},
