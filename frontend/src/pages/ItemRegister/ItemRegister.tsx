@@ -98,7 +98,7 @@ const ItemRegister: React.FC = () => {
         formData.append(key, modalData[key]);
       });
       axiosApi
-        .post("item_register", formData, {
+        .post("item_register/", formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },

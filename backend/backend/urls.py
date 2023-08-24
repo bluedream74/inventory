@@ -33,13 +33,15 @@ urlpatterns = [
     path('size_register/', include('size_register.urls')),
     path('delivery_register/', include('delivery_register.urls')),
     path('origin_country_register/', include('origin_country_register.urls')),
-
-    path('storehouse_register/', include('storehouse_register.urls')),
+    path('item_register/', include('item_register.urls')),
     
     path('storehouse_register/', include('storehouse_register.urls')),
     path('charger_register/', include('charger_register.urls')),
     path('dealer_register/', include('dealer_register.urls')),
     path('exhibition_register/', include('exhibition_register.urls')),
-
+    
+    path('incomingDepartment_register/', include('incomingDepartment_register.urls')),
+    path('deposittype_register/',include('deposittype_register.urls')),
+    path('entrust_register/', include('entrust_register.urls')),
     path('slip/', include('slip.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

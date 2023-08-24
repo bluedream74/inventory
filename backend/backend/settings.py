@@ -50,7 +50,16 @@ INSTALLED_APPS = [
     'charger_register',
     'dealer_register',
     'exhibition_register',
+    'incomingDepartment_register',
+    'deposittype_register',
+    'entrust_register',
     'slip.order_slip',
+    'slip.consignment_slip',
+    'slip.deposit_slip',
+    'slip.purchaseorder_slip',
+    'slip.purchase_slip',
+    'slip.collection_slip',
+    'slip.payment_slip',
     'django_extensions',
     # 'rest_framework_simplejwt'
     

@@ -16,8 +16,8 @@ const initialState: IncomingDepartmentStateType = {
 export const getIncomingDepartmentList = createAsyncThunk<IncomingDepartmentInterface[]>(
   "incomingDepartment/getIncomingDepartmentList",
   async () => {
-    const response: AxiosResponse<IncomingDepartmentInterface[]> = await axiosApi.get("basic/incoming_department/");
-    return response.data;
+    const response: AxiosResponse<IncomingDepartmentInterface[]> = await axiosApi.get("incomingDepartment_register/");
+    return response.data.incomingDepartments;
   }
 )
 

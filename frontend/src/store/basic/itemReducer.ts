@@ -17,7 +17,7 @@ export const getItemList = createAsyncThunk<ItemInterface[]>(
   "item/getItemList",
   async () => {
     const response: AxiosResponse<ItemInterface[]> = await axiosApi.get("item_register/");
-    return response.data;
+    return response.data.items;
   }
 )
 

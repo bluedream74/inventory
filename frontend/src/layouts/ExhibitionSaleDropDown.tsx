@@ -111,6 +111,10 @@ export const ExhibitionSaleDropDown = () => {
                     <FileCopyIcon />
                     <Link to='/dealer_register'>得意先登録</Link>
                 </MenuItem>
+                <MenuItem>
+                    <FileCopyIcon />
+                    <Link to='/deposittype_register'>入金支払登録</Link>
+                </MenuItem>
                 <Divider sx={{ my: 0.5 }} />
                 
             </StyledMenu>

@@ -7,6 +7,10 @@ import {
   InputBase,
   Checkbox,
   FormControlLabel,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -51,6 +55,8 @@ import { getChargerList } from '../../store/basic/chargerReducer';
 import { getExhibitionList } from '../../store/basic/exhibitionReducer';
 import { getProductList } from '../../store/basic/productReducer';
 import { ProductInterface } from '../ProductRegister/ProductRegister';
+import { getColorList } from '../../store/basic/colorReducer';
+import { getSizeList } from '../../store/basic/sizeReducer';
 
 const StyledIconButton = styled(IconButton)({
   border: '1px solid black',
@@ -90,6 +96,7 @@ export interface IOrderSlip {
   receiver_code :string;
   exhibition_code : string;
   status : string;
+  other: string;
   items : Array<any>;
 }
 export interface OrderSlipCommon {
@@ -162,28 +169,32 @@ const OrderSlip = () => {
     const lists = state.exhibition.exhibitionList.map(item=>item.code??"");
     return lists;
   });
+  const colorList : string[] = useAppSelector((state) => {
+    const lists = state.color.colorList.map(item=>item.code??"");
+    return lists;
+  });
+  const sizeList : string[] = useAppSelector((state) => {
+    const lists = state.size.sizeList.map(item=>item.code??"");
+    return lists;
+  });
   const productList : Array<ProductInterface> = useAppSelector(state => state.product.productList);
   const proList : string[] = useAppSelector((state) => {
     const lists = state.product.productList.map(item=>item.code??"");
     return lists;
   });
-  // const [addRow, setAddRow] = useState({
-  //   product_code : '',
-  //   product_name : '',
-  //   product_part_number : '',
-  //   size_code : '',
-  //   color_code : '',
-  //   quantity : '',
-  //   unit : '',
-  //   rate : '',
-  //   max_cost : '',
-  //   max_price : '',
-  //   min_price : '',
-  //   min_cost : '',
-  //   cost : '',
-  //   price : '',
-  //   profit : ''
-  // });
+  useEffect(() => {
+    handleNoChange(slipCommon.No);
+  }, [orderSlipList]);
+  useEffect(()=>{
+    handleNoChange(noList[noList.length - 1])
+  },[orderSlipList.length])
+  useEffect(() => {
+    setBtnStatus({
+      ...btnStatus,
+      save: "active",
+      cancel: "active",
+    });
+  }, [slipCommon]);
   function EditToolbar(props: EditToolbarProps) {
     const { setRows, setRowModesModel } = props;
   
@@ -255,48 +266,61 @@ const OrderSlip = () => {
     setSlipCommon({...slipCommon, status: (event.target as HTMLInputElement).value});
   };
 
-  const handleNoChange = (event: any, newValue: string | null) => {
-    btnStatus.first = ((newValue === "新規登録" || newValue === noList[noList.length - 1]) ? 'disable' : 'active');
-    btnStatus.prev = ((newValue === "新規登録" || newValue === noList[noList.length - 1]) ? 'disable' : 'active');
-    btnStatus.next = ((newValue === "新規登録" || newValue === noList[1]) ? 'disable' : 'active');
-    btnStatus.last = ((newValue === "新規登録" || newValue === noList[1]) ? 'disable' : 'active');
-    btnStatus.delete = (newValue === "新規登録" ? 'disable' : 'active');
-    btnStatus.cancel = 'disable';
-    btnStatus.save = 'active';
-    if(newValue === "新規登録")
-      setSlipCommon({
-        No: "新規登録",
-        slipDate: dayjs(formattedDate),
-        deliveryDate: dayjs(formattedDate),
-        shoppingDate: dayjs(formattedDate),
-        deliveryPlaceCode: "",
-        storehouseCode: "",
-        globalRate: "100.0%",
-        chargerCode: "",
-        receiverCode: "",
-        exhibitionCode: "",
-        status: "1"
+  const handleNoChange = (noValue: string | null) => {
+    if (noValue && noValue !== "新規登録") {
+      const index = noList.indexOf(noValue) - 1;
+      selectSilp(orderSlipList[index]);
+      setRows(orderSlipList[index]?.items);
+      setBtnStatus({
+        ...btnStatus,
+        first: noList.length > 2 && noValue !== noList[1] ? "active" : "disable",
+        prev: noList.length > 2 && noValue !== noList[1] ? "active" : "disable",
+        next:
+          noList.length > 2 && noValue !== noList[noList.length - 1]
+            ? "active"
+            : "disable",
+        last:
+          noList.length > 2 && noValue !== noList[noList.length - 1]
+            ? "active"
+            : "disable",
+        delete: "active",
       });
-    else {
-      const newSlip = orderSlipList.filter(item=>item.no===newValue)[0];
-      setSlipCommon({
-        No: newSlip.no,
-        slipDate: dayjs(newSlip.slip_date),
-        deliveryDate: dayjs(newSlip.delivery_date),
-        shoppingDate: dayjs(newSlip.shopping_date),
-        deliveryPlaceCode: newSlip.delivery_place_code,
-        storehouseCode: newSlip.storehouse_code,
-        globalRate: newSlip.global_rate,
-        chargerCode: newSlip.charger_code,
-        receiverCode: newSlip.receiver_code,
-        exhibitionCode: newSlip.exhibition_code,
-        status: newSlip.status,
-      })
-      setRows(newSlip.items)
-    }
-      
+    } else handleCancel();
   };
-
+  const selectSilp = (newSlip : IOrderSlip) => {
+    setSlipCommon({
+      No: newSlip.no,
+      slipDate: dayjs(newSlip.slip_date),
+      deliveryDate: dayjs(newSlip.delivery_date),
+      shoppingDate: dayjs(newSlip.shopping_date),
+      deliveryPlaceCode: newSlip.delivery_place_code,
+      storehouseCode: newSlip.storehouse_code,
+      globalRate: newSlip.global_rate,
+      chargerCode: newSlip.charger_code,
+      receiverCode: newSlip.receiver_code,
+      exhibitionCode: newSlip.exhibition_code,
+      status: newSlip.status,
+    })
+    setRows(newSlip.items)
+  }
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const handleCloseDelete = () => {
+    setDeleteOpen(false);
+  }
+  const DeleteModal = (
+    <Dialog open={deleteOpen}>
+      <DialogTitle textAlign="center">色削除</DialogTitle>
+      <DialogContent>
+        削除しましょか？
+      </DialogContent>
+      <DialogActions sx={{ p: '1.25rem' }}>
+        <Button onClick={handleCloseDelete}>キャンセル</Button>
+        <Button color="secondary" onClick={() => deleteOrder()} variant="contained">
+          削除
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
   const processRowUpdate = (newRow: GridRowModel) => {
     const updatedRow = { ...newRow, isNew: false };
     console.log(rows)
@@ -323,7 +347,6 @@ const OrderSlip = () => {
       headerName: '商品コード ',
       minWidth: 150,
       align: 'center',
-      // headerAlign: 'left',
       type: 'singleSelect',
       valueOptions: proList,
       editable: true,
@@ -349,7 +372,8 @@ const OrderSlip = () => {
       headerName: 'サイズ',
       minWidth: 100,
       align: 'left',
-      headerAlign: 'left',
+      type: 'singleSelect',
+      valueOptions: sizeList,
       editable: true,
     },
     {
@@ -357,7 +381,8 @@ const OrderSlip = () => {
       headerName: '色',
       minWidth: 100,
       align: 'left',
-      headerAlign: 'left',
+      type: 'singleSelect',
+      valueOptions: colorList,
       editable: true,
     },
     {
@@ -500,8 +525,8 @@ const OrderSlip = () => {
   const CustomFooter = () => {
     const selectedRows = [...rows];
     const quantitySum = selectedRows.reduce((sum: number, row: any) => sum + (row.quantity || 0), 0);
-    const maxPriceSum = selectedRows.reduce((sum: number, row: any) => sum + (row.maxPrice || 0), 0);
-    const minPriceSum = selectedRows.reduce((sum: number, row: any) => sum + (row.minPrice || 0), 0);
+    const maxPriceSum = selectedRows.reduce((sum: number, row: any) => sum + (row.max_price || 0), 0);
+    const minPriceSum = selectedRows.reduce((sum: number, row: any) => sum + (row.min_price || 0), 0);
     const profitSum = selectedRows.reduce((sum: number, row: any) => sum + (row.profit || 0), 0);
 
     return (
@@ -545,6 +570,8 @@ const OrderSlip = () => {
     axiosApi
       .delete(`slip/order_slip/${slip_id}`)
       .then(res => {
+        setSlipCommon({...slipCommon, No: proList[proList.length-1] })
+        setDeleteOpen(false);
         dispatch(getSlipList())
       })
       .catch(err => {
@@ -583,11 +610,34 @@ const OrderSlip = () => {
     void dispatch(getChargerList());
     void dispatch(getExhibitionList());
     void dispatch(getProductList());
-  }, [dispatch]);
+    void dispatch(getColorList());
+    void dispatch(getSizeList());
+  }, [orderSlipList.length]);
 
-  useEffect(() => {
-    // const slipData = 
-  }, [slipCommon.No]);
+  const changeSlip = (st : number) => {
+    switch (st) {
+      case 1 :
+        selectSilp(orderSlipList[0])
+        break;
+      case 2:
+        orderSlipList.map((item, index)=>{
+          if(item.no === slipCommon.No)
+            selectSilp(orderSlipList[index-1])
+        })
+        break;
+      case 3:
+          orderSlipList.map((item, index)=>{
+            if(item.no === slipCommon.No)
+              selectSilp(orderSlipList[index+1])
+          })
+          break;
+      case 4 :
+            selectSilp(orderSlipList[orderSlipList.length-1])
+            break;
+      default:
+        break;
+    }
+  }
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} localeText={jaJP1.components.MuiLocalizationProvider.defaultProps.localeText}>
@@ -607,21 +657,21 @@ const OrderSlip = () => {
             </div>
           </div>
           <div className="arrow-button-group">
-            <StyledIconButton disabled={btnStatus.first === 'disable'}>
+            <StyledIconButton disabled={btnStatus.first === 'disable'} onClick={(()=>changeSlip(1))}>
               <SkipPreviousIcon />
             </StyledIconButton>
-            <StyledIconButton disabled={btnStatus.prev === 'disable'}>
+            <StyledIconButton disabled={btnStatus.prev === 'disable'} onClick={(()=>changeSlip(2))}>
               <ArrowBackIosIcon />
             </StyledIconButton>
-            <StyledIconButton disabled={btnStatus.next === 'disable'}>
+            <StyledIconButton disabled={btnStatus.next === 'disable'} onClick={(()=>changeSlip(3))}>
               <ArrowForwardIosIcon />
             </StyledIconButton>
-            <StyledIconButton disabled={btnStatus.last === 'disable'}>
+            <StyledIconButton disabled={btnStatus.last === 'disable'} onClick={(()=>changeSlip(4))}>
               <SkipNextIcon />
             </StyledIconButton>
           </div>
           <div className="action-btn">
-            <NonBorderRadiusButton variant="outlined" disabled={btnStatus.delete === 'disable'} onClick={deleteOrder}>削除</NonBorderRadiusButton>
+            <NonBorderRadiusButton variant="outlined" disabled={btnStatus.delete === 'disable'} onClick={()=>setDeleteOpen(true)}>削除</NonBorderRadiusButton>
             <NonBorderRadiusButton variant="outlined" disabled={btnStatus.cancel === 'disable'} onClick={handleCancel}>キャンセル</NonBorderRadiusButton>
             <NonBorderRadiusButton variant="outlined" disabled={btnStatus.save === 'disable'} onClick={handleSave} >保存</NonBorderRadiusButton>
           </div>
@@ -638,7 +688,8 @@ const OrderSlip = () => {
                     id="No"
                     size='small'
                     value={slipCommon.No}
-                    onChange={handleNoChange}
+                    onChange={(event: any, noValue: string | null) =>
+                      handleNoChange(noValue)}
                     options={noList}
                     sx={{ width: 300 }}
                     renderInput={(params) => <TextField {...params} label="" 
@@ -899,6 +950,8 @@ const OrderSlip = () => {
           }
         </div>
       </div>
+      
+      {DeleteModal}
     </LocalizationProvider>
   );
 }

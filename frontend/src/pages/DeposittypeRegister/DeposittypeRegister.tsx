@@ -76,7 +76,7 @@ const DeposittypeRegister: React.FC = () => {
   const handleModalSubmit = () => {
     if (modalData.id) {
       axiosApi
-        .put(`basic/deposittype/${modalData.id}`, modalData)
+        .put(`deposittype_register/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
           void dispatch(getDeposittypeList());
@@ -86,7 +86,7 @@ const DeposittypeRegister: React.FC = () => {
         })
     } else {
       axiosApi
-        .post("basic/deposittype/", modalData)
+        .post("deposittype_register/", modalData)
         .then(res => {
           handleClose();
           void dispatch(getDeposittypeList());
@@ -99,7 +99,7 @@ const DeposittypeRegister: React.FC = () => {
 
   const handleDeleteRow = (id: number) => {
     axiosApi
-      .delete(`basic/deposittype/${id}`)
+      .delete(`deposittype_register/${id}`)
       .then(res => {
         void dispatch(getDeposittypeList());
         handleCloseDelete();

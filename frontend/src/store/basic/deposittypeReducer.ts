@@ -16,8 +16,8 @@ const initialState: DeposittypeStateType = {
 export const getDeposittypeList = createAsyncThunk<DeposittypeInterface[]>(
   "deposittype/getDeposittypeList",
   async () => {
-    const response: AxiosResponse<DeposittypeInterface[]> = await axiosApi.get("basic/deposittype/");
-    return response.data;
+    const response: AxiosResponse<DeposittypeInterface[]> = await axiosApi.get("deposittype_register/");
+    return response.data.deposittypes;
   }
 )
 

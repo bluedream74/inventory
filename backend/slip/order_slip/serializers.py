@@ -22,7 +22,7 @@ class OrderSerializer(serializers.ModelSerializer):
             'items'
         )
     def get_items(self, obj):
-        items  = OrderItem.objects.filter(order=obj)
+        items  = OrderItem.objects.filter(order=obj).order_by('-id')
         return OrderItemSerializer(items, many=True).data
 
 class OrderItemSerializer(serializers.ModelSerializer):

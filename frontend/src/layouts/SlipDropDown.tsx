@@ -100,10 +100,33 @@ export const SlipDropDown = () => {
                 onClose={handleClose}
             >
                 <MenuItem onClick={handleClose} disableRipple>
-                <FileCopyIcon />
+                    <FileCopyIcon />
                     <Link to='/order_slip'>受注伝票</Link>
                 </MenuItem>
-                
+                <MenuItem onClick={handleClose} disableRipple>
+                    <FileCopyIcon />
+                    <Link to='/consignment_slip'>委託伝票</Link>
+                </MenuItem>
+                <MenuItem onClick={handleClose} disableRipple>
+                    <FileCopyIcon />
+                    <Link to='/deposit_slip'>入金伝票</Link>
+                </MenuItem>
+                <MenuItem onClick={handleClose} disableRipple>
+                    <FileCopyIcon />
+                    <Link to='/purchase_order_slip'>発注伝票</Link>
+                </MenuItem>
+                <MenuItem onClick={handleClose} disableRipple>
+                    <FileCopyIcon />
+                    <Link to='/purchase_slip'>仕入伝票</Link>
+                </MenuItem>
+                <MenuItem onClick={handleClose} disableRipple>
+                    <FileCopyIcon />
+                    <Link to='/collection_slip'>取置伝票</Link>
+                </MenuItem>
+                <MenuItem onClick={handleClose} disableRipple>
+                    <FileCopyIcon />
+                    <Link to='/payment_slip'>支払伝票</Link>
+                </MenuItem>
                 <Divider sx={{ my: 0.5 }} />
                 
             </StyledMenu>
