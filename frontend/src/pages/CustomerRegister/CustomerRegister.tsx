@@ -42,7 +42,7 @@ const CustomerRegister: React.FC = () => {
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   useEffect(() => {
-    void dispatch(getCustomerList());
+    dispatch(getCustomerList());
   }, [dispatch]);
 
   const handleClose = () => {
@@ -85,7 +85,7 @@ const CustomerRegister: React.FC = () => {
         .put(`basic/customer/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
-          void dispatch(getCustomerList());
+          dispatch(getCustomerList());
         })
         .catch(err => {
           console.log(err);
@@ -95,7 +95,7 @@ const CustomerRegister: React.FC = () => {
         .post("basic/customer/", modalData)
         .then(res => {
           handleClose();
-          void dispatch(getCustomerList());
+          dispatch(getCustomerList());
         })
         .catch(err => {
           console.log(err);
@@ -107,7 +107,7 @@ const CustomerRegister: React.FC = () => {
     axiosApi
       .delete(`basic/customer/${id}`)
       .then(res => {
-        void dispatch(getCustomerList());
+        dispatch(getCustomerList());
         handleCloseDelete();
       })
       .catch(err => {

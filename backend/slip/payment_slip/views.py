@@ -8,6 +8,8 @@ from rest_framework.decorators import  permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view
 from datetime import datetime
+from slip.purchase_slip.models import PurchaseItem
+from product_inventory.models import ProductInventory
 
 @permission_classes([AllowAny])
 class PaymentView(APIView):
@@ -27,6 +29,7 @@ class PaymentView(APIView):
             last_payment= data['last_payment'],
             expected_date= data['expected_date'],
             remain_payment= data['remain_payment'],
+            purchase_no= data['purchase_no'],
             other= data['other']
         )
         newSlip.save()
@@ -50,6 +53,7 @@ class PaymentView(APIView):
         editSlip.last_payment= data['last_payment']
         editSlip.expected_date= data['expected_date']
         editSlip.remain_payment= data['remain_payment']
+        editSlip.purchase_no= data['purchase_no']
         editSlip.other= data['other']
         editSlip.save()
         status_code = status.HTTP_200_OK
@@ -72,7 +76,6 @@ class PaymentView(APIView):
     @permission_classes([AllowAny])
     def save_rows(request, slip_id):
         datas = request.data
-        print(datas)
         for  data in datas:
             if(PaymentItem.objects.filter(row_id = data['id'])):
                 row = PaymentItem.objects.get(row_id = data['id'])
@@ -82,6 +85,11 @@ class PaymentView(APIView):
                 row.payment_date = datetime.fromisoformat(data['payment_date']).strftime("%Y-%m-%d")
                 row.other = data['other']
                 row.save()
+                productInventories = ProductInventory.objects.filter(purchaseitem=row)
+                for productInventory in productInventories:
+                    productInventory.deposit_date = row.payment.slip_date
+                    productInventory.deposit_price = data['payment_price']
+                    productInventory.save()
             else:    
                 newItem = PaymentItem (
                     row_id = data['id'],
@@ -92,6 +100,13 @@ class PaymentView(APIView):
                     other = data['other']
                 )
                 newItem.save()
+                purcharseItem = PurchaseItem.objects.get(row_id = data['id'])
+                print(purcharseItem.pk ,  data['id'])
+                newProductInventory = ProductInventory.objects.get(purchaseitem=purcharseItem)
+                newProductInventory.payment_date = newItem.payment.slip_date
+                newProductInventory.payment_price = data['payment_price']
+                newProductInventory.paymentitem = newItem
+                newProductInventory.save()
         #Delete
         slipItems = PaymentItem.objects.filter(payment = Payment.objects.get(pk=slip_id))
         if(len(datas) != len(slipItems)):

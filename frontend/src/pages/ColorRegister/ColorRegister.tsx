@@ -38,7 +38,7 @@ const ColorRegister: React.FC = () => {
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   useEffect(() => {
-    void dispatch(getColorList());
+    dispatch(getColorList());
   }, [dispatch]);
 
   const handleClose = () => {
@@ -79,7 +79,7 @@ const ColorRegister: React.FC = () => {
         .put(`color_register/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
-          void dispatch(getColorList());
+          dispatch(getColorList());
         })
         .catch(err => {
           console.log(err);
@@ -89,7 +89,7 @@ const ColorRegister: React.FC = () => {
         .post("color_register/", modalData)
         .then(res => {
           handleClose();
-          void dispatch(getColorList());
+          dispatch(getColorList());
         })
         .catch(err => {
           console.log(err);
@@ -101,7 +101,7 @@ const ColorRegister: React.FC = () => {
     axiosApi
       .delete(`color_register/${id}`)
       .then(res => {
-        void dispatch(getColorList());
+        dispatch(getColorList());
         handleCloseDelete();
       })
       .catch(err => {

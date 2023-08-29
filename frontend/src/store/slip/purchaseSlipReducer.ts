@@ -29,6 +29,7 @@ export interface PurchaseSlipInterface {
   factory_code : string;
   storehouse_code : string;
   charger_code : string;
+  purchaseorder_no: string;
   other: string;
   update_date: string;
   items : Array<PurchaseSlipItemInterface>;

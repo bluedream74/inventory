@@ -51,6 +51,8 @@ import {
 import axiosApi from "../../utilities/axios";
 import { getDealerList } from "../../store/basic/dealerReducer";
 import { getIncomingDepartmentList } from "../../store/basic/incomingDepartmentReducer";
+import { getPurchaseSlipList } from "../../store/slip/purchaseSlipReducer";
+import { getFactoryList } from "../../store/basic/factoryReducer";
 export interface BtnStatusInterface {
   first: "active" | "disable";
   prev: "active" | "disable";
@@ -102,40 +104,48 @@ export const PaymentSlip = () => {
     id: 0,
     no: "",
     slip_date: formattedDate,
-    supplier_code : '',
-    last_payment_date : formattedDate,
-    last_payment : '',
-    expected_date : formattedDate,
-    remain_payment : '',
-    other: '',
+    supplier_code: "",
+    last_payment_date: formattedDate,
+    last_payment: "",
+    expected_date: formattedDate,
+    remain_payment: "",
+    purchase_no: "",
+    other: "",
     update_date: formattedDate,
-    items: []    
+    items: [],
   });
 
   const dispatch = useAppDispatch();
 
-  const supplierList: string[] = useAppSelector((state) => {
-    const lists = state.incomingDepartment.incomingDepartmentList.map((item) => item.code ?? "");
-    return lists;
-  });  
-  const paymentList = useAppSelector(
-    (state) => state.paymentSlip.slips
+  const suplierList = useAppSelector(
+    (state) => state.factory.factoryList
   );
+  const supplierCodeList: string[] = useMemo(() => {
+    const lists = suplierList.map((item) => item.code ?? "");
+    return lists;
+  }, [suplierList]);
+  const paymentList = useAppSelector((state) => state.paymentSlip.slips);
   console.log(paymentList);
   const noList: string[] = useAppSelector((state) => {
     const ret = state.paymentSlip.slips.map((slip) => slip.no ?? "");
     return ["新規登録", ...ret];
   });
+  const prucharseList = useAppSelector(state => state.purchaseSlip.slips);
+  const purchaseNoList = useMemo(()=>{
+    const lists = prucharseList.map(item=>item.factory_code === selectedSlip.supplier_code? item.no :'');
+    return lists;
+  },[prucharseList, selectedSlip.supplier_code])
   useEffect(() => {
     handleNoChange(selectedSlip.no);
   }, [paymentList]);
   useEffect(() => {
+    dispatch(getPurchaseSlipList());
     dispatch(getPaymentSlipList());
-    dispatch(getIncomingDepartmentList());
+    dispatch(getFactoryList());
   }, [dispatch]);
-  useEffect(()=>{
-    handleNoChange(noList[noList.length - 1])
-  },[paymentList.length])
+  useEffect(() => {
+    handleNoChange(noList[noList.length - 1]);
+  }, [paymentList.length]);
   const handleSaveClick = (id: GridRowId) => () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
   };
@@ -214,14 +224,14 @@ export const PaymentSlip = () => {
       field: "payment_date",
       headerName: "手形期日",
       minWidth: 150,
-      type: 'date',
+      type: "date",
       valueFormatter(params) {
         const date = new Date(params.value);
-        return date.toLocaleDateString('en-US');
+        return date.toLocaleDateString("en-US");
       },
       align: "left",
       headerAlign: "left",
-      editable: true
+      editable: true,
     },
 
     {
@@ -232,7 +242,7 @@ export const PaymentSlip = () => {
       headerAlign: "left",
       editable: true,
     },
-    
+
     {
       field: "actions",
       type: "actions",
@@ -288,13 +298,13 @@ export const PaymentSlip = () => {
         handleNoChange(noList[1]);
         break;
       case 2:
-        handleNoChange(noList[index-1]);
+        handleNoChange(noList[index - 1]);
         break;
       case 3:
-        handleNoChange(noList[index+1]);
+        handleNoChange(noList[index + 1]);
         break;
       case 4:
-        handleNoChange(noList[noList.length-1]);
+        handleNoChange(noList[noList.length - 1]);
         break;
       default:
         break;
@@ -305,12 +315,13 @@ export const PaymentSlip = () => {
       id: 0,
       no: "新規登録",
       slip_date: formattedDate,
-      supplier_code : '',
-      last_payment_date : formattedDate,
-      last_payment : '',
-      expected_date : formattedDate,
-      remain_payment : '',
-      other: '',
+      supplier_code: "",
+      last_payment_date: formattedDate,
+      last_payment: "",
+      expected_date: formattedDate,
+      remain_payment: "",
+      purchase_no: "",
+      other: "",
       items: [],
       update_date: formattedDate,
     });
@@ -348,6 +359,18 @@ export const PaymentSlip = () => {
         });
     }
   };
+  const handlePurchaseNoChange = (val: string | null) => {
+    setSelectedSlip({...selectedSlip, purchase_no: val??''});
+    const purcharseItem = prucharseList.filter((item)=>item.no===val)[0];
+    const rowItem : any = purcharseItem?.items?.map( item=>item?{
+      id: item.id,
+      payment_category: `${purcharseItem.slip_date}/${item.product_code}-${item.product_name}`,
+      payment_price: '',
+      payment_date: formattedDate,
+      other: ''
+    }: null)
+    rowItem && setRows(rowItem);
+  }
   const handleNoChange = (noValue: string | null) => {
     console.log("dsdfsdfsd", noValue);
     if (noValue && noValue !== "新規登録") {
@@ -372,40 +395,38 @@ export const PaymentSlip = () => {
     } else handleCancel();
   };
   const handleSaveRows = () => {
-    const slip_id = paymentList.filter(
-      (item) => item.no === selectedSlip.no
-    )[0]?.id;
+    const slip_id = paymentList.filter((item) => item.no === selectedSlip.no)[0]
+      ?.id;
     console.log(rows);
     axiosApi
       .post(`slip/payment_slip/saveRows/${slip_id}`, rows)
       .then((res) => dispatch(getPaymentSlipList()));
   };
   const deleteSlip = () => {
-    const slip_id = paymentList.filter(item=>item.no === selectedSlip.no)[0]?.id;
+    const slip_id = paymentList.filter((item) => item.no === selectedSlip.no)[0]
+      ?.id;
     axiosApi
       .delete(`slip/payment_slip/${slip_id}`)
-      .then(res => {
-        dispatch(getPaymentSlipList())
+      .then((res) => {
+        dispatch(getPaymentSlipList());
         setDeleteOpen(false);
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
-      })
-  }
-  const get_all_payment = useMemo(()=>{
+      });
+  };
+  const get_all_payment = useMemo(() => {
     let all_payment = 0;
-    selectedSlip?.items.map(item=>all_payment+=item.payment_price*1);
-    return all_payment
-  },[selectedSlip]);
-  
+    selectedSlip?.items.map((item) => (all_payment += item.payment_price * 1));
+    return all_payment;
+  }, [selectedSlip]);
+
   const DeleteModal = (
     <Dialog open={deleteOpen}>
       <DialogTitle textAlign="center">色削除</DialogTitle>
-      <DialogContent>
-        削除しましょか？
-      </DialogContent>
-      <DialogActions sx={{ p: '1.25rem' }}>
-        <Button onClick={()=>setDeleteOpen(false)}>キャンセル</Button>
+      <DialogContent>削除しましょか？</DialogContent>
+      <DialogActions sx={{ p: "1.25rem" }}>
+        <Button onClick={() => setDeleteOpen(false)}>キャンセル</Button>
         <Button color="secondary" onClick={deleteSlip} variant="contained">
           削除
         </Button>
@@ -426,11 +447,19 @@ export const PaymentSlip = () => {
             <div className="flex gap-4">
               <div className="flex items-end gap-1">
                 <h3>登録日</h3>
-                <p className="text-lg">{selectedSlip.no !== '新規登録'? selectedSlip.slip_date : '00/00/00'}</p>
+                <p className="text-lg">
+                  {selectedSlip.no !== "新規登録"
+                    ? selectedSlip.slip_date
+                    : "00/00/00"}
+                </p>
               </div>
               <div className="flex items-end gap-1">
                 <h3>更新日</h3>
-                <p className="text-lg">{selectedSlip.no !== '新規登録'? selectedSlip.update_date : '00/00/00'}</p>
+                <p className="text-lg">
+                  {selectedSlip.no !== "新規登録"
+                    ? selectedSlip.update_date
+                    : "00/00/00"}
+                </p>
               </div>
             </div>
           </div>
@@ -488,7 +517,7 @@ export const PaymentSlip = () => {
         <div className="">
           <div className="flex py-3 px-10 justify-between">
             <div className="flex flex-col">
-              <div className="flex items-center justify-left pb-3">
+              <div className="flex items-center justify-start pb-3">
                 <div className="flex items-center">
                   <p className="w-40">伝票番号 </p>
                   <Autocomplete
@@ -517,9 +546,9 @@ export const PaymentSlip = () => {
                   />
                 </div>
               </div>
-              <div className="flex items-center justify-left pb-3">
+              <div className="flex items-center justify-start pb-3">
                 <div className="flex items-center">
-                  <p className="w-40">支払日付  </p>
+                  <p className="w-40">支払日付 </p>
                   <DatePicker
                     className="w-72 border-solid border-gray border-2"
                     slotProps={{ textField: { size: "small" } }}
@@ -535,7 +564,7 @@ export const PaymentSlip = () => {
                   />
                 </div>
               </div>
-              <div className="flex items-left justify-left pb-3">
+              <div className="flex items-left justify-start pb-3">
                 <div className="flex items-center">
                   <p className="w-40">仕入先コード</p>
                   <Autocomplete
@@ -547,9 +576,46 @@ export const PaymentSlip = () => {
                       setSelectedSlip({
                         ...selectedSlip,
                         supplier_code: value ?? "",
+                        purchase_no: ""
                       })
                     }
-                    options={supplierList}
+                    options={supplierCodeList}
+                    className="w-72"
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label=""
+                        sx={{
+                          borderRadius: "0px",
+                          "& .MuiAutocomplete-inputRoot": {
+                            // paddingLeft: "20px !important",
+                            borderRadius: "0px",
+                          },
+                        }}
+                      />
+                    )}
+                  />
+                  <p className="w-40 text-lg underline">
+                    {
+                      suplierList.filter(
+                        (item) => item.code === selectedSlip.supplier_code
+                      )[0]?.name
+                    }
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center justify-start pb-3">
+                <div className="flex items-center">
+                  <p className="w-40">仕入番号 </p>
+                  <Autocomplete
+                    disablePortal
+                    id="no"
+                    size="small"
+                    value={selectedSlip.purchase_no}
+                    onChange={(event: any, noValue: string | null) =>
+                      handlePurchaseNoChange(noValue)
+                    }
+                    options={purchaseNoList}
                     className="w-72"
                     renderInput={(params) => (
                       <TextField
@@ -570,7 +636,7 @@ export const PaymentSlip = () => {
             </div>
             <div className="flex flex-col">
               <div className="flex items-center">
-                <p className="w-40">前回請求日  </p>
+                <p className="w-40">前回請求日 </p>
                 <DatePicker
                   className="w-72 border-solid border-gray border-2"
                   slotProps={{ textField: { size: "small" } }}
@@ -584,7 +650,6 @@ export const PaymentSlip = () => {
                     });
                   }}
                 />
-                
               </div>
               <div className="flex items-center mt-1">
                 <p className="w-40">前師求額 </p>
@@ -596,7 +661,7 @@ export const PaymentSlip = () => {
                   onChange={(e) =>
                     setSelectedSlip({
                       ...selectedSlip,
-                      [e.target.name]: e.target.value
+                      [e.target.name]: e.target.value,
                     })
                   }
                 />
@@ -616,7 +681,6 @@ export const PaymentSlip = () => {
                     });
                   }}
                 />
-                
               </div>
               <div className="flex items-center mt-1">
                 <p className="w-40">買掛残高 </p>
@@ -628,7 +692,7 @@ export const PaymentSlip = () => {
                   onChange={(e) =>
                     setSelectedSlip({
                       ...selectedSlip,
-                      [e.target.name]: e.target.value
+                      [e.target.name]: e.target.value,
                     })
                   }
                 />
@@ -636,7 +700,7 @@ export const PaymentSlip = () => {
             </div>
           </div>
         </div>
-        {selectedSlip.no !=='新規登録' && (
+        {selectedSlip.no !== "新規登録" && (
           <div className="flex flex-col w-full justify-center mt-3 px-10">
             <div className="flex justify-end pb-3">
               <NonBorderRadiusButton
@@ -665,16 +729,6 @@ export const PaymentSlip = () => {
                 localeText={jaJP.components.MuiDataGrid.defaultProps.localeText}
               />
             </div>
-            <div className="flex flex-row gap-5 justify-center mt-2">
-                <div className="flex flex-row gap-3">
-                  <Typography>合計金額</Typography>
-                  <Typography variant="subtitle1">1000</Typography>
-                </div>
-                <div className="flex flex-row gap-3">
-                  <Typography>締処理</Typography>
-                  <Typography variant="subtitle1">5未</Typography>
-                </div>
-            </div>
           </div>
         )}
         <div className="px-3 flex justify-between mt-4 ">
@@ -697,7 +751,9 @@ export const PaymentSlip = () => {
             <Typography>合計金額</Typography>
             <Typography>{get_all_payment}</Typography>
             <Typography pl={2}>締処理</Typography>
-            <Typography>{selectedSlip.items?`${selectedSlip.items.length} 未`:'0'}</Typography>
+            <Typography>
+              {selectedSlip.items ? `${selectedSlip.items.length} 未` : "0"}
+            </Typography>
           </div>
         </div>
         {DeleteModal}

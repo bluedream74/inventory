@@ -42,7 +42,7 @@ const StorehouseRegister: React.FC = () => {
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   useEffect(() => {
-    void dispatch(getStorehouseList());
+    dispatch(getStorehouseList());
   }, [dispatch]);
 
   const handleClose = () => {
@@ -85,7 +85,7 @@ const StorehouseRegister: React.FC = () => {
         .put(`storehouse_register/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
-          void dispatch(getStorehouseList());
+          dispatch(getStorehouseList());
         })
         .catch(err => {
           console.log(err);
@@ -95,7 +95,7 @@ const StorehouseRegister: React.FC = () => {
         .post("storehouse_register/", modalData)
         .then(res => {
           handleClose();
-          void dispatch(getStorehouseList());
+          dispatch(getStorehouseList());
         })
         .catch(err => {
           console.log(err);
@@ -107,7 +107,7 @@ const StorehouseRegister: React.FC = () => {
     axiosApi
       .delete(`storehouse_register/${id}`)
       .then(res => {
-        void dispatch(getStorehouseList());
+        dispatch(getStorehouseList());
         handleCloseDelete();
       })
       .catch(err => {

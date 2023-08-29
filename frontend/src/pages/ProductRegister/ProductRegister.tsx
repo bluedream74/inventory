@@ -13,7 +13,7 @@ import { getProductList } from '../../store/basic/productReducer';
 import downArrow from '../../assets/downArrow.svg';
 import upArrow from '../../assets/upArrow.svg';
 import ImageInput from '../../components/ImageInput';
-import axiosApi, { BASE_URL } from '../../utilities/axios';
+import axiosApi, { BACKEND_RUL, BASE_URL } from '../../utilities/axios';
 
 export interface ProductInterface {
   id: number;
@@ -130,7 +130,7 @@ const ProductRegister: React.FC = () => {
         .then(res => {
           console.log(res.data)
           handleClose();
-          void dispatch(getProductList());
+          dispatch(getProductList());
         })
         .catch(err => {
           console.log(err);
@@ -190,7 +190,6 @@ const ProductRegister: React.FC = () => {
   const totalPages = useMemo(() => {
     return Math.ceil(sortedData.length / rowsPerPage);
   }, [sortedData, rowsPerPage]);
-
   const ModalSection = (
     <Dialog open={open}>
       <DialogTitle textAlign="center">商品登録</DialogTitle>
@@ -216,7 +215,7 @@ const ProductRegister: React.FC = () => {
                 disabled
               />
             }
-            <ImageInput onImageSelect={handleImageSelect} originImageUrl={ modalData.id ? BASE_URL + modalData.image_url : "" } />
+            <ImageInput onImageSelect={handleImageSelect} originImageUrl={ modalData.id ? BACKEND_RUL + modalData.image_url : "" } />
             <TextField
               key="image_mode"
               label="絵型"
@@ -374,11 +373,11 @@ const ProductRegister: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {currentRows.map((row) => (
+            {currentRows.map((row, key) => (
               <tr key={row.id}>
-                <td>{row.id}</td>
+                <td>{key+1}</td>
                 <td>
-                  <img src={BASE_URL + row.image_url} width="150" alt="" />
+                  <img src={BACKEND_RUL + row.image_url} width="150" alt="" />
                 </td>
                 <td>{row.image_mode}</td>
                 <td>{row.code}</td>

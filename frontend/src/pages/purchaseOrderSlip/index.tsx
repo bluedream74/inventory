@@ -63,6 +63,7 @@ import { getEntrustList } from "../../store/basic/entrustReducer";
 import axiosApi from "../../utilities/axios";
 import { Link } from "react-router-dom";
 import { getIncomingDepartmentList } from "../../store/basic/incomingDepartmentReducer";
+import { getFactoryList } from "../../store/basic/factoryReducer";
 export interface BtnStatusInterface {
   first: "active" | "disable";
   prev: "active" | "disable";
@@ -114,13 +115,13 @@ export const PurchaseOrderSlip = () => {
     id: 0,
     no: "",
     slip_date: formattedDate,
-    delivery_date : formattedDate,
-    cost_category : '',
-    factory_code : '',
-    storehouse_code : '',
-    charger_code : '',
-    status : '',
-    other: '',
+    delivery_date: formattedDate,
+    cost_category: "",
+    factory_code: "",
+    storehouse_code: "",
+    charger_code: "",
+    status: "",
+    other: "",
     update_date: formattedDate,
     items: [],
   });
@@ -130,18 +131,23 @@ export const PurchaseOrderSlip = () => {
     const lists = state.product.productList.map((item) => item.code ?? "");
     return lists;
   });
-  const factoryList: string[] = useAppSelector((state) => {
-    const lists = state.incomingDepartment.incomingDepartmentList.map((item) => item.code ?? "");
+  const factoryList = useAppSelector((state) => state.factory.factoryList);
+  const factoryCodeList: string[] = useMemo(() => {
+    const lists = factoryList.map((item) => item.code ?? "");
     return lists;
-  });
-  const chargerList: string[] = useAppSelector((state) => {
-    const lists = state.charger.chargerList.map((item) => item.code ?? "");
+  }, [factoryList]);
+  const chargerList = useAppSelector((state) => state.charger.chargerList);
+  const chargerCodeList: string[] = useMemo(() => {
+    const lists = chargerList.map((item) => item.code ?? "");
     return lists;
-  });
-  const storehouseList: string[] = useAppSelector((state) => {
-    const shl = state.storehouse.storehouseList.map((item) => item.code ?? "");
+  }, [chargerList]);
+  const storehouseList = useAppSelector(
+    (state) => state.storehouse.storehouseList
+  );
+  const storehouseCodeList: string[] = useMemo(() => {
+    const shl = storehouseList.map((item) => item.code ?? "");
     return shl;
-  });
+  }, [storehouseList]);
   const colorList: string[] = useAppSelector((state) => {
     const lists = state.color.colorList.map((item) => item.code ?? "");
     return lists;
@@ -158,30 +164,30 @@ export const PurchaseOrderSlip = () => {
     return ["新規登録", ...ret];
   });
   useEffect(() => {
-    void dispatch(getPurchaseorderSlipList());
-    void dispatch(getStorehouseList());
-    void dispatch(getIncomingDepartmentList());
-    void dispatch(getChargerList());
-    void dispatch(getProductList());
-    void dispatch(getColorList());
-    void dispatch(getSizeList());
+    dispatch(getPurchaseorderSlipList());
+    dispatch(getStorehouseList());
+    dispatch(getFactoryList());
+    dispatch(getChargerList());
+    dispatch(getProductList());
+    dispatch(getColorList());
+    dispatch(getSizeList());
   }, [purchaseorderList.length]);
-  const get_quantity = useMemo(()=>{
+  const get_quantity = useMemo(() => {
     let all_quantity = 0;
-    selectedSlip?.items.map(item=>all_quantity+=item.quantity);
-    return all_quantity
-  },[selectedSlip]);
-  const get_max_price = useMemo(()=>{
+    selectedSlip?.items.map((item) => (all_quantity += item.quantity));
+    return all_quantity;
+  }, [selectedSlip]);
+  const get_max_price = useMemo(() => {
     let all_max_price = 0;
-    selectedSlip?.items.map(item=>all_max_price+=item.max_price);
-    return all_max_price
-  },[selectedSlip]);
+    selectedSlip?.items.map((item) => (all_max_price += item.max_price));
+    return all_max_price;
+  }, [selectedSlip]);
   useEffect(() => {
     handleNoChange(selectedSlip.no);
   }, [purchaseorderList]);
-  useEffect(()=>{
-    handleNoChange(noList[noList.length - 1])
-  },[purchaseorderList.length])
+  useEffect(() => {
+    handleNoChange(noList[noList.length - 1]);
+  }, [purchaseorderList.length]);
   const handleSaveClick = (id: GridRowId) => () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
   };
@@ -253,7 +259,7 @@ export const PurchaseOrderSlip = () => {
     {
       field: "product_name",
       headerName: "商品名",
-      minWidth: 150,
+      minWidth: 250,
       align: "left",
       headerAlign: "left",
       editable: true,
@@ -261,7 +267,7 @@ export const PurchaseOrderSlip = () => {
     {
       field: "product_part_number",
       headerName: "仮品番",
-      minWidth: 100,
+      minWidth: 120,
       align: "left",
       headerAlign: "left",
       editable: true,
@@ -269,7 +275,7 @@ export const PurchaseOrderSlip = () => {
     {
       field: "size_code",
       headerName: "サイズ",
-      minWidth: 100,
+      minWidth: 120,
       align: "left",
       type: "singleSelect",
       valueOptions: sizeList,
@@ -278,7 +284,7 @@ export const PurchaseOrderSlip = () => {
     {
       field: "color_code",
       headerName: "色",
-      minWidth: 100,
+      minWidth: 120,
       align: "left",
       type: "singleSelect",
       valueOptions: colorList,
@@ -302,15 +308,6 @@ export const PurchaseOrderSlip = () => {
       editable: true,
     },
     {
-      field: "rate",
-      headerName: "掛率",
-      minWidth: 120,
-      align: "right",
-      headerAlign: "left",
-      type: "number",
-      editable: true,
-    },
-    {
       field: "max_cost",
       headerName: "上代単価",
       minWidth: 120,
@@ -329,15 +326,6 @@ export const PurchaseOrderSlip = () => {
       editable: true,
     },
     {
-      field: "cost",
-      headerName: "原単価 ",
-      minWidth: 120,
-      align: "right",
-      headerAlign: "left",
-      type: "number",
-      editable: true,
-    },
-    {
       field: "max_price",
       headerName: "上代金額",
       minWidth: 120,
@@ -349,15 +337,6 @@ export const PurchaseOrderSlip = () => {
     {
       field: "min_price",
       headerName: "下代金額 ",
-      minWidth: 120,
-      align: "right",
-      headerAlign: "left",
-      type: "number",
-      editable: true,
-    },
-    {
-      field: "price",
-      headerName: "原価金額  ",
       minWidth: 120,
       align: "right",
       headerAlign: "left",
@@ -419,13 +398,13 @@ export const PurchaseOrderSlip = () => {
         handleNoChange(noList[1]);
         break;
       case 2:
-        handleNoChange(noList[index-1]);
+        handleNoChange(noList[index - 1]);
         break;
       case 3:
-        handleNoChange(noList[index+1]);
+        handleNoChange(noList[index + 1]);
         break;
       case 4:
-        handleNoChange(noList[noList.length-1]);
+        handleNoChange(noList[noList.length - 1]);
         break;
       default:
         break;
@@ -436,13 +415,13 @@ export const PurchaseOrderSlip = () => {
       id: 0,
       no: "新規登録",
       slip_date: formattedDate,
-      delivery_date : formattedDate,
-      cost_category : '',
-      factory_code : '',
-      storehouse_code : '',
-      charger_code : '',
-      status : '',
-      other: '',
+      delivery_date: formattedDate,
+      cost_category: "",
+      factory_code: "",
+      storehouse_code: "",
+      charger_code: "",
+      status: "",
+      other: "",
       update_date: formattedDate,
       items: [],
     });
@@ -513,25 +492,25 @@ export const PurchaseOrderSlip = () => {
       .then((res) => dispatch(getPurchaseorderSlipList()));
   };
   const deleteSlip = () => {
-    const slip_id = purchaseorderList.filter(item=>item.no === selectedSlip.no)[0]?.id;
+    const slip_id = purchaseorderList.filter(
+      (item) => item.no === selectedSlip.no
+    )[0]?.id;
     axiosApi
       .delete(`slip/purchaseorder_slip/${slip_id}`)
-      .then(res => {
-        dispatch(getPurchaseorderSlipList())
+      .then((res) => {
+        dispatch(getPurchaseorderSlipList());
         setDeleteOpen(false);
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
-      })
-  }
+      });
+  };
   const DeleteModal = (
     <Dialog open={deleteOpen}>
       <DialogTitle textAlign="center">色削除</DialogTitle>
-      <DialogContent>
-        削除しましょか？
-      </DialogContent>
-      <DialogActions sx={{ p: '1.25rem' }}>
-        <Button onClick={()=>setDeleteOpen(false)}>キャンセル</Button>
+      <DialogContent>削除しましょか？</DialogContent>
+      <DialogActions sx={{ p: "1.25rem" }}>
+        <Button onClick={() => setDeleteOpen(false)}>キャンセル</Button>
         <Button color="secondary" onClick={deleteSlip} variant="contained">
           削除
         </Button>
@@ -552,11 +531,19 @@ export const PurchaseOrderSlip = () => {
             <div className="flex gap-4">
               <div className="flex items-end gap-1">
                 <h3>登録日</h3>
-                <p className="text-lg">{selectedSlip.no !== '新規登録'? selectedSlip.slip_date : '00/00/00'}</p>
+                <p className="text-lg">
+                  {selectedSlip.no !== "新規登録"
+                    ? selectedSlip.slip_date
+                    : "00/00/00"}
+                </p>
               </div>
               <div className="flex items-end gap-1">
                 <h3>更新日</h3>
-                <p className="text-lg">{selectedSlip.no !== '新規登録'? selectedSlip.update_date : '00/00/00'}</p>
+                <p className="text-lg">
+                  {selectedSlip.no !== "新規登録"
+                    ? selectedSlip.update_date
+                    : "00/00/00"}
+                </p>
               </div>
             </div>
           </div>
@@ -614,7 +601,7 @@ export const PurchaseOrderSlip = () => {
         <div className="">
           <div className="flex p-3 justify-between">
             <div className="flex flex-col">
-              <div className="flex items-center justify-left pb-3">
+              <div className="flex items-center justify-start pb-3">
                 <div className="flex items-center">
                   <p className="w-40">委託番号</p>
                   <Autocomplete
@@ -643,7 +630,7 @@ export const PurchaseOrderSlip = () => {
                   />
                 </div>
               </div>
-              <div className="flex flex-row items-center justify-left pb-3">
+              <div className="flex flex-row items-center justify-start pb-3">
                 <div className="flex items-center">
                   <p className="w-40">伝票日付</p>
                   <DatePicker
@@ -678,22 +665,27 @@ export const PurchaseOrderSlip = () => {
                 </div>
                 <div className="flex items-center">
                   <p className="w-28">原価区分</p>
-                  <Box sx={{ minWidth: 120}}>
+                  <Box sx={{ minWidth: 120 }}>
                     <FormControl fullWidth>
                       <Select
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
                         size="small"
                         value={selectedSlip.cost_category}
-                        onChange={(e: SelectChangeEvent)=>setSelectedSlip({...selectedSlip, cost_category: e.target.value})}
+                        onChange={(e: SelectChangeEvent) =>
+                          setSelectedSlip({
+                            ...selectedSlip,
+                            cost_category: e.target.value,
+                          })
+                        }
                       >
-                        <MenuItem value='プロバー'>プロバー</MenuItem>
+                        <MenuItem value="プロバー">プロバー</MenuItem>
                       </Select>
                     </FormControl>
                   </Box>
                 </div>
               </div>
-              <div className="flex items-left justify-left pb-3">
+              <div className="flex items-left justify-start pb-3">
                 <div className="flex items-center">
                   <p className="w-40">工場コード</p>
                   <Autocomplete
@@ -707,7 +699,7 @@ export const PurchaseOrderSlip = () => {
                         factory_code: entrustCode ?? "",
                       })
                     }
-                    options={factoryList}
+                    options={factoryCodeList}
                     className="w-72"
                     renderInput={(params) => (
                       <TextField
@@ -723,9 +715,16 @@ export const PurchaseOrderSlip = () => {
                       />
                     )}
                   />
+                  <p className="w-40 underline text-lg">
+                    {
+                      factoryList.filter(
+                        (item) => item.code === selectedSlip.factory_code
+                      )[0]?.name
+                    }
+                  </p>
                 </div>
               </div>
-              <div className="flex flex-row items-center justify-left pb-3 gap-10">
+              <div className="flex flex-row items-center justify-start pb-3 gap-10">
                 <div className="flex items-center">
                   <p className="w-40">店舗コード</p>
                   <Autocomplete
@@ -739,7 +738,7 @@ export const PurchaseOrderSlip = () => {
                         storehouse_code: storehouseCode ?? "",
                       })
                     }
-                    options={storehouseList}
+                    options={storehouseCodeList}
                     className="w-72"
                     renderInput={(params) => (
                       <TextField
@@ -755,6 +754,13 @@ export const PurchaseOrderSlip = () => {
                       />
                     )}
                   />
+                  <p className="w-40 underline text-lg">
+                    {
+                      storehouseList.filter(
+                        (item) => item.code === selectedSlip.storehouse_code
+                      )[0]?.name
+                    }
+                  </p>
                 </div>
               </div>
             </div>
@@ -774,7 +780,7 @@ export const PurchaseOrderSlip = () => {
                           charger_code: chargerCode ?? "",
                         })
                       }
-                      options={chargerList}
+                      options={chargerCodeList}
                       className="w-72"
                       renderInput={(params) => (
                         <TextField
@@ -790,6 +796,13 @@ export const PurchaseOrderSlip = () => {
                         />
                       )}
                     />
+                    <p className="w-40 text-lg underline">
+                      {
+                        chargerList.filter(
+                          (item) => item.code === selectedSlip.charger_code
+                        )[0]?.name
+                      }
+                    </p>
                   </div>
                 </div>
                 <div className="flex flex-col pl-5">
@@ -834,7 +847,7 @@ export const PurchaseOrderSlip = () => {
             </div>
           </div>
         </div>
-        {selectedSlip.no !=='新規登録' && (
+        {selectedSlip.no !== "新規登録" && (
           <div className="flex flex-col mt-3">
             <div className="flex justify-end pb-3">
               <NonBorderRadiusButton
@@ -872,7 +885,7 @@ export const PurchaseOrderSlip = () => {
               type="text"
               name="other"
               className="border-[1px] border-gray-400 border-solid w-96 px-3"
-              value={selectedSlip.other??''}
+              value={selectedSlip.other ?? ""}
               onChange={(e) =>
                 setSelectedSlip({
                   ...selectedSlip,

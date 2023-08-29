@@ -20,6 +20,7 @@ class Order(models.Model):
     charger_code = models.CharField(max_length=30)
     receiver_code = models.CharField(max_length=30)
     exhibition_code = models.CharField(max_length=30)
+    dealer_code = models.CharField(max_length=30, null=True)
     status = models.CharField(choices=STATUS_CHOICES, max_length=10)
     update_date = models.DateField(auto_now=True, null=True)
 

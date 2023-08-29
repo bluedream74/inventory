@@ -45,11 +45,13 @@ import {
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { randomId } from "@mui/x-data-grid-generator";
 import {
+  DepositItemInterface,
   DepositSlipInterface,
   getDepositSlipList,
 } from "../../store/slip/depositSlipReducer";
 import axiosApi from "../../utilities/axios";
 import { getDealerList } from "../../store/basic/dealerReducer";
+import { getSaleSlipList } from "../../store/slip/saleSlipReducer";
 export interface BtnStatusInterface {
   first: "active" | "disable";
   prev: "active" | "disable";
@@ -106,37 +108,43 @@ export const DepositSlip = () => {
     last_invoice : '',
     expected_date : formattedDate,
     remain_invoice : '',
+    sale_no: '',
     other: '',
     update_date: formattedDate,
     items: []    
   });
 
   const dispatch = useAppDispatch();
-
-  const dealerList: string[] = useAppSelector((state) => {
-    const lists = state.dealer.dealerList.map((item) => item.code ?? "");
+  const dealerList = useAppSelector(state => state.dealer.dealerList);
+  const dealerCodeList: string[] = useMemo(() => {
+    const lists = dealerList.map((item : any) => item.code ?? "");
     return lists;
-  });  
+  },[dealerList]);  
   const depositList = useAppSelector(
     (state) => state.depositSlip.slips
   );
-  console.log(depositList);
   const noList: string[] = useAppSelector((state) => {
     const ret = state.depositSlip.slips.map((slip) => slip.no ?? "");
     return ["新規登録", ...ret];
   });
+  const saleList = useAppSelector(state => state.saleSlip.slips);
+  const saleNoList = useMemo(()=>{
+    const lists = saleList.map(item=>item.dealer_code === selectedSlip.dealer_code? item.no :'');
+    return lists;
+  },[saleList, selectedSlip.dealer_code])
   const get_all_payment = useMemo(()=>{
     let all_payment = 0;
     selectedSlip?.items.map(item=>all_payment+=item.deposit_price*1);
     return all_payment
   },[selectedSlip]);
-  useEffect(()=> {
-    dispatch(getDepositSlipList());
-  },[depositList])
   useEffect(() => {
-    void dispatch(getDepositSlipList());
-    void dispatch(getDealerList());
-  }, [depositList.length]);
+    handleNoChange(selectedSlip.no);
+  }, [depositList]);
+  useEffect(() => {
+    dispatch(getSaleSlipList());
+    dispatch(getDepositSlipList());
+    dispatch(getDealerList());
+  }, [dispatch]);
   useEffect(()=>{
     handleNoChange(noList[noList.length - 1])
   },[depositList.length])
@@ -315,6 +323,7 @@ export const DepositSlip = () => {
       last_invoice : '',
       expected_date : formattedDate,
       remain_invoice : '',
+      sale_no: '',
       other: '',
       items: [],
       update_date: formattedDate,
@@ -353,6 +362,19 @@ export const DepositSlip = () => {
         });
     }
   };
+  const handleSaleChange = (event: any, val: string | null) => {
+    setSelectedSlip({...selectedSlip, sale_no: val??''});
+    const saleItem = saleList.filter(item=>item.no===selectedSlip.sale_no)[0];
+    const rowItem : any = saleItem?.items?.map( item=>item?{
+      id: item.id,
+      deposit_category: `${saleItem.slip_date}/${item.product_code}-${item.product_name}`,
+      deposit_price: '',
+      deposit_date: formattedDate,
+      other: ''
+    }: null)
+    rowItem && setRows(rowItem);
+  }
+  
   const handleNoChange = (noValue: string | null) => {
     console.log("dsdfsdfsd", noValue);
     if (noValue && noValue !== "新規登録") {
@@ -383,7 +405,7 @@ export const DepositSlip = () => {
     console.log(rows);
     axiosApi
       .post(`slip/deposit_slip/saveRows/${slip_id}`, rows)
-      .then((res) => console.log(res));
+      .then((res) => dispatch(getDepositSlipList()));
   };
   const deleteSlip = () => {
     const slip_id = depositList.filter(item=>item.no === selectedSlip.no)[0]?.id;
@@ -421,7 +443,7 @@ export const DepositSlip = () => {
       <div className="w-full py-5 px-8 mt-0 mb-auto min-w-[1028px]">
         <div className="flex justify-between items-center mb-10">
           <div className="flex items-end gap-5">
-            <h2 className="text-xl">委託伝票</h2>
+            <h2 className="text-xl">入金伝票</h2>
             <div className="flex gap-4">
               <div className="flex items-end gap-1">
                 <h3>登録日</h3>
@@ -487,9 +509,9 @@ export const DepositSlip = () => {
         <div className="">
           <div className="flex py-3 px-10 justify-between">
             <div className="flex flex-col">
-              <div className="flex items-center justify-left pb-3">
+              <div className="flex items-center justify-start pb-3">
                 <div className="flex items-center">
-                  <p className="w-40">委託番号</p>
+                  <p className="w-40">伝票番号</p>
                   <Autocomplete
                     disablePortal
                     id="no"
@@ -516,25 +538,7 @@ export const DepositSlip = () => {
                   />
                 </div>
               </div>
-              <div className="flex items-center justify-left pb-3">
-                <div className="flex items-center">
-                  <p className="w-40">伝票日付</p>
-                  <DatePicker
-                    className="w-72 border-solid border-gray border-2"
-                    slotProps={{ textField: { size: "small" } }}
-                    format="YYYY-MM-DD"
-                    value={dayjs(selectedSlip.slip_date)}
-                    onChange={(newValue) => {
-                      console.log(newValue);
-                      setSelectedSlip({
-                        ...selectedSlip,
-                        slip_date: newValue?.format("YYYY-MM-DD"),
-                      });
-                    }}
-                  />
-                </div>
-              </div>
-              <div className="flex items-left justify-left pb-3">
+              <div className="flex items-left justify-start pb-3">
                 <div className="flex items-center">
                   <p className="w-40">得意先コード</p>
                   <Autocomplete
@@ -546,9 +550,10 @@ export const DepositSlip = () => {
                       setSelectedSlip({
                         ...selectedSlip,
                         dealer_code: entrustCode ?? "",
+                        sale_no: ""
                       })
                     }
-                    options={dealerList}
+                    options={dealerCodeList}
                     className="w-72"
                     renderInput={(params) => (
                       <TextField
@@ -563,6 +568,58 @@ export const DepositSlip = () => {
                         }}
                       />
                     )}
+                  />
+                  <p className="w-40 underline text-lg">
+                    {
+                      dealerList.filter(
+                        (item) => item.code === selectedSlip.dealer_code
+                      )[0]?.name
+                    }
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-left justify-start pb-3">
+                <div className="flex items-center">
+                  <p className="w-40">売上伝票</p>
+                  <Autocomplete
+                    disablePortal
+                    id="entrust_code"
+                    size="small"
+                    value={selectedSlip.sale_no}
+                    onChange={handleSaleChange}
+                    options={saleNoList}
+                    className="w-72"
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label=""
+                        sx={{
+                          borderRadius: "0px",
+                          "& .MuiAutocomplete-inputRoot": {
+                            // paddingLeft: "20px !important",
+                            borderRadius: "0px",
+                          },
+                        }}
+                      />
+                    )}
+                  />
+                </div>
+              </div>
+              <div className="flex items-center justify-start pb-3">
+                <div className="flex items-center">
+                  <p className="w-40">伝票日付</p>
+                  <DatePicker
+                    className="w-72 border-solid border-gray border-2"
+                    slotProps={{ textField: { size: "small" } }}
+                    format="YYYY-MM-DD"
+                    value={dayjs(selectedSlip.slip_date)}
+                    onChange={(newValue) => {
+                      console.log(newValue);
+                      setSelectedSlip({
+                        ...selectedSlip,
+                        slip_date: newValue?.format("YYYY-MM-DD"),
+                      });
+                    }}
                   />
                 </div>
               </div>

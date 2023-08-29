@@ -9,6 +9,7 @@ class Payment(models.Model):
     last_payment = models.CharField(max_length=30)
     expected_date = models.DateField()
     remain_payment = models.CharField(max_length=30)
+    purchase_no = models.CharField(max_length=20, null=True)
     other = models.CharField(max_length=200)
     update_date = models.DateField(auto_now=True, null=True)
 

@@ -49,7 +49,7 @@ const DealerRegister: React.FC = () => {
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   useEffect(() => {
-    void dispatch(getDealerList());
+    dispatch(getDealerList());
   }, [dispatch]);
 
   const handleClose = () => {
@@ -93,7 +93,7 @@ const DealerRegister: React.FC = () => {
         .put(`dealer_register/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
-          void dispatch(getDealerList());
+          dispatch(getDealerList());
         })
         .catch(err => {
           console.log(err);
@@ -103,7 +103,7 @@ const DealerRegister: React.FC = () => {
         .post("dealer_register/", modalData)
         .then(res => {
           handleClose();
-          void dispatch(getDealerList());
+          dispatch(getDealerList());
         })
         .catch(err => {
           console.log(err);
@@ -115,7 +115,7 @@ const DealerRegister: React.FC = () => {
     axiosApi
       .delete(`dealer_register/${id}`)
       .then(res => {
-        void dispatch(getDealerList());
+        dispatch(getDealerList());
         handleCloseDelete();
       })
       .catch(err => {
@@ -349,7 +349,7 @@ const DealerRegister: React.FC = () => {
                 <td>{row.id}</td>
                 <td>{row.code}</td>
                 <td>{row.name}</td>
-                <td>{row.due_date}</td>
+                <td>{row.due_date?.toString()}</td>
                 <td>{row.phone}</td>
                 <td>{row.address}</td>
                 <td className='row_action'>

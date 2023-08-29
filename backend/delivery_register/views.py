@@ -22,7 +22,9 @@ class DeliverytView(APIView):
         print(request.data)
         newDelivery = Delivery(
             code = request.data['code'],
-            name = request.data['name']
+            name = request.data['name'],
+            tel = request.data['tel'],
+            phone = request.data['phone']
         )
         newDelivery.save()
 
@@ -50,6 +52,8 @@ class DeliverytView(APIView):
         editDelivery = Delivery.objects.get(id=id)
         editDelivery.code = request.data['code']
         editDelivery.name = request.data['name']
+        editDelivery.tel = request.data['tel']
+        editDelivery.phone = request.data['phone']
         editDelivery.save()
         status_code = status.HTTP_200_OK
         response = {

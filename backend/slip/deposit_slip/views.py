@@ -8,6 +8,8 @@ from rest_framework.decorators import  permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view
 from datetime import datetime
+from slip.sale_slip.models import SaleItem
+from product_inventory.models import ProductInventory
 
 @permission_classes([AllowAny])
 class DepositView(APIView):
@@ -27,6 +29,7 @@ class DepositView(APIView):
             last_invoice= data['last_invoice'],
             expected_date= data['expected_date'],
             remain_invoice= data['remain_invoice'],
+            sale_no = data['sale_no'],
             other= data['other']
         )
         newSlip.save()
@@ -50,6 +53,7 @@ class DepositView(APIView):
         editSlip.last_invoice= data['last_invoice']
         editSlip.expected_date= data['expected_date']
         editSlip.remain_invoice= data['remain_invoice']
+        editSlip.sale_no= data['sale_no']
         editSlip.other= data['other']
         editSlip.save()
         status_code = status.HTTP_200_OK
@@ -82,6 +86,11 @@ class DepositView(APIView):
                 row.deposit_date = datetime.fromisoformat(data['deposit_date']).strftime("%Y-%m-%d")
                 row.other = data['other']
                 row.save()
+                productInventories = ProductInventory.objects.filter(deposititem=row)
+                for productInventory in productInventories:
+                    productInventory.deposit_date = row.deposit.slip_date
+                    productInventory.deposit_price = data['deposit_price']
+                    productInventory.save()
             else:    
                 newItem = DepositItem (
                     row_id = data['id'],
@@ -92,6 +101,13 @@ class DepositView(APIView):
                     other = data['other']
                 )
                 newItem.save()
+                saleItem = SaleItem.objects.get(row_id = data['id'])
+                print(saleItem)
+                newProductInventory = ProductInventory.objects.get(saleitem=saleItem)
+                newProductInventory.deposit_date = newItem.deposit.slip_date
+                newProductInventory.deposit_price = data['deposit_price']
+                newProductInventory.deposititem = newItem
+                newProductInventory.save()
         #Delete
         slipItems = DepositItem.objects.filter(deposit = Deposit.objects.get(pk=slip_id))
         if(len(datas) != len(slipItems)):

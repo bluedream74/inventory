@@ -128,7 +128,15 @@ export const RegisterDropDown = () => {
                 </MenuItem>
                 <MenuItem onClick={handleClose} disableRipple>
                     <FileCopyIcon />
-                    <Link to='/delivery_register'>納期登録</Link>
+                    <Link to='/delivery_register'>納品先登録</Link>
+                </MenuItem>
+                <MenuItem onClick={handleClose} disableRipple>
+                    <FileCopyIcon />
+                    <Link to='/dealer_register'>得意先登録</Link>
+                </MenuItem>
+                <MenuItem onClick={handleClose} disableRipple>
+                    <FileCopyIcon />
+                    <Link to='factory_register'>工場登録</Link>
                 </MenuItem>
                 <MenuItem onClick={handleClose} disableRipple>
                     <FileCopyIcon />

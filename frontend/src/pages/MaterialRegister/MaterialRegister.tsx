@@ -38,7 +38,7 @@ const MaterialRegister: React.FC = () => {
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   useEffect(() => {
-    void dispatch(getMaterialList());
+    dispatch(getMaterialList());
   }, [dispatch]);
 
   const handleClose = () => {
@@ -79,7 +79,7 @@ const MaterialRegister: React.FC = () => {
         .put(`material_register/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
-          void dispatch(getMaterialList());
+          dispatch(getMaterialList());
         })
         .catch(err => {
           console.log(err);
@@ -89,7 +89,7 @@ const MaterialRegister: React.FC = () => {
         .post("material_register/", modalData)
         .then(res => {
           handleClose();
-          void dispatch(getMaterialList());
+          dispatch(getMaterialList());
         })
         .catch(err => {
           console.log(err);
@@ -101,7 +101,7 @@ const MaterialRegister: React.FC = () => {
     axiosApi
       .delete(`material_register/${id}`)
       .then(res => {
-        void dispatch(getMaterialList());
+        dispatch(getMaterialList());
         handleCloseDelete();
       })
       .catch(err => {

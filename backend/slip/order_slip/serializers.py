@@ -17,6 +17,7 @@ class OrderSerializer(serializers.ModelSerializer):
             'charger_code',
             'receiver_code',
             'exhibition_code',
+            'dealer_code',
             'status',
             'update_date',
             'items'
