@@ -29,6 +29,9 @@ import { PurchaseOrderSlip } from "../pages/purchaseOrderSlip";
 import { PurchaseSlip } from "../pages/purchaseSlip";
 import { CollectionSlip } from "../pages/CollectionSlip";
 import { PaymentSlip } from "../pages/PaymentSlip";
+import { SaleSlip } from "../pages/SaleSlip";
+import FactoryRegister from "../pages/FactoryRegister/FactoryRegister";
+import { ProductLedger } from "../pages/Product_ledger";
 
 
 export const Router = () => {
@@ -56,6 +59,7 @@ export const Router = () => {
         <Route path="item_register" element={<ItemRegister />} />
         <Route path="entrust_register" element={<EntrustRegister />} />
         <Route path="storehouse_register" element={<StorehouseRegister />} />
+        <Route path="factory_register" element={<FactoryRegister />} />
 
         {/* begin Exhibition Sales  */}
         <Route path="charger_register" element={<ChargerRegister />} />
@@ -64,8 +68,10 @@ export const Router = () => {
         <Route path="incomingdepartment_register" element={<IncomingDepartmentRegister />} />
         <Route path="deposittype_register" element={<DeposittypeRegister/>}/>
         {/* begin slip */}
+        <Route path="product_ledger" element={<ProductLedger />} />
         <Route path="order_slip" element={<OrderSlip />} />
         <Route path="consignment_slip" element={<ConsignmentSlip />} />
+        <Route path="sale_slip" element={<SaleSlip />} />
         <Route path="deposit_slip" element={<DepositSlip />} />
         <Route path="purchase_order_slip" element={<PurchaseOrderSlip />} />
         <Route path="purchase_slip" element={<PurchaseSlip />} />

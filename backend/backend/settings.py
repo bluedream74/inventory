@@ -52,14 +52,17 @@ INSTALLED_APPS = [
     'exhibition_register',
     'incomingDepartment_register',
     'deposittype_register',
+    'factory_register',
     'entrust_register',
     'slip.order_slip',
+    'slip.sale_slip',
     'slip.consignment_slip',
     'slip.deposit_slip',
     'slip.purchaseorder_slip',
     'slip.purchase_slip',
     'slip.collection_slip',
     'slip.payment_slip',
+    'product_inventory',
     'django_extensions',
     # 'rest_framework_simplejwt'
     

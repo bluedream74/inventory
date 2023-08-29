@@ -44,7 +44,7 @@ const IncomingDepartmentRegister: React.FC = () => {
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   useEffect(() => {
-    void dispatch(getIncomingDepartmentList());
+    dispatch(getIncomingDepartmentList());
   }, [dispatch]);
 
   const handleClose = () => {
@@ -88,7 +88,7 @@ const IncomingDepartmentRegister: React.FC = () => {
         .put(`incomingDepartment_register/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
-          void dispatch(getIncomingDepartmentList());
+          dispatch(getIncomingDepartmentList());
         })
         .catch(err => {
           console.log(err);
@@ -98,7 +98,7 @@ const IncomingDepartmentRegister: React.FC = () => {
         .post("incomingDepartment_register/", modalData)
         .then(res => {
           handleClose();
-          void dispatch(getIncomingDepartmentList());
+          dispatch(getIncomingDepartmentList());
         })
         .catch(err => {
           console.log(err);
@@ -110,7 +110,7 @@ const IncomingDepartmentRegister: React.FC = () => {
     axiosApi
       .delete(`incomingDepartment_register/${id}`)
       .then(res => {
-        void dispatch(getIncomingDepartmentList());
+        dispatch(getIncomingDepartmentList());
         handleCloseDelete();
       })
       .catch(err => {

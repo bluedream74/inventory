@@ -15,6 +15,7 @@ class PurchaseSerializer(serializers.ModelSerializer):
             'factory_code',
             'storehouse_code',
             'charger_code',
+            'purchaseorder_no',
             'other',
             'update_date',
             'items'

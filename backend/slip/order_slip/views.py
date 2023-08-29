@@ -4,6 +4,7 @@ from .serializers import OrderSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Order, OrderItem
+from product_inventory.models import ProductInventory
 from rest_framework.decorators import  permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view
@@ -18,7 +19,6 @@ class OrderView(APIView):
         return Response({'orders': serializer.data}, status=status.HTTP_200_OK)
     def post(self, request):
         data = request.data
-        
         newOrder = Order(
             no= data['No'],
             slip_date= datetime.fromisoformat(data['slipDate']).strftime("%Y-%m-%d"),
@@ -30,21 +30,37 @@ class OrderView(APIView):
             charger_code= data['chargerCode'],
             receiver_code= data['receiverCode'],
             exhibition_code= data['exhibitionCode'],
+            dealer_code = data['dealerCode'],
             status= data['status']
         )
         newOrder.save()
-        print(newOrder.pk)
         if (newOrder.no == '新規登録'):
             newOrder.no = str(newOrder.pk).zfill(6)
             newOrder.save()
         status_code = status.HTTP_200_OK
         response = {
+
             'success': 'True',
             'status code': status_code,
             'type': 'User registered  successfully',
         }
         return Response(response, status=status_code)
     def put(self, request, order_id):
+        data = request.data
+        editSlip = Order.objects.get(pk=order_id)
+        print(data)
+        editSlip.slip_date= datetime.fromisoformat(data['slipDate']).strftime("%Y-%m-%d")
+        editSlip.delivery_date=  datetime.fromisoformat(data['deliveryDate']).strftime("%Y-%m-%d")
+        editSlip.shopping_date=  datetime.fromisoformat(data['shoppingDate']).strftime("%Y-%m-%d")
+        editSlip.delivery_place_code= data['deliveryPlaceCode']
+        editSlip.storehouse_code= data['storehouseCode']
+        editSlip.global_rate= data['globalRate']
+        editSlip.charger_code= data['chargerCode']
+        editSlip.receiver_code= data['receiverCode']
+        editSlip.exhibition_code= data['exhibitionCode']
+        editSlip.dealer_code = data['dealerCode']
+        editSlip.status= data['status']
+        editSlip.save()
         status_code = status.HTTP_200_OK
         response = {
             'success': 'True',
@@ -85,6 +101,28 @@ class OrderView(APIView):
                 row.price = data['price']
                 row.profit = data['profit']
                 row.save()
+                inventoryData = ProductInventory.objects.filter(orderitem = row)
+                for inventory in inventoryData:
+                    inventory.product_code = data['product_code']
+                    inventory.product_name = data['product_name']
+                    inventory.product_part_number = data['product_part_number']
+                    inventory.size_code = data['size_code']
+                    inventory.color_code = data['color_code']
+                    inventory.unit = data['unit']
+                    inventory.rate = data['rate']
+                    inventory.max_cost = data['max_cost']
+                    inventory.max_price = data['max_price']
+                    inventory.min_cost = data['min_cost']
+                    inventory.min_price = data['min_price']
+                    inventory.cost = data['cost']
+                    inventory.price = data['price']
+                    inventory.storehouse_code = row.order.storehouse_code
+                    inventory.dealer_code = row.order.dealer_code
+                    inventory.global_rate = row.order.global_rate
+
+                    inventory.order_date = row.date_created
+                    inventory.order_quantity = data['quantity']
+                    inventory.save()
             else:    
                 newOrderItem = OrderItem (
                     row_id = data['id'],
@@ -106,6 +144,29 @@ class OrderView(APIView):
                     profit = data['profit']
                 )
                 newOrderItem.save()
+                newProductInventory = ProductInventory(
+                    product_code = data['product_code'],
+                    product_name = data['product_name'],
+                    product_part_number = data['product_part_number'],
+                    size_code = data['size_code'],
+                    color_code = data['color_code'],
+                    unit = data['unit'],
+                    rate = data['rate'],
+                    max_cost = data['max_cost'],
+                    max_price = data['max_price'],
+                    min_cost = data['min_cost'],
+                    min_price = data['min_price'],
+                    cost = data['cost'],
+                    price = data['price'],
+                    storehouse_code = newOrderItem.order.storehouse_code,
+                    dealer_code = newOrderItem.order.dealer_code,
+                    global_rate = newOrderItem.order.global_rate,
+
+                    order_date = newOrderItem.date_created,
+                    order_quantity = data['quantity'],
+                    orderitem = newOrderItem
+                )
+                newProductInventory.save()
         #Delete
         orderItems = OrderItem.objects.filter(order = Order.objects.get(pk=order_id))
         if(len(datas) != len(orderItems)):

@@ -42,7 +42,7 @@ const EntrustRegister: React.FC = () => {
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   useEffect(() => {
-    void dispatch(getEntrustList());
+    dispatch(getEntrustList());
   }, [dispatch]);
 
   const handleClose = () => {
@@ -85,7 +85,7 @@ const EntrustRegister: React.FC = () => {
         .put(`entrust_register/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
-          void dispatch(getEntrustList());
+          dispatch(getEntrustList());
         })
         .catch(err => {
           console.log(err);
@@ -95,7 +95,7 @@ const EntrustRegister: React.FC = () => {
         .post("entrust_register/", modalData)
         .then(res => {
           handleClose();
-          void dispatch(getEntrustList());
+          dispatch(getEntrustList());
         })
         .catch(err => {
           console.log(err);
@@ -107,7 +107,7 @@ const EntrustRegister: React.FC = () => {
     axiosApi
       .delete(`entrust_register/${id}`)
       .then(res => {
-        void dispatch(getEntrustList());
+        dispatch(getEntrustList());
         handleCloseDelete();
       })
       .catch(err => {

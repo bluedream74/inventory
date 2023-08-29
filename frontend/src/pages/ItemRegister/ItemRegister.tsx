@@ -38,7 +38,7 @@ const ItemRegister: React.FC = () => {
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   useEffect(() => {
-    void dispatch(getItemList());
+    dispatch(getItemList());
   }, [dispatch]);
 
   const handleClose = () => {
@@ -87,7 +87,7 @@ const ItemRegister: React.FC = () => {
         })
         .then(res => {
           handleClose();
-          void dispatch(getItemList());
+          dispatch(getItemList());
         })
         .catch(err => {
           console.log(err);
@@ -105,7 +105,7 @@ const ItemRegister: React.FC = () => {
         })
         .then(res => {
           handleClose();
-          void dispatch(getItemList());
+          dispatch(getItemList());
         })
         .catch(err => {
           console.log(err);
@@ -117,7 +117,7 @@ const ItemRegister: React.FC = () => {
     axiosApi
       .delete(`item_register/${id}`)
       .then(res => {
-        void dispatch(getItemList());
+        dispatch(getItemList());
         handleCloseDelete();
       })
       .catch(err => {

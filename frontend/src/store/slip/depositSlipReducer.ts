@@ -20,6 +20,7 @@ export interface DepositSlipInterface {
   last_invoice : string;
   expected_date : string | undefined;
   remain_invoice : string ;
+  sale_no : string;
   other: string;
   update_date: string;
   items : Array<DepositItemInterface>;

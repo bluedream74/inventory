@@ -24,6 +24,9 @@ import purchaseorderSlipReducer from "./slip/purchaseorderSlipReducer";
 import purchaseSlipReducer from "./slip/purchaseSlipReducer";
 import collectionSlipReducer from "./slip/collectionSlipReducer";
 import paymentSlipReducer from "./slip/paymentSlipReducer";
+import saleSlipReducer from "./slip/saleSlipReducer";
+import factoryReducer from "./basic/factoryReducer";
+import productLedgerRuducer from "./slip/productLedgerRuducer";
 
 export const store = configureStore({
   reducer: {
@@ -44,7 +47,9 @@ export const store = configureStore({
     customer: customerReducer,
     deposittype: deposittypeReducer,
     entrust: entrustReducer,
+    factory: factoryReducer,
     //slip
+    productLedger: productLedgerRuducer,
     orderSlip: orderSlipReducer,
     consignmentSlip: consignmentSlipReducer,
     depositSlip: depositSlipReducer,
@@ -52,6 +57,7 @@ export const store = configureStore({
     purchaseSlip: purchaseSlipReducer,
     collectionSlip: collectionSlipReducer,
     paymentSlip: paymentSlipReducer,
+    saleSlip: saleSlipReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

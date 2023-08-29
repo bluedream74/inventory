@@ -10,6 +10,7 @@ class Purchase(models.Model):
     factory_code = models.CharField(max_length=30)
     storehouse_code = models.CharField(max_length=30)
     charger_code = models.CharField(max_length=30)
+    purchaseorder_no = models.CharField(max_length=20, null=True)
     other = models.CharField(max_length=200, null=True)
     update_date = models.DateField(auto_now=True, null=True)
 

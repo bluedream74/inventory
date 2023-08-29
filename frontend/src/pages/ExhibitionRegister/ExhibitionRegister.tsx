@@ -38,7 +38,7 @@ const ExhibitionRegister: React.FC = () => {
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   useEffect(() => {
-    void dispatch(getExhibitionList());
+    dispatch(getExhibitionList());
   }, [dispatch]);
 
   const handleClose = () => {
@@ -79,7 +79,7 @@ const ExhibitionRegister: React.FC = () => {
         .put(`exhibition_register/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
-          void dispatch(getExhibitionList());
+          dispatch(getExhibitionList());
         })
         .catch(err => {
           console.log(err);
@@ -89,7 +89,7 @@ const ExhibitionRegister: React.FC = () => {
         .post("exhibition_register/", modalData)
         .then(res => {
           handleClose();
-          void dispatch(getExhibitionList());
+          dispatch(getExhibitionList());
         })
         .catch(err => {
           console.log(err);
@@ -101,7 +101,7 @@ const ExhibitionRegister: React.FC = () => {
     axiosApi
       .delete(`exhibition_register/${id}`)
       .then(res => {
-        void dispatch(getExhibitionList());
+        dispatch(getExhibitionList());
         handleCloseDelete();
       })
       .catch(err => {

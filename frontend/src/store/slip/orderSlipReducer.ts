@@ -17,6 +17,7 @@ export interface OrderSlipInterface {
   chargerCode: string;
   receiverCode: string;
   exhibitionCode:string;
+  dealerCode : string;
   status: string;
   other: string;
 }
@@ -34,7 +35,7 @@ const initialState: OrderSlipStateType = {
 export const getSlipList = createAsyncThunk<OrderSlipInterface[]>(
   'orderSlip/getOrderSlipList',
   async () => {
-    const response: AxiosResponse<OrderSlipInterface[]> = await axiosApi.get("slip/order_slip/")
+    const response: AxiosResponse<any> = await axiosApi.get("slip/order_slip/")
     return response.data?.orders
   }
 )

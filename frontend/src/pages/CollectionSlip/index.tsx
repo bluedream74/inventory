@@ -124,24 +124,30 @@ export const CollectionSlip = () => {
     const lists = state.product.productList.map((item) => item.code ?? "");
     return lists;
   });
-  const deliveryList: string[] = useAppSelector((state) => {
-    const lists = state.delivery.deliveryList.map((item) => item.code ?? "");
+  const deliveryList = useAppSelector((state) => state.delivery.deliveryList);
+  const deliveryCodeList: string[] = useMemo(() => {
+    const lists = deliveryList.map((item) => item.code ?? "");
     return lists;
-  });
-  const chargerList: string[] = useAppSelector((state) => {
-    const lists = state.charger.chargerList.map((item) => item.code ?? "");
+  }, [deliveryList]);
+  const chargerList = useAppSelector((state) => state.charger.chargerList);
+  const chargerCodeList: string[] = useMemo(() => {
+    const lists = chargerList.map((item) => item.code ?? "");
     return lists;
-  });
-  const exhibitionList: string[] = useAppSelector((state) => {
-    const lists = state.exhibition.exhibitionList.map(
-      (item) => item.code ?? ""
-    );
+  }, [chargerList]);
+  const exhibitionList = useAppSelector(
+    (state) => state.exhibition.exhibitionList
+  );
+  const exhibitionCodeList: string[] = useMemo(() => {
+    const lists = exhibitionList.map((item) => item.code ?? "");
     return lists;
-  });
-  const storehouseList: string[] = useAppSelector((state) => {
-    const shl = state.storehouse.storehouseList.map((item) => item.code ?? "");
+  }, [exhibitionList]);
+  const storehouseList = useAppSelector(
+    (state) => state.storehouse.storehouseList
+  );
+  const storehouseCodeList: string[] = useMemo(() => {
+    const shl = storehouseList.map((item) => item.code ?? "");
     return shl;
-  });
+  }, [storehouseList]);
   const colorList: string[] = useAppSelector((state) => {
     const lists = state.color.colorList.map((item) => item.code ?? "");
     return lists;
@@ -155,16 +161,16 @@ export const CollectionSlip = () => {
     const ret = state.collectionSlip.slips.map((slip) => slip.no ?? "");
     return ["新規登録", ...ret];
   });
-  const get_quantity = useMemo(()=>{
+  const get_quantity = useMemo(() => {
     let all_quantity = 0;
-    selectedSlip?.items.map(item=>all_quantity+=item.quantity);
-    return all_quantity
-  },[selectedSlip]);
-  const get_price = useMemo(()=>{
+    selectedSlip?.items.map((item) => (all_quantity += item.quantity));
+    return all_quantity;
+  }, [selectedSlip]);
+  const get_price = useMemo(() => {
     let all_price = 0;
-    selectedSlip?.items.map(item=>all_price+=item.price);
-    return all_price
-  },[selectedSlip]);
+    selectedSlip?.items.map((item) => (all_price += item.price));
+    return all_price;
+  }, [selectedSlip]);
   useEffect(() => {
     handleNoChange(selectedSlip.no);
   }, [collectionList]);
@@ -178,9 +184,9 @@ export const CollectionSlip = () => {
     dispatch(getColorList());
     dispatch(getSizeList());
   }, [dispatch]);
-  useEffect(()=>{
-    handleNoChange(noList[noList.length-1]);
-  },[collectionList.length]);
+  useEffect(() => {
+    handleNoChange(noList[noList.length - 1]);
+  }, [collectionList.length]);
   const handleSaveClick = (id: GridRowId) => () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
   };
@@ -619,7 +625,7 @@ export const CollectionSlip = () => {
         <div className="">
           <div className="flex p-3 justify-between">
             <div className="flex flex-col">
-              <div className="flex items-center justify-left pb-3">
+              <div className="flex items-center justify-start pb-3">
                 <div className="flex items-center">
                   <p className="w-40">委託番号</p>
                   <Autocomplete
@@ -648,7 +654,7 @@ export const CollectionSlip = () => {
                   />
                 </div>
               </div>
-              <div className="flex flex-row items-center justify-left pb-3">
+              <div className="flex flex-row items-center justify-start pb-3">
                 <div className="flex items-center">
                   <p className="w-40">伝票日付</p>
                   <DatePicker
@@ -682,7 +688,7 @@ export const CollectionSlip = () => {
                   />
                 </div>
               </div>
-              <div className="flex items-left justify-left pb-3">
+              <div className="flex items-left justify-start pb-3">
                 <div className="flex items-center">
                   <p className="w-40">納品先コード</p>
                   <Autocomplete
@@ -696,7 +702,7 @@ export const CollectionSlip = () => {
                         delivery_code: value ?? "",
                       })
                     }
-                    options={deliveryList}
+                    options={deliveryCodeList}
                     className="w-72"
                     renderInput={(params) => (
                       <TextField
@@ -712,6 +718,13 @@ export const CollectionSlip = () => {
                       />
                     )}
                   />
+                  <p className="w-40 underline text-lg">
+                    {
+                      deliveryList.filter(
+                        (item) => item.code === selectedSlip.delivery_code
+                      )[0]?.name
+                    }
+                  </p>
                 </div>
               </div>
               <div className="flex flex-row items-center justify-center pb-3 gap-10">
@@ -728,7 +741,7 @@ export const CollectionSlip = () => {
                         storehouse_code: storehouseCode ?? "",
                       })
                     }
-                    options={storehouseList}
+                    options={storehouseCodeList}
                     className="w-72"
                     renderInput={(params) => (
                       <TextField
@@ -744,6 +757,13 @@ export const CollectionSlip = () => {
                       />
                     )}
                   />
+                  <p className="w-40 underline text-lg">
+                    {
+                      storehouseList.filter(
+                        (item) => item.code === selectedSlip.storehouse_code
+                      )[0]?.name
+                    }
+                  </p>
                 </div>
                 <div className="flex items-center">
                   <p className="w-40">掛率</p>
@@ -778,7 +798,7 @@ export const CollectionSlip = () => {
                           charger_code: chargerCode ?? "",
                         })
                       }
-                      options={chargerList}
+                      options={chargerCodeList}
                       className="w-72"
                       renderInput={(params) => (
                         <TextField
@@ -794,6 +814,13 @@ export const CollectionSlip = () => {
                         />
                       )}
                     />
+                    <p className="w-40 text-lg underline">
+                      {
+                        chargerList.filter(
+                          (item) => item.code === selectedSlip.charger_code
+                        )[0]?.name
+                      }
+                    </p>
                   </div>
                   <div className="flex items-center mt-2">
                     <p className="w-40">展示会コード </p>
@@ -808,7 +835,7 @@ export const CollectionSlip = () => {
                           exhibition_code: exhibitionCode ?? "",
                         })
                       }
-                      options={exhibitionList}
+                      options={exhibitionCodeList}
                       className="w-72"
                       renderInput={(params) => (
                         <TextField
@@ -824,6 +851,13 @@ export const CollectionSlip = () => {
                         />
                       )}
                     />
+                    <p className="w-40 text-lg underline">
+                      {
+                        exhibitionList.filter(
+                          (item) => item.code === selectedSlip.exhibition_code
+                        )[0]?.name
+                      }
+                    </p>
                   </div>
                 </div>
               </div>

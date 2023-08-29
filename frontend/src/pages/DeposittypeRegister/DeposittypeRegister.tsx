@@ -38,7 +38,7 @@ const DeposittypeRegister: React.FC = () => {
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   useEffect(() => {
-    void dispatch(getDeposittypeList());
+    dispatch(getDeposittypeList());
   }, [dispatch]);
 
   const handleClose = () => {
@@ -79,7 +79,7 @@ const DeposittypeRegister: React.FC = () => {
         .put(`deposittype_register/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
-          void dispatch(getDeposittypeList());
+          dispatch(getDeposittypeList());
         })
         .catch(err => {
           console.log(err);
@@ -89,7 +89,7 @@ const DeposittypeRegister: React.FC = () => {
         .post("deposittype_register/", modalData)
         .then(res => {
           handleClose();
-          void dispatch(getDeposittypeList());
+          dispatch(getDeposittypeList());
         })
         .catch(err => {
           console.log(err);
@@ -101,7 +101,7 @@ const DeposittypeRegister: React.FC = () => {
     axiosApi
       .delete(`deposittype_register/${id}`)
       .then(res => {
-        void dispatch(getDeposittypeList());
+        dispatch(getDeposittypeList());
         handleCloseDelete();
       })
       .catch(err => {
