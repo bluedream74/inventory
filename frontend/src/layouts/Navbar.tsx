@@ -60,7 +60,7 @@ export const Navbar : React.FC = () => {
       <CssBaseline />
       <Toolbar className = {classes.navbar}>
         <Typography variant="h4" className={classes.logo}>
-          <Link to='/home' className="text-white hover:text-gray-200">Strawberry Jam</Link>
+          <Link to='/home' className="text-white hover:text-gray-200">衣類在庫管理システム</Link>
           
         </Typography>
         {isMobile ? (

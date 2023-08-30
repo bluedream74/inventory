@@ -1,0 +1,17 @@
+{
+  apps: [
+    {
+      name: "frontend",
+      script: "npm",
+      args: [
+        "run",
+        "dev"
+      ],
+      exec_mode: "fork", 
+      instances: "1", 
+      wait_ready: true, 
+      autorestart: false, 
+      max_restarts: 5 
+    }
+  ]
+}
