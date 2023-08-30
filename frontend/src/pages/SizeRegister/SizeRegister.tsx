@@ -38,7 +38,7 @@ const SizeRegister: React.FC = () => {
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   useEffect(() => {
-    void dispatch(getSizeList());
+    dispatch(getSizeList());
   }, [dispatch]);
 
   const handleClose = () => {
@@ -79,7 +79,7 @@ const SizeRegister: React.FC = () => {
         .put(`size_register/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
-          void dispatch(getSizeList());
+          dispatch(getSizeList());
         })
         .catch(err => {
           console.log(err);
@@ -89,7 +89,7 @@ const SizeRegister: React.FC = () => {
         .post("size_register/", modalData)
         .then(res => {
           handleClose();
-          void dispatch(getSizeList());
+          dispatch(getSizeList());
         })
         .catch(err => {
           console.log(err);
@@ -101,7 +101,7 @@ const SizeRegister: React.FC = () => {
     axiosApi
       .delete(`size_register/${id}`)
       .then(res => {
-        void dispatch(getSizeList());
+        dispatch(getSizeList());
         handleCloseDelete();
       })
       .catch(err => {

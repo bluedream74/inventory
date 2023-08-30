@@ -15,6 +15,7 @@ class DepositSerializer(serializers.ModelSerializer):
             'expected_date',
             'remain_invoice',
             'other',
+            'sale_no',
             'update_date',
             'items'
         )

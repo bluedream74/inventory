@@ -39,7 +39,8 @@ class PurchaseorderItemSerializer(serializers.ModelSerializer):
             'max_cost',
             'max_price',
             'min_cost',
-            'min_price'
+            'min_price',
+            
         )
     def get_id(self, obj):
         return obj.row_id

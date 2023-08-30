@@ -114,7 +114,7 @@ export const ConsignmentSlip = () => {
     charger_code: "",
     exhibition_code: "",
     status: "",
-    other: '',
+    other: "",
     update_date: formattedDate,
     items: [],
   });
@@ -124,24 +124,32 @@ export const ConsignmentSlip = () => {
     const lists = state.product.productList.map((item) => item.code ?? "");
     return lists;
   });
-  const entrustList: string[] = useAppSelector((state) => {
-    const lists = state.entrust.entrustList.map((item) => item.code ?? "");
+  const entrustList = useAppSelector(
+    (state) => state.entrust.entrustList
+  );
+  const entrustCodeList: string[] = useMemo(() => {
+    const lists = entrustList.map((item) => item.code ?? "");
     return lists;
-  });
-  const chargerList: string[] = useAppSelector((state) => {
-    const lists = state.charger.chargerList.map((item) => item.code ?? "");
+  },[entrustList]);
+  const chargerList = useAppSelector((state) => state.charger.chargerList);
+  const chargerCodeList: string[] = useMemo(() => {
+    const lists = chargerList.map((item) => item.code ?? "");
     return lists;
-  });
-  const exhibitionList: string[] = useAppSelector((state) => {
-    const lists = state.exhibition.exhibitionList.map(
-      (item) => item.code ?? ""
-    );
+  }, [chargerList]);
+  const exhibitionList = useAppSelector(
+    (state) => state.exhibition.exhibitionList
+  );
+  const exhibitionCodeList: string[] = useMemo(() => {
+    const lists = exhibitionList.map((item) => item.code ?? "");
     return lists;
-  });
-  const storehouseList: string[] = useAppSelector((state) => {
-    const shl = state.storehouse.storehouseList.map((item) => item.code ?? "");
+  }, [exhibitionList]);
+  const storehouseList = useAppSelector(
+    (state) => state.storehouse.storehouseList
+  );
+  const storehouseCodeList: string[] = useMemo(() => {
+    const shl = storehouseList.map((item) => item.code ?? "");
     return shl;
-  });
+  }, [storehouseList]);
   const colorList: string[] = useAppSelector((state) => {
     const lists = state.color.colorList.map((item) => item.code ?? "");
     return lists;
@@ -158,31 +166,31 @@ export const ConsignmentSlip = () => {
     return ["新規登録", ...ret];
   });
   useEffect(() => {
-    void dispatch(getConsignmentSlipList());
-    void dispatch(getStorehouseList());
-    void dispatch(getEntrustList());
-    void dispatch(getChargerList());
-    void dispatch(getExhibitionList());
-    void dispatch(getProductList());
-    void dispatch(getColorList());
-    void dispatch(getSizeList());
+    dispatch(getConsignmentSlipList());
+    dispatch(getStorehouseList());
+    dispatch(getEntrustList());
+    dispatch(getChargerList());
+    dispatch(getExhibitionList());
+    dispatch(getProductList());
+    dispatch(getColorList());
+    dispatch(getSizeList());
   }, [consignmentList.length]);
-  const get_quantity = useMemo(()=>{
+  const get_quantity = useMemo(() => {
     let all_quantity = 0;
-    selectedSlip?.items.map(item=>all_quantity+=item.quantity);
-    return all_quantity
-  },[selectedSlip]);
-  const get_price = useMemo(()=>{
+    selectedSlip?.items.map((item) => (all_quantity += item.quantity));
+    return all_quantity;
+  }, [selectedSlip]);
+  const get_price = useMemo(() => {
     let all_price = 0;
-    selectedSlip?.items.map(item=>all_price+=item.price);
-    return all_price
-  },[selectedSlip]);
+    selectedSlip?.items.map((item) => (all_price += item.price));
+    return all_price;
+  }, [selectedSlip]);
   useEffect(() => {
     handleNoChange(selectedSlip.no);
   }, [consignmentList]);
-  useEffect(()=>{
-    handleNoChange(noList[noList.length - 1])
-  },[consignmentList.length])
+  useEffect(() => {
+    handleNoChange(noList[noList.length - 1]);
+  }, [consignmentList.length]);
   const handleSaveClick = (id: GridRowId) => () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
   };
@@ -420,13 +428,13 @@ export const ConsignmentSlip = () => {
         handleNoChange(noList[1]);
         break;
       case 2:
-        handleNoChange(noList[index-1]);
+        handleNoChange(noList[index - 1]);
         break;
       case 3:
-        handleNoChange(noList[index+1]);
+        handleNoChange(noList[index + 1]);
         break;
       case 4:
-        handleNoChange(noList[noList.length-1]);
+        handleNoChange(noList[noList.length - 1]);
         break;
       default:
         break;
@@ -443,7 +451,7 @@ export const ConsignmentSlip = () => {
       charger_code: "",
       exhibition_code: "",
       status: "",
-      other: '',
+      other: "",
       update_date: formattedDate,
       items: [],
     });
@@ -510,28 +518,28 @@ export const ConsignmentSlip = () => {
     console.log(rows);
     axiosApi
       .post(`slip/consignment_slip/saveRows/${slip_id}`, rows)
-      .then((res) => console.log(res));
+      .then((res) => dispatch(getConsignmentSlipList()));
   };
   const deleteSlip = () => {
-    const slip_id = consignmentList.filter(item=>item.no === selectedSlip.no)[0]?.id;
+    const slip_id = consignmentList.filter(
+      (item) => item.no === selectedSlip.no
+    )[0]?.id;
     axiosApi
       .delete(`slip/consignment_slip/${slip_id}`)
-      .then(res => {
-        dispatch(getConsignmentSlipList())
+      .then((res) => {
+        dispatch(getConsignmentSlipList());
         setDeleteOpen(false);
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
-      })
-  }
+      });
+  };
   const DeleteModal = (
     <Dialog open={deleteOpen}>
       <DialogTitle textAlign="center">色削除</DialogTitle>
-      <DialogContent>
-        削除しましょか？
-      </DialogContent>
-      <DialogActions sx={{ p: '1.25rem' }}>
-        <Button onClick={()=>setDeleteOpen(false)}>キャンセル</Button>
+      <DialogContent>削除しましょか？</DialogContent>
+      <DialogActions sx={{ p: "1.25rem" }}>
+        <Button onClick={() => setDeleteOpen(false)}>キャンセル</Button>
         <Button color="secondary" onClick={deleteSlip} variant="contained">
           削除
         </Button>
@@ -552,11 +560,19 @@ export const ConsignmentSlip = () => {
             <div className="flex gap-4">
               <div className="flex items-end gap-1">
                 <h3>登録日</h3>
-                <p className="text-lg">{selectedSlip.no !== '新規登録'? selectedSlip.slip_date : '00/00/00'}</p>
+                <p className="text-lg">
+                  {selectedSlip.no !== "新規登録"
+                    ? selectedSlip.slip_date
+                    : "00/00/00"}
+                </p>
               </div>
               <div className="flex items-end gap-1">
                 <h3>更新日</h3>
-                <p className="text-lg">{selectedSlip.no !== '新規登録'? selectedSlip.update_date : '00/00/00'}</p>
+                <p className="text-lg">
+                  {selectedSlip.no !== "新規登録"
+                    ? selectedSlip.update_date
+                    : "00/00/00"}
+                </p>
               </div>
             </div>
           </div>
@@ -614,7 +630,7 @@ export const ConsignmentSlip = () => {
         <div className="">
           <div className="flex p-3 justify-between">
             <div className="flex flex-col">
-              <div className="flex items-center justify-left pb-3">
+              <div className="flex items-center justify-start pb-3">
                 <div className="flex items-center">
                   <p className="w-40">委託番号</p>
                   <Autocomplete
@@ -643,7 +659,7 @@ export const ConsignmentSlip = () => {
                   />
                 </div>
               </div>
-              <div className="flex items-center justify-left pb-3">
+              <div className="flex items-center justify-start pb-3">
                 <div className="flex items-center">
                   <p className="w-40">伝票日付</p>
                   <DatePicker
@@ -661,7 +677,7 @@ export const ConsignmentSlip = () => {
                   />
                 </div>
               </div>
-              <div className="flex items-left justify-left pb-3">
+              <div className="flex items-left justify-start pb-3">
                 <div className="flex items-center">
                   <p className="w-40">委託コード</p>
                   <Autocomplete
@@ -675,7 +691,7 @@ export const ConsignmentSlip = () => {
                         entrust_code: entrustCode ?? "",
                       })
                     }
-                    options={entrustList}
+                    options={entrustCodeList}
                     className="w-72"
                     renderInput={(params) => (
                       <TextField
@@ -691,6 +707,13 @@ export const ConsignmentSlip = () => {
                       />
                     )}
                   />
+                  <p className="w-40 underline text-lg">
+                    {
+                      entrustList.filter(
+                        (item) => item.code === selectedSlip.entrust_code
+                      )[0]?.name
+                    }
+                  </p>
                 </div>
               </div>
               <div className="flex flex-row items-center justify-center pb-3 gap-10">
@@ -707,7 +730,7 @@ export const ConsignmentSlip = () => {
                         storehouse_code: storehouseCode ?? "",
                       })
                     }
-                    options={storehouseList}
+                    options={storehouseCodeList}
                     className="w-72"
                     renderInput={(params) => (
                       <TextField
@@ -723,6 +746,13 @@ export const ConsignmentSlip = () => {
                       />
                     )}
                   />
+                  <p className="w-40 underline text-lg">
+                    {
+                      storehouseList.filter(
+                        (item) => item.code === selectedSlip.storehouse_code
+                      )[0]?.name
+                    }
+                  </p>
                 </div>
                 <div className="flex items-center">
                   <p className="w-40">掛率</p>
@@ -734,7 +764,7 @@ export const ConsignmentSlip = () => {
                     onChange={(e) =>
                       setSelectedSlip({
                         ...selectedSlip,
-                        [e.target.name]: e.target.value
+                        [e.target.name]: e.target.value,
                       })
                     }
                   />
@@ -744,16 +774,55 @@ export const ConsignmentSlip = () => {
             <div className="flex flex-col">
               <div className="flex justify-end gap-2">
                 <NonBorderRadiusButton variant="outlined">
-                    <Link to='/purchase_order_slip'>取置明細選択</Link>
+                  <Link to="/purchase_order_slip">取置明細選択</Link>
                 </NonBorderRadiusButton>
                 <NonBorderRadiusButton variant="outlined">
-                  <Link to='/order_slip'>受注明細選択</Link>
-                  
+                  <Link to="/order_slip">受注明細選択</Link>
                 </NonBorderRadiusButton>
               </div>
-              <div className="flex flex-row mt-2">
+              <div className="flex flex-col mt-2">
+                <div className="flex w-full justify-end">
+                  <div className="flex flex-col justify-self-end">
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          color="default"
+                          checked={selectedSlip.status === "1"}
+                          onChange={(
+                            event: React.ChangeEvent<HTMLInputElement>
+                          ) => {
+                            setSelectedSlip({
+                              ...selectedSlip,
+                              status: (event.target as HTMLInputElement).value,
+                            });
+                          }}
+                          value="1"
+                        />
+                      }
+                      label="委託書発行済"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          color="default"
+                          checked={selectedSlip.status === "2"}
+                          onChange={(
+                            event: React.ChangeEvent<HTMLInputElement>
+                          ) => {
+                            setSelectedSlip({
+                              ...selectedSlip,
+                              status: (event.target as HTMLInputElement).value,
+                            });
+                          }}
+                          value="2"
+                        />
+                      }
+                      label="あとで発行"
+                    />
+                  </div>
+                </div>
                 <div className="flex flex-col">
-                  <div className="flex items-center mt-20">
+                  <div className="flex items-center mt-2">
                     <p className="w-40">担当者コード </p>
                     <Autocomplete
                       disablePortal
@@ -766,7 +835,7 @@ export const ConsignmentSlip = () => {
                           charger_code: chargerCode ?? "",
                         })
                       }
-                      options={chargerList}
+                      options={chargerCodeList}
                       className="w-72"
                       renderInput={(params) => (
                         <TextField
@@ -782,6 +851,13 @@ export const ConsignmentSlip = () => {
                         />
                       )}
                     />
+                    <p className="w-40 text-lg underline">
+                      {
+                        chargerList.filter(
+                          (item) => item.code === selectedSlip.charger_code
+                        )[0]?.name
+                      }
+                    </p>
                   </div>
                   <div className="flex items-center mt-2">
                     <p className="w-40">展示会コード </p>
@@ -796,7 +872,7 @@ export const ConsignmentSlip = () => {
                           exhibition_code: exhibitionCode ?? "",
                         })
                       }
-                      options={exhibitionList}
+                      options={exhibitionCodeList}
                       className="w-72"
                       renderInput={(params) => (
                         <TextField
@@ -812,51 +888,20 @@ export const ConsignmentSlip = () => {
                         />
                       )}
                     />
+                    <p className="w-40 text-lg underline">
+                      {
+                        exhibitionList.filter(
+                          (item) => item.code === selectedSlip.exhibition_code
+                        )[0]?.name
+                      }
+                    </p>
                   </div>
-                </div>
-                <div className="flex flex-col pl-5">
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        color="default"
-                        checked={selectedSlip.status === "1"}
-                        onChange={(
-                          event: React.ChangeEvent<HTMLInputElement>
-                        ) => {
-                          setSelectedSlip({
-                            ...selectedSlip,
-                            status: (event.target as HTMLInputElement).value,
-                          });
-                        }}
-                        value="1"
-                      />
-                    }
-                    label="委託書発行済"
-                  />
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        color="default"
-                        checked={selectedSlip.status === "2"}
-                        onChange={(
-                          event: React.ChangeEvent<HTMLInputElement>
-                        ) => {
-                          setSelectedSlip({
-                            ...selectedSlip,
-                            status: (event.target as HTMLInputElement).value,
-                          });
-                        }}
-                        value="2"
-                      />
-                    }
-                    label="あとで発行"
-                  />
                 </div>
               </div>
             </div>
           </div>
         </div>
-        {selectedSlip.no !=='新規登録' && (
+        {selectedSlip.no !== "新規登録" && (
           <div className="flex flex-col mt-3">
             <div className="flex justify-end pb-3">
               <NonBorderRadiusButton
@@ -894,7 +939,7 @@ export const ConsignmentSlip = () => {
               type="text"
               name="other"
               className="border-[1px] border-gray-400 border-solid w-96 px-3"
-              value={selectedSlip.other??''}
+              value={selectedSlip.other ?? ""}
               onChange={(e) =>
                 setSelectedSlip({
                   ...selectedSlip,

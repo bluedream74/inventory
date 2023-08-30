@@ -10,6 +10,7 @@ class Deposit(models.Model):
     expected_date = models.DateField()
     remain_invoice = models.CharField(max_length=30)
     other = models.CharField(max_length=200)
+    sale_no = models.CharField(max_length=20, null=True)
     update_date = models.DateField(auto_now=True, null=True)
 
 

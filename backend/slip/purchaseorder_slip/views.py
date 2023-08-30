@@ -8,6 +8,7 @@ from rest_framework.decorators import  permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view
 from datetime import datetime
+from product_inventory.models import ProductInventory
 
 @permission_classes([AllowAny])
 class PurchaseorderView(APIView):
@@ -108,6 +109,26 @@ class PurchaseorderView(APIView):
                     min_price = data['min_price']
                 )
                 newItem.save()
+                newProductInventory = ProductInventory(
+                    product_code = data['product_code'],
+                    product_name = data['product_name'],
+                    product_part_number = data['product_part_number'],
+                    size_code = data['size_code'],
+                    color_code = data['color_code'],
+                    unit = data['unit'],
+                    max_cost = data['max_cost'],
+                    max_price = data['max_price'],
+                    min_cost = data['min_cost'],
+                    min_price = data['min_price'],
+
+                    storehouse_code = newItem.purchaseorder.storehouse_code,
+                    factory_code = newItem.purchaseorder.factory_code,
+
+                    purchaseorder_date = newItem.purchaseorder.slip_date,
+                    purcaseorder_quantity = newItem.quantity,
+                    purchaseorderitem = newItem
+                )
+                newProductInventory.save()
         #Delete
         slipItems = PurchaseorderItem.objects.filter(purchaseorder = Purchaseorder.objects.get(pk=slip_id))
         if(len(datas) != len(slipItems)):

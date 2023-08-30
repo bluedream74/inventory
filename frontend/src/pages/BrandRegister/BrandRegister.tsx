@@ -40,7 +40,7 @@ const BrandRegister: React.FC = () => {
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   useEffect(() => {
-    void dispatch(getBrandList());
+    dispatch(getBrandList());
   }, [dispatch]);
 
   const handleClose = () => {
@@ -86,7 +86,7 @@ const BrandRegister: React.FC = () => {
         .put(`brand_register/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
-          void dispatch(getBrandList());
+          dispatch(getBrandList());
         })
         .catch(err => {
           console.log(err);
@@ -100,7 +100,7 @@ const BrandRegister: React.FC = () => {
         .post("brand_register/", modalData)
         .then(res => {
           handleClose();
-          void dispatch(getBrandList());
+          dispatch(getBrandList());
         })
         .catch(err => {
           console.log(err);
@@ -112,7 +112,7 @@ const BrandRegister: React.FC = () => {
     axiosApi
       .delete(`brand_register/${id}`)
       .then(res => {
-        void dispatch(getBrandList());
+        dispatch(getBrandList());
         handleCloseDelete();
       })
       .catch(err => {

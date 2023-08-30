@@ -24,7 +24,7 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('api/admin/', admin.site.urls),
     path('api/product_register/', include('product_register.urls')),
     path('api/color_register/', include('color_register.urls')),
     path('api/season_register/', include('season_register.urls')),
@@ -34,6 +34,7 @@ urlpatterns = [
     path('api/delivery_register/', include('delivery_register.urls')),
     path('api/origin_country_register/', include('origin_country_register.urls')),
     path('api/item_register/', include('item_register.urls')),
+    path('api/factory_register/', include('factory_register.urls')),
     
     path('api/storehouse_register/', include('storehouse_register.urls')),
     path('api/charger_register/', include('charger_register.urls')),
@@ -44,4 +45,5 @@ urlpatterns = [
     path('api/deposittype_register/',include('deposittype_register.urls')),
     path('api/entrust_register/', include('entrust_register.urls')),
     path('api/slip/', include('slip.urls')),
+    path('api/product_inventory/', include('product_inventory.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

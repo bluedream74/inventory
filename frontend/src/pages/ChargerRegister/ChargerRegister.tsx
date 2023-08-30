@@ -42,7 +42,7 @@ const ChargerRegister: React.FC = () => {
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   useEffect(() => {
-    void dispatch(getChargerList());
+    dispatch(getChargerList());
   }, [dispatch]);
 
   const handleClose = () => {
@@ -85,7 +85,7 @@ const ChargerRegister: React.FC = () => {
         .put(`charger_register/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
-          void dispatch(getChargerList());
+          dispatch(getChargerList());
         })
         .catch(err => {
           console.log(err);
@@ -95,7 +95,7 @@ const ChargerRegister: React.FC = () => {
         .post("charger_register/", modalData)
         .then(res => {
           handleClose();
-          void dispatch(getChargerList());
+          dispatch(getChargerList());
         })
         .catch(err => {
           console.log(err);
@@ -107,7 +107,7 @@ const ChargerRegister: React.FC = () => {
     axiosApi
       .delete(`charger_register/${id}`)
       .then(res => {
-        void dispatch(getChargerList());
+        dispatch(getChargerList());
         handleCloseDelete();
       })
       .catch(err => {

@@ -101,7 +101,16 @@ export const SlipDropDown = () => {
             >
                 <MenuItem onClick={handleClose} disableRipple>
                     <FileCopyIcon />
+                    <Link to='/product_ledger'>商品台帳</Link>
+                </MenuItem>
+                <Divider sx={{ my: 0.5 }} />
+                <MenuItem onClick={handleClose} disableRipple>
+                    <FileCopyIcon />
                     <Link to='/order_slip'>受注伝票</Link>
+                </MenuItem>
+                <MenuItem onClick={handleClose} disableRipple>
+                    <FileCopyIcon />
+                    <Link to='/sale_slip'>売上伝票</Link>
                 </MenuItem>
                 <MenuItem onClick={handleClose} disableRipple>
                     <FileCopyIcon />
@@ -127,7 +136,7 @@ export const SlipDropDown = () => {
                     <FileCopyIcon />
                     <Link to='/payment_slip'>支払伝票</Link>
                 </MenuItem>
-                <Divider sx={{ my: 0.5 }} />
+                
                 
             </StyledMenu>
         </div>

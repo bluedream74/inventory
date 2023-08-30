@@ -38,7 +38,7 @@ const SeasonRegister: React.FC = () => {
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   useEffect(() => {
-    void dispatch(getSeasonList());
+    dispatch(getSeasonList());
   }, [dispatch]);
 
   const handleClose = () => {
@@ -87,7 +87,7 @@ const SeasonRegister: React.FC = () => {
         })
         .then(res => {
           handleClose();
-          void dispatch(getSeasonList());
+          dispatch(getSeasonList());
         })
         .catch(err => {
           console.log(err);
@@ -106,7 +106,7 @@ const SeasonRegister: React.FC = () => {
         })
         .then(res => {
           handleClose();
-          void dispatch(getSeasonList());
+          dispatch(getSeasonList());
         })
         .catch(err => {
           console.log(err);
@@ -118,7 +118,7 @@ const SeasonRegister: React.FC = () => {
     axiosApi
       .delete(`season_register/${id}`)
       .then(res => {
-        void dispatch(getSeasonList());
+        dispatch(getSeasonList());
         handleCloseDelete();
       })
       .catch(err => {

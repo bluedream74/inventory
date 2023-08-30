@@ -8,6 +8,8 @@ from rest_framework.decorators import  permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view
 from datetime import datetime
+from slip.purchaseorder_slip.models import PurchaseorderItem
+from product_inventory.models import ProductInventory
 
 @permission_classes([AllowAny])
 class PurchaseView(APIView):
@@ -28,6 +30,7 @@ class PurchaseView(APIView):
             factory_code= data['factory_code'],
             storehouse_code= data['storehouse_code'],
             charger_code= data['charger_code'],
+            purchaseorder_no= data['purchaseorder_no'],
             other= data['other']
         )
         newSlip.save()
@@ -52,6 +55,7 @@ class PurchaseView(APIView):
         editSlip.factory_code= data['factory_code']
         editSlip.storehouse_code= data['storehouse_code']
         editSlip.charger_code= data['charger_code']
+        editSlip.purchaseorder_no= data['purchaseorder_no']
         editSlip.other= data['other']
         editSlip.save()
         status_code = status.HTTP_200_OK
@@ -90,8 +94,14 @@ class PurchaseView(APIView):
                 row.max_price = data['max_price']
                 row.min_cost = data['min_cost']
                 row.min_price = data['min_price']
-                row.other = data['other']
+                # row.other = data['other']
                 row.save()
+                productInventories = ProductInventory.objects.filter(purchaseitem=row)
+                for productInventory in productInventories:
+                    productInventory.purchase_date = row.purchase.slip_date
+                    productInventory.purchase_quantity = data['quantity']
+                    productInventory.quantity = data['quantity']
+                    productInventory.save()
             else:    
                 newItem = PurchaseItem (
                     row_id = data['id'],
@@ -107,9 +117,16 @@ class PurchaseView(APIView):
                     max_price = data['max_price'],
                     min_cost = data['min_cost'],
                     min_price = data['min_price'],
-                    other = data['other']
+                    # other = data['other']
                 )
                 newItem.save()
+                porderItem = PurchaseorderItem.objects.get(row_id = data['id'])
+                newProductInventory = ProductInventory.objects.get(purchaseorderitem=porderItem)
+                newProductInventory.purchase_date = newItem.purchase.slip_date
+                newProductInventory.purchase_quantity = data['quantity']
+                newProductInventory.purchaseitem = newItem
+                newProductInventory.quantity = data['quantity']
+                newProductInventory.save()
         #Delete
         slipItems = PurchaseItem.objects.filter(purchase = Purchase.objects.get(pk=slip_id))
         if(len(datas) != len(slipItems)):

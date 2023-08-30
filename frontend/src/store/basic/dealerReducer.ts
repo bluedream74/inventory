@@ -16,7 +16,7 @@ const initialState: DealerStateType = {
 export const getDealerList = createAsyncThunk<DealerInterface[]>(
   "dealer/getDealerList",
   async () => {
-    const response: AxiosResponse<DealerInterface[]> = await axiosApi.get("dealer_register/");
+    const response: AxiosResponse<any> = await axiosApi.get("dealer_register/");
     return response.data?.dealers;
   }
 )

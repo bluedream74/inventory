@@ -38,7 +38,7 @@ const OriginCountryRegister: React.FC = () => {
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   useEffect(() => {
-    void dispatch(getOriginCountryList());
+    dispatch(getOriginCountryList());
   }, [dispatch]);
 
   const handleClose = () => {
@@ -79,7 +79,7 @@ const OriginCountryRegister: React.FC = () => {
         .put(`origin_country_register/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
-          void dispatch(getOriginCountryList());
+          dispatch(getOriginCountryList());
         })
         .catch(err => {
           console.log(err);
@@ -89,7 +89,7 @@ const OriginCountryRegister: React.FC = () => {
         .post("origin_country_register/", modalData)
         .then(res => {
           handleClose();
-          void dispatch(getOriginCountryList());
+          dispatch(getOriginCountryList());
         })
         .catch(err => {
           console.log(err);
@@ -101,7 +101,7 @@ const OriginCountryRegister: React.FC = () => {
     axiosApi
       .delete(`origin_country_register/${id}`)
       .then(res => {
-        void dispatch(getOriginCountryList());
+        dispatch(getOriginCountryList());
         handleCloseDelete();
       })
       .catch(err => {

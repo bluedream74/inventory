@@ -14,6 +14,7 @@ class PaymentSerializer(serializers.ModelSerializer):
             'last_payment',
             'expected_date',
             'remain_payment',
+            'purchase_no',
             'other',
             'update_date',
             'items'

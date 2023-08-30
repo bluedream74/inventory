@@ -18,6 +18,8 @@ export interface DeliveryInterface {
   id: number;
   code: string;
   name: string;
+  tel: string;
+  phone: string;
 }
 
 const DeliveryRegister: React.FC = () => {
@@ -32,13 +34,15 @@ const DeliveryRegister: React.FC = () => {
   const [modalData, setModalData] = useState<DeliveryInterface>({
     id: 0,
     name: "",
-    code: ""
+    code: "",
+    tel: "",
+    phone: ""
   });
 
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   useEffect(() => {
-    void dispatch(getDeliveryList());
+    dispatch(getDeliveryList());
   }, [dispatch]);
 
   const handleClose = () => {
@@ -62,7 +66,9 @@ const DeliveryRegister: React.FC = () => {
     setModalData({
       id: 0,
       name: "",
-      code: ""
+      code: "",
+      phone: "",
+      tel: ""
     });
     setOpen(true);
   };
@@ -79,7 +85,7 @@ const DeliveryRegister: React.FC = () => {
         .put(`delivery_register/${modalData.id}`, modalData)
         .then(res => {
           handleClose();
-          void dispatch(getDeliveryList());
+          dispatch(getDeliveryList());
         })
         .catch(err => {
           console.log(err);
@@ -89,7 +95,7 @@ const DeliveryRegister: React.FC = () => {
         .post("delivery_register/", modalData)
         .then(res => {
           handleClose();
-          void dispatch(getDeliveryList());
+          dispatch(getDeliveryList());
         })
         .catch(err => {
           console.log(err);
@@ -101,7 +107,7 @@ const DeliveryRegister: React.FC = () => {
     axiosApi
       .delete(`delivery_register/${id}`)
       .then(res => {
-        void dispatch(getDeliveryList());
+        dispatch(getDeliveryList());
         handleCloseDelete();
       })
       .catch(err => {
@@ -152,7 +158,7 @@ const DeliveryRegister: React.FC = () => {
 
   const ModalSection = (
     <Dialog open={open}>
-      <DialogTitle textAlign="center">納期登録</DialogTitle>
+      <DialogTitle textAlign="center">納品先登録</DialogTitle>
       <DialogContent>
         <form onSubmit={(e) => e.preventDefault()}>
           <Stack
@@ -177,7 +183,7 @@ const DeliveryRegister: React.FC = () => {
             }
             <TextField
               key="code"
-              label="納期コード"
+              label="納品先コード"
               name="code"
               value={modalData.code}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -186,9 +192,27 @@ const DeliveryRegister: React.FC = () => {
             />
             <TextField
               key="name"
-              label="納期名"
+              label="納品先名"
               name="name"
               value={modalData.name}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setModalData({ ...modalData, [e.target.name]: e.target.value })
+              }
+            />
+            <TextField
+              key="tel"
+              label="tel"
+              name="tel"
+              value={modalData.tel}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setModalData({ ...modalData, [e.target.name]: e.target.value })
+              }
+            />
+            <TextField
+              key="phone"
+              label="住所"
+              name="phone"
+              value={modalData.phone}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setModalData({ ...modalData, [e.target.name]: e.target.value })
               }
@@ -207,7 +231,7 @@ const DeliveryRegister: React.FC = () => {
 
   const DeleteModal = (
     <Dialog open={deleteOpen}>
-      <DialogTitle textAlign="center">納期削除</DialogTitle>
+      <DialogTitle textAlign="center">納品先削除</DialogTitle>
       <DialogContent>
         削除しましょか？
       </DialogContent>
@@ -224,7 +248,7 @@ const DeliveryRegister: React.FC = () => {
     <div className='delivery_register'>
       <div className="toolbar">
         <div>
-          <button className='delivery_add' onClick={handleAddRow}>納期登録</button>
+          <button className='delivery_add' onClick={handleAddRow}>納品先登録</button>
           {ModalSection}
           {DeleteModal}
         </div>
@@ -245,7 +269,7 @@ const DeliveryRegister: React.FC = () => {
                 }
               </th>
               <th onClick={() => handleSort('code')}>
-                納期コード
+                納品先コード
                 {sortColumn === "code" &&
                   (sortDirection === "asc"
                     ? <img className='sort-icon' src={upArrow} />
@@ -254,8 +278,26 @@ const DeliveryRegister: React.FC = () => {
                 }
               </th>
               <th onClick={() => handleSort('name')}>
-                納期名
+                納品先名
                 {sortColumn === "name" &&
+                  (sortDirection === "asc"
+                    ? <img className='sort-icon' src={upArrow} />
+                    : <img className='sort-icon' src={downArrow} />
+                  )
+                }
+              </th>
+              <th onClick={() => handleSort('phone')}>
+                Tel
+                {sortColumn === "phone" &&
+                  (sortDirection === "asc"
+                    ? <img className='sort-icon' src={upArrow} />
+                    : <img className='sort-icon' src={downArrow} />
+                  )
+                }
+              </th>
+              <th onClick={() => handleSort('address')}>
+                住所
+                {sortColumn === "address" &&
                   (sortDirection === "asc"
                     ? <img className='sort-icon' src={upArrow} />
                     : <img className='sort-icon' src={downArrow} />
@@ -271,6 +313,8 @@ const DeliveryRegister: React.FC = () => {
                 <td>{row.id}</td>
                 <td>{row.code}</td>
                 <td>{row.name}</td>
+                <td>{row.tel}</td>
+                <td>{row.phone}</td>
                 <td className='row_action'>
                   <button className='edit_button' onClick={() => handleEditRow(row.id)}>
                     編集
