@@ -93,7 +93,7 @@ export interface IOrderSlip {
   charger_code: string;
   receiver_code: string;
   exhibition_code: string;
-  dealer_code : string;
+  dealer_code: string;
   status: string;
   other: string;
   items: Array<any>;
@@ -177,11 +177,11 @@ const OrderSlip = () => {
     const lists = chargerList.map((item) => item.code ?? "");
     return lists;
   }, [chargerList]);
-  const dealerList = useAppSelector(state=>state.dealer.dealerList);
-  const dealerCodeList = useMemo(()=>{
-    const lists = dealerList.map(item=>item.code??'');
+  const dealerList = useAppSelector((state) => state.dealer.dealerList);
+  const dealerCodeList = useMemo(() => {
+    const lists = dealerList.map((item) => item.code ?? "");
     return lists;
-  },[dealerList])
+  }, [dealerList]);
   const exhibitionList = useAppSelector(
     (state) => state.exhibition.exhibitionList
   );
@@ -189,21 +189,31 @@ const OrderSlip = () => {
     const lists = exhibitionList.map((item) => item.code ?? "");
     return lists;
   }, [exhibitionList]);
-  const colorList: string[] = useAppSelector((state) => {
-    const lists = state.color.colorList.map((item) => item.code ?? "");
+  const colorList = useAppSelector((state) => {
+    const lists = state.color.colorList.map((item) =>
+      item.code
+        ? { value: item.id, label: `${item.code}/${item.name}` }
+        : { value: "", label: "" }
+    );
     return lists;
   });
-  const sizeList: string[] = useAppSelector((state) => {
-    const lists = state.size.sizeList.map((item) => item.code ?? "");
+  const sizeList = useAppSelector((state) => {
+    const lists = state.size.sizeList.map((item) =>
+      item.code
+        ? { value: item.id, label: `${item.code}/${item.name}` }
+        : { value: "", label: "" }
+    );
     return lists;
   });
-  const productList: Array<ProductInterface> = useAppSelector(
-    (state) => state.product.productList
-  );
-  const proList: string[] = useAppSelector((state) => {
-    const lists = state.product.productList.map((item) => item.code ?? "");
+  const productList = useAppSelector((state) => state.product.productList);
+  const proList = useMemo(() => {
+    const lists = productList.map((item) =>
+      item.code
+        ? { value: item.id, label: `${item.code}/${item.part_number}` }
+        : { value: "", label: "" }
+    );
     return lists;
-  });
+  }, [productList]);
   useEffect(() => {
     handleNoChange(slipCommon.No);
   }, [orderSlipList]);
@@ -355,6 +365,23 @@ const OrderSlip = () => {
     </Dialog>
   );
   const processRowUpdate = (newRow: GridRowModel) => {
+    if (
+      newRow.product !== undefined &&
+      newRow.quantity !== undefined &&
+      newRow.size !== undefined &&
+      newRow.color !== undefined
+    ) {
+      const slip_id = orderSlipList.filter(
+        (item) => item.no === slipCommon.No
+      )[0]?.id;
+      axiosApi
+        .post(`slip/order_slip/saveRow/${slip_id}`, newRow)
+        .then((res) => dispatch(getSlipList()));
+
+      const selectProduct = productList.filter(
+        (item) => item.id === newRow.product
+      )[0];
+    }
     const updatedRow = { ...newRow, isNew: false };
     console.log(rows);
     setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
@@ -374,8 +401,8 @@ const OrderSlip = () => {
 
   const columns: GridColDef[] = [
     {
-      field: "product_code",
-      headerName: "商品コード ",
+      field: "product",
+      headerName: "商品コード/仮品番",
       minWidth: 150,
       align: "center",
       type: "singleSelect",
@@ -386,32 +413,24 @@ const OrderSlip = () => {
       field: "product_name",
       headerName: "商品名",
       minWidth: 150,
-      align: "left",
-      headerAlign: "left",
-      editable: true,
+      align: "center",
+      headerAlign: "center",
+      editable: false,
     },
     {
-      field: "product_part_number",
-      headerName: "仮品番",
-      minWidth: 100,
-      align: "left",
-      headerAlign: "left",
-      editable: true,
-    },
-    {
-      field: "size_code",
+      field: "size",
       headerName: "サイズ",
       minWidth: 100,
-      align: "left",
+      align: "center",
       type: "singleSelect",
       valueOptions: sizeList,
       editable: true,
     },
     {
-      field: "color_code",
+      field: "color",
       headerName: "色",
       minWidth: 100,
-      align: "left",
+      align: "center",
       type: "singleSelect",
       valueOptions: colorList,
       editable: true,
@@ -420,8 +439,8 @@ const OrderSlip = () => {
       field: "quantity",
       headerName: "数量",
       minWidth: 120,
-      align: "right",
-      headerAlign: "left",
+      align: "center",
+      headerAlign: "center",
       editable: true,
       type: "number",
     },
@@ -429,43 +448,16 @@ const OrderSlip = () => {
       field: "unit",
       headerName: "単位",
       minWidth: 80,
-      align: "left",
-      headerAlign: "left",
-      editable: true,
-    },
-    {
-      field: "max_cost",
-      headerName: "上代単価",
-      minWidth: 120,
-      align: "right",
-      headerAlign: "left",
-      type: "number",
+      align: "center",
+      headerAlign: "center",
       editable: true,
     },
     {
       field: "rate",
       headerName: "掛率",
       minWidth: 120,
-      align: "right",
-      headerAlign: "left",
-      type: "number",
-      editable: true,
-    },
-    {
-      field: "max_price",
-      headerName: "上代金額",
-      minWidth: 120,
-      align: "right",
-      headerAlign: "left",
-      type: "number",
-      editable: true,
-    },
-    {
-      field: "min_cost",
-      headerName: "下代単価 ",
-      minWidth: 120,
-      align: "right",
-      headerAlign: "left",
+      align: "center",
+      headerAlign: "center",
       type: "number",
       editable: true,
     },
@@ -473,35 +465,62 @@ const OrderSlip = () => {
       field: "cost",
       headerName: "原単価 ",
       minWidth: 120,
-      align: "right",
-      headerAlign: "left",
-      type: "number",
-      editable: true,
-    },
-    {
-      field: "min_price",
-      headerName: "下代金額 ",
-      minWidth: 120,
-      align: "right",
-      headerAlign: "left",
+      align: "center",
+      headerAlign: "center",
       type: "number",
       editable: true,
     },
     {
       field: "price",
-      headerName: "原価金額  ",
+      headerName: "原金額 ",
       minWidth: 120,
-      align: "right",
-      headerAlign: "left",
+      align: "center",
+      headerAlign: "center",
       type: "number",
       editable: true,
     },
     {
+      field: "max_cost",
+      headerName: "上代単価",
+      minWidth: 120,
+      align: "center",
+      headerAlign: "center",
+      type: "number",
+      editable: true,
+    },
+    {
+      field: "max_price",
+      headerName: "上代金額",
+      minWidth: 120,
+      align: "center",
+      headerAlign: "center",
+      type: "number",
+      editable: false,
+    },
+    {
+      field: "min_cost",
+      headerName: "原価単価",
+      minWidth: 120,
+      align: "center",
+      headerAlign: "center",
+      type: "number",
+      editable: false,
+    },
+    {
+      field: "min_price",
+      headerName: "原価金額",
+      minWidth: 120,
+      align: "center",
+      headerAlign: "center",
+      type: "number",
+      editable: false,
+    },    
+    {
       field: "profit",
       headerName: "粗利金額 ",
       minWidth: 120,
-      align: "right",
-      headerAlign: "left",
+      align: "center",
+      headerAlign: "center",
       type: "number",
       editable: true,
     },
@@ -605,7 +624,7 @@ const OrderSlip = () => {
     axiosApi
       .delete(`slip/order_slip/${slip_id}`)
       .then((res) => {
-        setSlipCommon({ ...slipCommon, No: proList[proList.length - 1] });
+        setSlipCommon({ ...slipCommon, No: noList[noList.length - 1] });
         setDeleteOpen(false);
         dispatch(getSlipList());
       })
@@ -913,7 +932,7 @@ const OrderSlip = () => {
               </div>
             </div>
             <div className="common__right">
-            <div className="common-item">
+              <div className="common-item">
                 <div className="common-item__small">
                   <p className="common-item__title">得意先コード </p>
                   <Autocomplete

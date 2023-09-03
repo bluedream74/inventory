@@ -28,21 +28,14 @@ class ProductView(APIView):
     def post(self, request):
         print(request.data)
         image = request.FILES.get('image_url')
-        # image_url = ''
-        # if (image) :
-        #     timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-        #     filename = f"{timestamp}_{image.name}"
-        #     fs = FileSystemStorage(location=settings.PRODUCT_ROOT)
-        #     fs.save(filename, image)
-        #     image_url = settings.PRODUCT_URL+(filename)
         newProduct = Product(
             image_url = image,
             image_mode = request.data['image_mode'],
             code = request.data['code'],
             part_number = request.data['part_number'],
             name = request.data['name'],
-            ancient_time = request.data['ancient_time'],
-            price = request.data['price']
+            max_cost = request.data['max_cost'],
+            min_cost = request.data['min_cost']
         )
         newProduct.save()
 
@@ -66,18 +59,16 @@ class ProductView(APIView):
         }
         return Response(response, status=status_code)
     def put(self, request, id):
-        print(id)
         edit_product = Product.objects.get(id=id)
         edit_product.image_url = request.FILES.get('image_url')
         edit_product.image_mode = request.data['image_mode']
         edit_product.code = request.data['code']
         edit_product.part_number = request.data['part_number']
         edit_product.name = request.data['name']
-        edit_product.ancient_time = request.data['ancient_time']
-        edit_product.price = request.data['price']
-
+        edit_product.max_cost = request.data['max_cost']
+        edit_product.min_cost = request.data['min_cost']
         edit_product.save()
-
+        
         status_code = status.HTTP_200_OK
         response = {
             'success': 'True',

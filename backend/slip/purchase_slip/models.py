@@ -1,5 +1,8 @@
 from django.db import models
-
+from product_register.models import Product
+from size_register.models import Size
+from color_register.models import Color
+from slip.purchaseorder_slip.models import PurchaseorderItem, Purchaseorder
 # Create your models here.
 class Purchase(models.Model):
     no = models.CharField(max_length=30)
@@ -10,7 +13,7 @@ class Purchase(models.Model):
     factory_code = models.CharField(max_length=30)
     storehouse_code = models.CharField(max_length=30)
     charger_code = models.CharField(max_length=30)
-    purchaseorder_no = models.CharField(max_length=20, null=True)
+    purchaseorder = models.ForeignKey(Purchaseorder, on_delete=models.CASCADE, null=True)
     other = models.CharField(max_length=200, null=True)
     update_date = models.DateField(auto_now=True, null=True)
 
@@ -18,18 +21,12 @@ class Purchase(models.Model):
 class PurchaseItem(models.Model):
     row_id = models.CharField(max_length=200, default='', null=True)
     purchase = models.ForeignKey(Purchase, on_delete=models.CASCADE, null=True)
-    product_code = models.CharField(max_length=30)
-    product_name = models.CharField(max_length=30)
-    product_part_number = models.CharField(max_length=30)
-    size_code = models.CharField(max_length=30)
-    color_code = models.CharField(max_length=30)
+    purchaseorderItem = models.ForeignKey(PurchaseorderItem, on_delete=models.CASCADE, null=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
+    size = models.ForeignKey(Size, on_delete=models.CASCADE, null=True)
+    color = models.ForeignKey(Color, on_delete=models.CASCADE, null=True)
     quantity = models.FloatField(default=0)
     unit = models.CharField(max_length=10)
-    max_cost = models.FloatField(default=0)
-    min_cost = models.FloatField(default=0)
-    max_price = models.FloatField(default=0)
-    min_price = models.FloatField(default=0)
-    other = models.CharField(max_length=200)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
     class Meta:

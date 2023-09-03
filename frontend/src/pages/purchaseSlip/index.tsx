@@ -56,7 +56,6 @@ import {
   getPurchaseSlipList,
 } from "../../store/slip/purchaseSlipReducer";
 import axiosApi from "../../utilities/axios";
-import { getIncomingDepartmentList } from "../../store/basic/incomingDepartmentReducer";
 import { getFactoryList } from "../../store/basic/factoryReducer";
 import { getPurchaseorderSlipList } from "../../store/slip/purchaseorderSlipReducer";
 export interface BtnStatusInterface {
@@ -115,17 +114,22 @@ export const PurchaseSlip = () => {
     factory_code: "",
     storehouse_code: "",
     charger_code: "",
-    purchaseorder_no: "",
+    purchaseorder: 0,
     other: "",
     update_date: formattedDate,
     items: [],
   });
 
   const dispatch = useAppDispatch();
-  const proList: string[] = useAppSelector((state) => {
-    const lists = state.product.productList.map((item) => item.code ?? "");
+  const productList = useAppSelector((state) => state.product.productList);
+  const proList = useMemo(() => {
+    const lists = productList.map((item) =>
+      item.code
+        ? { value: item.id, label: `${item.code}/${item.part_number}` }
+        : { value: "", label: "" }
+    );
     return lists;
-  });
+  }, [productList]);
   const factoryList = useAppSelector((state) => state.factory.factoryList);
   const factoryCodeList: string[] = useMemo(() => {
     const lists = factoryList.map((item) => item.code ?? "");
@@ -143,12 +147,20 @@ export const PurchaseSlip = () => {
     const shl = storehouseList.map((item) => item.code ?? "");
     return shl;
   }, [storehouseList]);
-  const colorList: string[] = useAppSelector((state) => {
-    const lists = state.color.colorList.map((item) => item.code ?? "");
+  const colorList = useAppSelector((state) => {
+    const lists = state.color.colorList.map((item) =>
+      item.code
+        ? { value: item.id, label: `${item.code}/${item.name}` }
+        : { value: "", label: "" }
+    );
     return lists;
   });
-  const sizeList: string[] = useAppSelector((state) => {
-    const lists = state.size.sizeList.map((item) => item.code ?? "");
+  const sizeList = useAppSelector((state) => {
+    const lists = state.size.sizeList.map((item) =>
+      item.code
+        ? { value: item.id, label: `${item.code}/${item.name}` }
+        : { value: "", label: "" }
+    );
     return lists;
   });
   const purchaseList = useAppSelector((state) => state.purchaseSlip.slips);
@@ -156,11 +168,13 @@ export const PurchaseSlip = () => {
     const ret = state.purchaseSlip.slips.map((slip) => slip.no ?? "");
     return ["新規登録", ...ret];
   });
-  const porderList = useAppSelector(state=>state.purchaseorderSlip.slips);
-  const porderNoList = useMemo(()=>{
-    const lists = porderList.map(item => item.no??'')
+  const porderList = useAppSelector((state) => state.purchaseorderSlip.slips);
+  const porderNoList = useMemo(() => {
+    const lists = porderList.map((item) =>
+      item.no ? { value: item.id, label: item.no } : { value: 0, label: "" }
+    );
     return lists;
-  },[porderList])
+  }, [porderList]);
   useEffect(() => {
     dispatch(getPurchaseorderSlipList());
     dispatch(getPurchaseSlipList());
@@ -188,6 +202,18 @@ export const PurchaseSlip = () => {
     handleNoChange(noList[noList.length - 1]);
   }, [purchaseList.length]);
   const handleSaveClick = (id: GridRowId) => () => {
+    if (!rowModesModel[id] || rowModesModel[id].mode !== GridRowModes.Edit) {
+      const selectRow = rows.filter((item) => item.id === id)[0];
+      const slip_id = purchaseList.filter(
+        (item) => item.no === selectedSlip.no
+      )[0]?.id;
+      axiosApi
+        .post(`slip/purchase_slip/saveRow/${slip_id}`, selectRow)
+        .then((res) => {
+          console.log("sdfssdfs");
+          dispatch(getPurchaseSlipList());
+        });
+    }
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
   };
   const handleCancelClick = (id: GridRowId) => () => {
@@ -202,10 +228,19 @@ export const PurchaseSlip = () => {
     }
   };
   const handleEditClick = (id: GridRowId) => () => {
+    console.log(id);
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
   };
+
   const handleDeleteClick = (id: GridRowId) => () => {
-    setRows(rows.filter((row) => row.id !== id));
+    axiosApi
+      .post(`slip/purchase_slip/deleteRow`, { row_id: id })
+      .then((res) => {
+        if (res) {
+          dispatch(getPurchaseSlipList());
+          setRows(rows.filter((row) => row.id !== id));
+        }
+      });
   };
   const handleRowModesModelChange = (newRowModesModel: GridRowModesModel) => {
     setRowModesModel(newRowModesModel);
@@ -214,14 +249,18 @@ export const PurchaseSlip = () => {
     params,
     event
   ) => {
-    console.log("asassass");
     if (params.reason === GridRowEditStopReasons.rowFocusOut) {
       event.defaultMuiPrevented = true;
     }
   };
   const processRowUpdate = (newRow: GridRowModel) => {
     const updatedRow = { ...newRow, isNew: false };
-    console.log(rows);
+    const slip_id = purchaseList.filter(
+      (item) => item.no === selectedSlip.no
+    )[0]?.id;
+    axiosApi
+      .post(`slip/purchase_slip/saveRow/${slip_id}`, newRow)
+      .then((res) => dispatch(getPurchaseSlipList()));
     setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
     return updatedRow;
   };
@@ -247,13 +286,13 @@ export const PurchaseSlip = () => {
   };
   const columns: GridColDef[] = [
     {
-      field: "product_code",
-      headerName: "商品コード ",
+      field: "product",
+      headerName: "商品コード/仮品番 ",
       minWidth: 150,
       align: "center",
       type: "singleSelect",
       valueOptions: proList,
-      editable: true,
+      editable: false,
     },
     {
       field: "product_name",
@@ -261,33 +300,25 @@ export const PurchaseSlip = () => {
       minWidth: 250,
       align: "left",
       headerAlign: "left",
-      editable: true,
+      editable: false,
     },
     {
-      field: "product_part_number",
-      headerName: "仮品番",
-      minWidth: 120,
-      align: "left",
-      headerAlign: "left",
-      editable: true,
-    },
-    {
-      field: "size_code",
+      field: "size",
       headerName: "サイズ",
       minWidth: 120,
       align: "left",
       type: "singleSelect",
       valueOptions: sizeList,
-      editable: true,
+      editable: false,
     },
     {
-      field: "color_code",
+      field: "color",
       headerName: "色",
       minWidth: 120,
       align: "left",
       type: "singleSelect",
       valueOptions: colorList,
-      editable: true,
+      editable: false,
     },
     {
       field: "quantity",
@@ -304,7 +335,7 @@ export const PurchaseSlip = () => {
       minWidth: 120,
       align: "left",
       headerAlign: "left",
-      editable: true,
+      editable: false,
     },
     {
       field: "max_cost",
@@ -313,7 +344,7 @@ export const PurchaseSlip = () => {
       align: "right",
       headerAlign: "left",
       type: "number",
-      editable: true,
+      editable: false,
     },
     {
       field: "min_cost",
@@ -322,7 +353,7 @@ export const PurchaseSlip = () => {
       align: "right",
       headerAlign: "left",
       type: "number",
-      editable: true,
+      editable: false,
     },
     {
       field: "max_price",
@@ -331,7 +362,7 @@ export const PurchaseSlip = () => {
       align: "right",
       headerAlign: "left",
       type: "number",
-      editable: true,
+      editable: false,
     },
     {
       field: "min_price",
@@ -340,7 +371,7 @@ export const PurchaseSlip = () => {
       align: "right",
       headerAlign: "left",
       type: "number",
-      editable: true,
+      editable: false,
     },
     {
       field: "actions",
@@ -350,8 +381,8 @@ export const PurchaseSlip = () => {
       cellClassName: "actions",
       getActions: ({ id }) => {
         const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
-
-        if (isInEditMode) {
+        const selectRow = rows.filter((item) => item.id === id)[0];
+        if (isInEditMode || selectRow.status === "edit") {
           return [
             <GridActionsCellItem
               icon={<SaveIcon />}
@@ -420,7 +451,7 @@ export const PurchaseSlip = () => {
       factory_code: "",
       storehouse_code: "",
       charger_code: "",
-      purchaseorder_no: "",
+      purchaseorder: 0,
       other: "",
       update_date: formattedDate,
       items: [],
@@ -459,19 +490,19 @@ export const PurchaseSlip = () => {
         });
     }
   };
-  const handlePOrderNoChange = (val: string | null) => {
-    const porderItem = porderList.filter(item=>item.no===val)[0]
+  const handlePOrderNoChange = (val: number) => {
+    const porderItem = porderList.filter((item) => item.id === val)[0];
     setSelectedSlip({
-      ...selectedSlip, 
-      purchaseorder_no: val??'',
+      ...selectedSlip,
+      purchaseorder: val ?? 0,
       factory_code: porderItem?.factory_code,
-      storehouse_code: porderItem?.storehouse_code
-    })
-    const rowItem = porderItem?.items?.map((item : any)=> item ??null)
+      storehouse_code: porderItem?.storehouse_code,
+    });
+    const rowItem = porderItem?.items?.map((item: any) => item ?? null);
     rowItem && setRows(rowItem);
-  }
+  };
   const handleNoChange = (noValue: string | null) => {
-    console.log("dsdfsdfsd", noValue);
+    console.log(noValue);
     if (noValue && noValue !== "新規登録") {
       const index = noList.indexOf(noValue) - 1;
       setSelectedSlip(purchaseList[index]);
@@ -493,15 +524,7 @@ export const PurchaseSlip = () => {
       });
     } else handleCancel();
   };
-  const handleSaveRows = () => {
-    const slip_id = purchaseList.filter(
-      (item: PurchaseSlipInterface) => item.no === selectedSlip.no
-    )[0]?.id;
-    console.log(rows);
-    axiosApi
-      .post(`slip/purchase_slip/saveRows/${slip_id}`, rows)
-      .then((res) => dispatch(getPurchaseSlipList()));
-  };
+
   const deleteSlip = () => {
     const slip_id = purchaseList.filter(
       (item: PurchaseSlipInterface) => item.no === selectedSlip.no
@@ -528,6 +551,14 @@ export const PurchaseSlip = () => {
       </DialogActions>
     </Dialog>
   );
+  useEffect(() => {
+    rows.map((row) => {
+      if (row.status === "edit") {
+        console.log(row.id);
+        handleEditClick(row.id);
+      }
+    });
+  }, [rows]);
   return (
     <LocalizationProvider
       dateAdapter={AdapterDayjs}
@@ -644,13 +675,18 @@ export const PurchaseSlip = () => {
               <div className="flex items-center justify-start pb-3">
                 <div className="flex items-center">
                   <p className="w-40">発注番号</p>
+
                   <Autocomplete
                     disablePortal
-                    id="no"
+                    id="purchaseorder"
                     size="small"
-                    value={selectedSlip.purchaseorder_no}
-                    onChange={(event: any, noValue: string | null) =>
-                      handlePOrderNoChange(noValue)
+                    value={
+                      porderNoList.filter(
+                        (item) => item.value === selectedSlip.purchaseorder
+                      )[0] ?? { value: 0, label: "" }
+                    }
+                    onChange={(event: any, val) =>
+                      handlePOrderNoChange(val ? val.value : 0)
                     }
                     options={porderNoList}
                     className="w-72"
@@ -669,7 +705,7 @@ export const PurchaseSlip = () => {
                     )}
                   />
                 </div>
-              </div>          
+              </div>
               <div className="flex items-left justify-start pb-3">
                 <div className="flex items-center">
                   <p className="w-40">工場コード</p>
@@ -760,7 +796,7 @@ export const PurchaseSlip = () => {
                         slotProps={{ textField: { size: "small" } }}
                         format="YYYY-MM-DD"
                         value={dayjs(selectedSlip.slip_date)}
-                        onChange={(newValue) => { 
+                        onChange={(newValue) => {
                           console.log(newValue);
                           setSelectedSlip({
                             ...selectedSlip,
@@ -874,15 +910,6 @@ export const PurchaseSlip = () => {
         </div>
         {rows.length !== 0 && (
           <div className="flex flex-col mt-3">
-            <div className="flex justify-end pb-3">
-              <NonBorderRadiusButton
-                variant="outlined"
-                onClick={handleSaveRows}
-                className="bg-red-300"
-              >
-                明細保存
-              </NonBorderRadiusButton>
-            </div>
             <div>
               <DataGrid
                 rows={rows}

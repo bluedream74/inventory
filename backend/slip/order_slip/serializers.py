@@ -28,15 +28,19 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class OrderItemSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
+    product_name = serializers.SerializerMethodField()
+    max_cost = serializers.SerializerMethodField()
+    min_cost = serializers.SerializerMethodField()
+    max_price = serializers.SerializerMethodField()
+    min_price = serializers.SerializerMethodField()
     class Meta:
         model = OrderItem
         fields = (
             'id',
-            'product_code',
+            'product',
             'product_name',
-            'product_part_number',
-            'size_code',
-            'color_code',
+            'size',
+            'color',
             'quantity',
             'unit',
             'rate',
@@ -50,3 +54,17 @@ class OrderItemSerializer(serializers.ModelSerializer):
         )
     def get_id(self, obj):
         return obj.row_id
+    def get_product_name(self, obj):
+        return obj.product.name
+    
+    def get_max_cost(self, obj):
+        return int(obj.product.max_cost) 
+    
+    def get_min_cost(self, obj):
+        return obj.product.min_cost
+    
+    def get_max_price(self, obj):
+        return int(obj.product.max_cost) * obj.quantity
+    
+    def get_min_price(self, obj):
+        return obj.product.min_cost * obj.quantity

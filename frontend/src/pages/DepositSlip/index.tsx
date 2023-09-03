@@ -103,40 +103,42 @@ export const DepositSlip = () => {
     id: 0,
     no: "",
     slip_date: formattedDate,
-    dealer_code : '',
-    last_invoice_date : formattedDate,
-    last_invoice : '',
-    expected_date : formattedDate,
-    remain_invoice : '',
-    sale_no: '',
-    other: '',
+    dealer_code: "",
+    last_invoice_date: formattedDate,
+    last_invoice: "",
+    expected_date: formattedDate,
+    remain_invoice: "",
+    sale: 0,
+    other: "",
     update_date: formattedDate,
-    items: []    
+    items: [],
   });
 
   const dispatch = useAppDispatch();
-  const dealerList = useAppSelector(state => state.dealer.dealerList);
+  const dealerList = useAppSelector((state) => state.dealer.dealerList);
   const dealerCodeList: string[] = useMemo(() => {
-    const lists = dealerList.map((item : any) => item.code ?? "");
+    const lists = dealerList.map((item: any) => item.code ?? "");
     return lists;
-  },[dealerList]);  
-  const depositList = useAppSelector(
-    (state) => state.depositSlip.slips
-  );
+  }, [dealerList]);
+  const depositList = useAppSelector((state) => state.depositSlip.slips);
   const noList: string[] = useAppSelector((state) => {
     const ret = state.depositSlip.slips.map((slip) => slip.no ?? "");
     return ["新規登録", ...ret];
   });
-  const saleList = useAppSelector(state => state.saleSlip.slips);
-  const saleNoList = useMemo(()=>{
-    const lists = saleList.map(item=>item.dealer_code === selectedSlip.dealer_code? item.no :'');
+  const saleList = useAppSelector((state) => state.saleSlip.slips);
+  const saleNoList = useMemo(() => {
+    const lists = saleList.map((item) =>
+      item.dealer_code === selectedSlip.dealer_code
+        ? { value: item.id, label: item.no }
+        : { value: 0, label: "" }
+    );
     return lists;
-  },[saleList, selectedSlip.dealer_code])
-  const get_all_payment = useMemo(()=>{
+  }, [saleList, selectedSlip.dealer_code]);
+  const get_all_payment = useMemo(() => {
     let all_payment = 0;
-    selectedSlip?.items.map(item=>all_payment+=item.deposit_price*1);
-    return all_payment
-  },[selectedSlip]);
+    selectedSlip?.items.map((item) => (all_payment += item.deposit_price * 1));
+    return all_payment;
+  }, [selectedSlip]);
   useEffect(() => {
     handleNoChange(selectedSlip.no);
   }, [depositList]);
@@ -145,10 +147,16 @@ export const DepositSlip = () => {
     dispatch(getDepositSlipList());
     dispatch(getDealerList());
   }, [dispatch]);
-  useEffect(()=>{
-    handleNoChange(noList[noList.length - 1])
-  },[depositList.length])
+  useEffect(() => {
+    handleNoChange(noList[noList.length - 1]);
+  }, [depositList.length]);
   const handleSaveClick = (id: GridRowId) => () => {
+    const selectRow = rows.filter((item) => item.id === id)[0];
+    const slip_id = depositList.filter((item) => item.no === selectedSlip.no)[0]
+      ?.id;
+    axiosApi
+      .post(`slip/deposit_slip/saveRow/${slip_id}`, selectRow)
+      .then((res) => dispatch(getDepositSlipList()));
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
   };
   const handleCancelClick = (id: GridRowId) => () => {
@@ -175,14 +183,17 @@ export const DepositSlip = () => {
     params,
     event
   ) => {
-    console.log("asassass");
     if (params.reason === GridRowEditStopReasons.rowFocusOut) {
       event.defaultMuiPrevented = true;
     }
   };
   const processRowUpdate = (newRow: GridRowModel) => {
+    const slip_id = depositList.filter((item) => item.no === selectedSlip.no)[0]
+      ?.id;
+    axiosApi
+      .post(`slip/deposit_slip/saveRow/${slip_id}`, newRow)
+      .then((res) => dispatch(getDepositSlipList()));
     const updatedRow = { ...newRow, isNew: false };
-    console.log(rows);
     setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
     return updatedRow;
   };
@@ -227,14 +238,14 @@ export const DepositSlip = () => {
       field: "deposit_date",
       headerName: "手形期日",
       minWidth: 150,
-      type: 'date',
+      type: "date",
       valueFormatter(params) {
         const date = new Date(params.value);
-        return date.toLocaleDateString('en-US');
+        return date.toLocaleDateString("en-US");
       },
       align: "left",
       headerAlign: "left",
-      editable: true
+      editable: true,
     },
 
     {
@@ -245,7 +256,7 @@ export const DepositSlip = () => {
       headerAlign: "left",
       editable: true,
     },
-    
+
     {
       field: "actions",
       type: "actions",
@@ -254,8 +265,8 @@ export const DepositSlip = () => {
       cellClassName: "actions",
       getActions: ({ id }) => {
         const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
-
-        if (isInEditMode) {
+        const selectRow = rows.filter((item) => item.id === id)[0];
+        if (isInEditMode || selectRow.state === "edit") {
           return [
             <GridActionsCellItem
               icon={<SaveIcon />}
@@ -301,13 +312,13 @@ export const DepositSlip = () => {
         handleNoChange(noList[1]);
         break;
       case 2:
-        handleNoChange(noList[index-1]);
+        handleNoChange(noList[index - 1]);
         break;
       case 3:
-        handleNoChange(noList[index+1]);
+        handleNoChange(noList[index + 1]);
         break;
       case 4:
-        handleNoChange(noList[noList.length-1]);
+        handleNoChange(noList[noList.length - 1]);
         break;
       default:
         break;
@@ -318,13 +329,13 @@ export const DepositSlip = () => {
       id: 0,
       no: "新規登録",
       slip_date: formattedDate,
-      dealer_code : '',
-      last_invoice_date : formattedDate,
-      last_invoice : '',
-      expected_date : formattedDate,
-      remain_invoice : '',
-      sale_no: '',
-      other: '',
+      dealer_code: "",
+      last_invoice_date: formattedDate,
+      last_invoice: "",
+      expected_date: formattedDate,
+      remain_invoice: "",
+      sale: 0,
+      other: "",
       items: [],
       update_date: formattedDate,
     });
@@ -362,21 +373,25 @@ export const DepositSlip = () => {
         });
     }
   };
-  const handleSaleChange = (event: any, val: string | null) => {
-    setSelectedSlip({...selectedSlip, sale_no: val??''});
-    const saleItem = saleList.filter(item=>item.no===selectedSlip.sale_no)[0];
-    const rowItem : any = saleItem?.items?.map( item=>item?{
-      id: item.id,
-      deposit_category: `${saleItem.slip_date}/${item.product_code}-${item.product_name}`,
-      deposit_price: '',
-      deposit_date: formattedDate,
-      other: ''
-    }: null)
+  const handleSaleChange = (val: number) => {
+    console.log(val);
+    setSelectedSlip({ ...selectedSlip, sale: val ?? 0 });
+    const saleItem = saleList.filter((item) => item.id === val)[0];
+    const rowItem: any = saleItem?.items?.map((item) =>
+      item
+        ? {
+            id: item.id,
+            deposit_category: `${saleItem.slip_date}/${item.product_code}-${item.product_name}`,
+            deposit_price: "",
+            deposit_date: null,
+            other: "",
+          }
+        : null
+    );
     rowItem && setRows(rowItem);
-  }
-  
+  };
+
   const handleNoChange = (noValue: string | null) => {
-    console.log("dsdfsdfsd", noValue);
     if (noValue && noValue !== "新規登録") {
       const index = noList.indexOf(noValue) - 1;
       setSelectedSlip(depositList[index]);
@@ -398,35 +413,34 @@ export const DepositSlip = () => {
       });
     } else handleCancel();
   };
+  console.log(depositList);
   const handleSaveRows = () => {
-    const slip_id = depositList.filter(
-      (item) => item.no === selectedSlip.no
-    )[0]?.id;
+    const slip_id = depositList.filter((item) => item.no === selectedSlip.no)[0]
+      ?.id;
     console.log(rows);
     axiosApi
       .post(`slip/deposit_slip/saveRows/${slip_id}`, rows)
       .then((res) => dispatch(getDepositSlipList()));
   };
   const deleteSlip = () => {
-    const slip_id = depositList.filter(item=>item.no === selectedSlip.no)[0]?.id;
+    const slip_id = depositList.filter((item) => item.no === selectedSlip.no)[0]
+      ?.id;
     axiosApi
       .delete(`slip/deposit_slip/${slip_id}`)
-      .then(res => {
-        dispatch(getDepositSlipList())
+      .then((res) => {
+        dispatch(getDepositSlipList());
         setDeleteOpen(false);
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
-      })
-  }
+      });
+  };
   const DeleteModal = (
     <Dialog open={deleteOpen}>
       <DialogTitle textAlign="center">色削除</DialogTitle>
-      <DialogContent>
-        削除しましょか？
-      </DialogContent>
-      <DialogActions sx={{ p: '1.25rem' }}>
-        <Button onClick={()=>setDeleteOpen(false)}>キャンセル</Button>
+      <DialogContent>削除しましょか？</DialogContent>
+      <DialogActions sx={{ p: "1.25rem" }}>
+        <Button onClick={() => setDeleteOpen(false)}>キャンセル</Button>
         <Button color="secondary" onClick={deleteSlip} variant="contained">
           削除
         </Button>
@@ -447,11 +461,19 @@ export const DepositSlip = () => {
             <div className="flex gap-4">
               <div className="flex items-end gap-1">
                 <h3>登録日</h3>
-                <p className="text-lg">{selectedSlip.no !== '新規登録'? selectedSlip.slip_date : '00/00/00'}</p>
+                <p className="text-lg">
+                  {selectedSlip.no !== "新規登録"
+                    ? selectedSlip.slip_date
+                    : "00/00/00"}
+                </p>
               </div>
               <div className="flex items-end gap-1">
                 <h3>更新日</h3>
-                <p className="text-lg">{selectedSlip.no !== '新規登録'? selectedSlip.update_date : '00/00/00'}</p>
+                <p className="text-lg">
+                  {selectedSlip.no !== "新規登録"
+                    ? selectedSlip.update_date
+                    : "00/00/00"}
+                </p>
               </div>
             </div>
           </div>
@@ -550,7 +572,7 @@ export const DepositSlip = () => {
                       setSelectedSlip({
                         ...selectedSlip,
                         dealer_code: entrustCode ?? "",
-                        sale_no: ""
+                        sale: 0,
                       })
                     }
                     options={dealerCodeList}
@@ -585,8 +607,14 @@ export const DepositSlip = () => {
                     disablePortal
                     id="entrust_code"
                     size="small"
-                    value={selectedSlip.sale_no}
-                    onChange={handleSaleChange}
+                    value={
+                      saleNoList.filter(
+                        (item) => item.value === selectedSlip.sale
+                      )[0] ?? { value: 0, label: "" }
+                    }
+                    onChange={(event: any, val) => {
+                      handleSaleChange(val?.value ?? 0);
+                    }}
                     options={saleNoList}
                     className="w-72"
                     renderInput={(params) => (
@@ -614,7 +642,6 @@ export const DepositSlip = () => {
                     format="YYYY-MM-DD"
                     value={dayjs(selectedSlip.slip_date)}
                     onChange={(newValue) => {
-                      console.log(newValue);
                       setSelectedSlip({
                         ...selectedSlip,
                         slip_date: newValue?.format("YYYY-MM-DD"),
@@ -626,7 +653,7 @@ export const DepositSlip = () => {
             </div>
             <div className="flex flex-col">
               <div className="flex items-center">
-                <p className="w-40">前回請求日  </p>
+                <p className="w-40">前回請求日 </p>
                 <DatePicker
                   className="w-72 border-solid border-gray border-2"
                   slotProps={{ textField: { size: "small" } }}
@@ -640,7 +667,6 @@ export const DepositSlip = () => {
                     });
                   }}
                 />
-                
               </div>
               <div className="flex items-center mt-1">
                 <p className="w-40">前師求額 </p>
@@ -652,7 +678,7 @@ export const DepositSlip = () => {
                   onChange={(e) =>
                     setSelectedSlip({
                       ...selectedSlip,
-                      [e.target.name]: e.target.value
+                      [e.target.name]: e.target.value,
                     })
                   }
                 />
@@ -672,7 +698,6 @@ export const DepositSlip = () => {
                     });
                   }}
                 />
-                
               </div>
               <div className="flex items-center mt-1">
                 <p className="w-40">売掛残高 </p>
@@ -684,7 +709,7 @@ export const DepositSlip = () => {
                   onChange={(e) =>
                     setSelectedSlip({
                       ...selectedSlip,
-                      [e.target.name]: e.target.value
+                      [e.target.name]: e.target.value,
                     })
                   }
                 />
@@ -692,7 +717,7 @@ export const DepositSlip = () => {
             </div>
           </div>
         </div>
-        {selectedSlip.no !=='新規登録' && (
+        {rows.length !== 0 && (
           <div className="flex flex-col w-full justify-center mt-3 px-10">
             <div className="flex justify-end pb-3">
               <NonBorderRadiusButton
@@ -743,7 +768,9 @@ export const DepositSlip = () => {
             <Typography>合計金額</Typography>
             <Typography>{get_all_payment}</Typography>
             <Typography pl={2}>締処理</Typography>
-            <Typography>{selectedSlip.items?`${selectedSlip.items.length} 未`:'0'}</Typography>
+            <Typography>
+              {selectedSlip.items ? `${selectedSlip.items.length} 未` : "0"}
+            </Typography>
           </div>
         </div>
         {DeleteModal}

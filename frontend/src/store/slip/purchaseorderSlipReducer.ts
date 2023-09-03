@@ -6,11 +6,10 @@ import { Dayjs } from "dayjs";
 
 export interface PurchaseorderSlipItemInterface {
   id: string;
-  product_code: string;
+  product: number;
   product_name: string;
-  product_part_number: string;
-  size_code: string;
-  color_code: string;
+  size: number;
+  color: number;
   quantity: number;
   unit: string;
   max_cost: number;

@@ -32,7 +32,7 @@ import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
 import dayjs, { Dayjs } from "dayjs";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   DataGrid,
   GridActionsCellItem,
@@ -50,7 +50,6 @@ import {
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { getStorehouseList } from "../../store/basic/storehouseReducer";
 import { getChargerList } from "../../store/basic/chargerReducer";
-import { getExhibitionList } from "../../store/basic/exhibitionReducer";
 import { getProductList } from "../../store/basic/productReducer";
 import { getColorList } from "../../store/basic/colorReducer";
 import { getSizeList } from "../../store/basic/sizeReducer";
@@ -59,10 +58,7 @@ import {
   PurchaseorderSlipInterface,
   getPurchaseorderSlipList,
 } from "../../store/slip/purchaseorderSlipReducer";
-import { getEntrustList } from "../../store/basic/entrustReducer";
 import axiosApi from "../../utilities/axios";
-import { Link } from "react-router-dom";
-import { getIncomingDepartmentList } from "../../store/basic/incomingDepartmentReducer";
 import { getFactoryList } from "../../store/basic/factoryReducer";
 export interface BtnStatusInterface {
   first: "active" | "disable";
@@ -107,7 +103,6 @@ export const PurchaseOrderSlip = () => {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
   const currentDate = new Date();
-  console.log(currentDate);
   const formattedDate = `${currentDate.getFullYear()}-${
     currentDate.getMonth() + 1
   }-${currentDate.getDate()}`;
@@ -127,10 +122,15 @@ export const PurchaseOrderSlip = () => {
   });
 
   const dispatch = useAppDispatch();
-  const proList: string[] = useAppSelector((state) => {
-    const lists = state.product.productList.map((item) => item.code ?? "");
+  const productList = useAppSelector((state) => state.product.productList);
+  const proList = useMemo(() => {
+    const lists = productList.map((item) =>
+      item.code
+        ? { value: item.id, label: `${item.code}/${item.part_number}` }
+        : { value: "", label: "" }
+    );
     return lists;
-  });
+  }, [productList]);
   const factoryList = useAppSelector((state) => state.factory.factoryList);
   const factoryCodeList: string[] = useMemo(() => {
     const lists = factoryList.map((item) => item.code ?? "");
@@ -148,12 +148,20 @@ export const PurchaseOrderSlip = () => {
     const shl = storehouseList.map((item) => item.code ?? "");
     return shl;
   }, [storehouseList]);
-  const colorList: string[] = useAppSelector((state) => {
-    const lists = state.color.colorList.map((item) => item.code ?? "");
+  const colorList = useAppSelector((state) => {
+    const lists = state.color.colorList.map((item) =>
+      item.code
+        ? { value: item.id, label: `${item.code}/${item.name}` }
+        : { value: "", label: "" }
+    );
     return lists;
   });
-  const sizeList: string[] = useAppSelector((state) => {
-    const lists = state.size.sizeList.map((item) => item.code ?? "");
+  const sizeList = useAppSelector((state) => {
+    const lists = state.size.sizeList.map((item) =>
+      item.code
+        ? { value: item.id, label: `${item.code}/${item.name}` }
+        : { value: "", label: "" }
+    );
     return lists;
   });
   const purchaseorderList = useAppSelector(
@@ -179,7 +187,7 @@ export const PurchaseOrderSlip = () => {
   }, [selectedSlip]);
   const get_max_price = useMemo(() => {
     let all_max_price = 0;
-    selectedSlip?.items.map((item) => (all_max_price += item.max_price));
+    rows.map((item) => (all_max_price += item.max_price));
     return all_max_price;
   }, [selectedSlip]);
   useEffect(() => {
@@ -206,7 +214,14 @@ export const PurchaseOrderSlip = () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
   };
   const handleDeleteClick = (id: GridRowId) => () => {
-    setRows(rows.filter((row) => row.id !== id));
+    axiosApi
+      .post(`slip/purchaseorder_slip/deleteRow`, { row_id: id })
+      .then((res) => {
+        if (res) {
+          dispatch(getPurchaseorderSlipList());
+          setRows(rows.filter((row) => row.id !== id));
+        }
+      });
   };
   const handleRowModesModelChange = (newRowModesModel: GridRowModesModel) => {
     setRowModesModel(newRowModesModel);
@@ -215,16 +230,41 @@ export const PurchaseOrderSlip = () => {
     params,
     event
   ) => {
-    console.log("asassass");
     if (params.reason === GridRowEditStopReasons.rowFocusOut) {
       event.defaultMuiPrevented = true;
     }
   };
   const processRowUpdate = (newRow: GridRowModel) => {
-    const updatedRow = { ...newRow, isNew: false };
-    console.log(rows);
-    setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
-    return updatedRow;
+    if (
+      newRow.product !== undefined &&
+      newRow.quantity !== undefined &&
+      newRow.size !== undefined &&
+      newRow.color !== undefined
+    ) {
+      const slip_id = purchaseorderList.filter(
+        (item) => item.no === selectedSlip.no
+      )[0]?.id;
+      axiosApi
+        .post(`slip/purchaseorder_slip/saveRow/${slip_id}`, newRow)
+        .then((res) => dispatch(getPurchaseorderSlipList()));
+
+      const selectProduct = productList.filter(
+        (item) => item.id === newRow.product
+      )[0];
+      const updatedRow = {
+        ...newRow,
+        product_name: selectProduct.name,
+        product_part_number: selectProduct.part_number,
+        max_cost: selectProduct.max_cost,
+        min_cost: selectProduct.min_cost,
+        max_price: selectProduct.max_cost * newRow.quantity,
+        min_price: selectProduct.min_cost * newRow.quantity,
+        isNew: false,
+      };
+      setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
+
+      return updatedRow;
+    } else return newRow;
   };
   const EditToolbar = (props: EditToolbarProps) => {
     const { setRows, setRowModesModel } = props;
@@ -237,7 +277,6 @@ export const PurchaseOrderSlip = () => {
         [id]: { mode: GridRowModes.Edit, fieldToFocus: "product_code" },
       }));
     };
-
     return (
       <GridToolbarContainer>
         <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
@@ -248,10 +287,10 @@ export const PurchaseOrderSlip = () => {
   };
   const columns: GridColDef[] = [
     {
-      field: "product_code",
-      headerName: "商品コード ",
-      minWidth: 150,
-      align: "center",
+      field: "product",
+      headerName: "商品コード/仮品番",
+      minWidth: 200,
+      align: "left",
       type: "singleSelect",
       valueOptions: proList,
       editable: true,
@@ -260,32 +299,24 @@ export const PurchaseOrderSlip = () => {
       field: "product_name",
       headerName: "商品名",
       minWidth: 250,
-      align: "left",
-      headerAlign: "left",
-      editable: true,
+      align: "center",
+      headerAlign: "center",
+      editable: false,
     },
     {
-      field: "product_part_number",
-      headerName: "仮品番",
-      minWidth: 120,
-      align: "left",
-      headerAlign: "left",
-      editable: true,
-    },
-    {
-      field: "size_code",
+      field: "size",
       headerName: "サイズ",
-      minWidth: 120,
-      align: "left",
+      minWidth: 150,
+      align: "center",
       type: "singleSelect",
       valueOptions: sizeList,
       editable: true,
     },
     {
-      field: "color_code",
+      field: "color",
       headerName: "色",
-      minWidth: 120,
-      align: "left",
+      minWidth: 150,
+      align: "center",
       type: "singleSelect",
       valueOptions: colorList,
       editable: true,
@@ -294,55 +325,56 @@ export const PurchaseOrderSlip = () => {
       field: "quantity",
       headerName: "数量",
       minWidth: 120,
-      align: "right",
-      headerAlign: "left",
+      align: "center",
+      headerAlign: "center",
       editable: true,
       type: "number",
     },
     {
       field: "unit",
       headerName: "単位",
-      minWidth: 80,
-      align: "left",
-      headerAlign: "left",
+      minWidth: 100,
+      align: "center",
+      headerAlign: "center",
       editable: true,
     },
     {
       field: "max_cost",
       headerName: "上代単価",
-      minWidth: 120,
-      align: "right",
-      headerAlign: "left",
+      minWidth: 150,
+      align: "center",
+      headerAlign: "center",
       type: "number",
-      editable: true,
+      editable: false,
     },
     {
       field: "min_cost",
       headerName: "下代単価 ",
-      minWidth: 120,
-      align: "right",
-      headerAlign: "left",
+      minWidth: 150,
+      align: "center",
+      headerAlign: "center",
       type: "number",
-      editable: true,
+      editable: false,
     },
     {
       field: "max_price",
       headerName: "上代金額",
-      minWidth: 120,
-      align: "right",
-      headerAlign: "left",
+      minWidth: 150,
+      align: "center",
+      headerAlign: "center",
       type: "number",
-      editable: true,
+      editable: false,
     },
     {
       field: "min_price",
       headerName: "下代金額 ",
-      minWidth: 120,
-      align: "right",
-      headerAlign: "left",
+      minWidth: 150,
+      align: "center",
+      headerAlign: "center",
       type: "number",
-      editable: true,
+      editable: false,
     },
+
     {
       field: "actions",
       type: "actions",
@@ -434,7 +466,6 @@ export const PurchaseOrderSlip = () => {
     });
   }, [selectedSlip]);
   const handleSave = () => {
-    console.log(selectedSlip);
     if (selectedSlip.no === "新規登録") {
       axiosApi
         .post(`slip/purchaseorder_slip/`, selectedSlip)
@@ -460,7 +491,6 @@ export const PurchaseOrderSlip = () => {
     }
   };
   const handleNoChange = (noValue: string | null) => {
-    console.log("dsdfsdfsd", noValue);
     if (noValue && noValue !== "新規登録") {
       const index = noList.indexOf(noValue) - 1;
       setSelectedSlip(purchaseorderList[index]);
@@ -486,7 +516,6 @@ export const PurchaseOrderSlip = () => {
     const slip_id = purchaseorderList.filter(
       (item) => item.no === selectedSlip.no
     )[0]?.id;
-    console.log(rows);
     axiosApi
       .post(`slip/purchaseorder_slip/saveRows/${slip_id}`, rows)
       .then((res) => dispatch(getPurchaseorderSlipList()));
@@ -639,7 +668,6 @@ export const PurchaseOrderSlip = () => {
                     format="YYYY-MM-DD"
                     value={dayjs(selectedSlip.slip_date)}
                     onChange={(newValue) => {
-                      console.log(newValue);
                       setSelectedSlip({
                         ...selectedSlip,
                         slip_date: newValue?.format("YYYY-MM-DD"),
@@ -655,7 +683,6 @@ export const PurchaseOrderSlip = () => {
                     format="YYYY-MM-DD"
                     value={dayjs(selectedSlip.delivery_date)}
                     onChange={(newValue) => {
-                      console.log(newValue);
                       setSelectedSlip({
                         ...selectedSlip,
                         delivery_date: newValue?.format("YYYY-MM-DD"),
@@ -849,15 +876,6 @@ export const PurchaseOrderSlip = () => {
         </div>
         {selectedSlip.no !== "新規登録" && (
           <div className="flex flex-col mt-3">
-            <div className="flex justify-end pb-3">
-              <NonBorderRadiusButton
-                variant="outlined"
-                onClick={handleSaveRows}
-                className="bg-red-300"
-              >
-                明細保存
-              </NonBorderRadiusButton>
-            </div>
             <div>
               <DataGrid
                 rows={rows}
