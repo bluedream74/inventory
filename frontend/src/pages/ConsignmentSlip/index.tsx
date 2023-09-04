@@ -469,7 +469,8 @@ export const ConsignmentSlip = () => {
       axiosApi
         .post(`slip/consignment_slip/`, selectedSlip)
         .then((res) => {
-          dispatch(getConsignmentSlipList());
+          if(res)
+            dispatch(getConsignmentSlipList());
         })
         .catch((err) => {
           console.log(err);
@@ -481,8 +482,8 @@ export const ConsignmentSlip = () => {
       axiosApi
         .put(`slip/consignment_slip/${slip_id}`, selectedSlip)
         .then((res) => {
-          console.log(res);
-          dispatch(getConsignmentSlipList());
+          if(res)
+            dispatch(getConsignmentSlipList());
         })
         .catch((err) => {
           console.log(err);
@@ -518,7 +519,7 @@ export const ConsignmentSlip = () => {
     console.log(rows);
     axiosApi
       .post(`slip/consignment_slip/saveRows/${slip_id}`, rows)
-      .then((res) => dispatch(getConsignmentSlipList()));
+      .then((res) => res && dispatch(getConsignmentSlipList()));
   };
   const deleteSlip = () => {
     const slip_id = consignmentList.filter(
@@ -527,7 +528,8 @@ export const ConsignmentSlip = () => {
     axiosApi
       .delete(`slip/consignment_slip/${slip_id}`)
       .then((res) => {
-        dispatch(getConsignmentSlipList());
+        if (res)
+          dispatch(getConsignmentSlipList());
         setDeleteOpen(false);
       })
       .catch((err) => {

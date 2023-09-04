@@ -10,6 +10,7 @@ export interface DepositItemInterface {
   deposit_price: number;
   deposit_date: Dayjs;
   other: string;
+  state : string;
 }
 export interface DepositSlipInterface {
   id : number;
@@ -20,7 +21,7 @@ export interface DepositSlipInterface {
   last_invoice : string;
   expected_date : string | undefined;
   remain_invoice : string ;
-  sale_no : string;
+  sale : number;
   other: string;
   update_date: string;
   items : Array<DepositItemInterface>;

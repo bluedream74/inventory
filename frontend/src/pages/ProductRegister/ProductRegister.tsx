@@ -22,8 +22,8 @@ export interface ProductInterface {
   code: string;
   part_number: string;
   name: string;
-  ancient_time: string;
-  price: number;
+  max_cost: number;
+  min_cost: number;
 }
 
 const ProductRegister: React.FC = () => {
@@ -42,9 +42,9 @@ const ProductRegister: React.FC = () => {
     image_url: "",
     name: "",
     part_number: "",
-    ancient_time: "",
+    max_cost: 0,
     code: "",
-    price: 0
+    min_cost: 0
   });
 
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -81,9 +81,9 @@ const ProductRegister: React.FC = () => {
       image_url: "",
       name: "",
       part_number: "",
-      ancient_time: "",
+      max_cost: 0,
       code: "",
-      price: 0
+      min_cost: 0
     });
     setOpen(true);
   };
@@ -253,20 +253,21 @@ const ProductRegister: React.FC = () => {
               }
             />
             <TextField
-              key="ancient_time"
+              key="max_cost"
               label="上代"
-              name="ancient_time"
-              defaultValue={modalData.ancient_time}
+              name="max_cost"
+              type='number'
+              defaultValue={modalData.max_cost}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setModalData({ ...modalData, [e.target.name]: e.target.value })
               }
             />
             <TextField
-              key="price"
+              key="min_cost"
               label="原価"
-              name="price"
+              name="min_cost"
               type='number'
-              defaultValue={modalData.price}
+              defaultValue={modalData.min_cost}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setModalData({ ...modalData, [e.target.name]: e.target.value })
               }
@@ -351,18 +352,18 @@ const ProductRegister: React.FC = () => {
                   )
                 }
               </th>
-              <th onClick={() => handleSort('ancient_time')}>
+              <th onClick={() => handleSort('max_cost')}>
                 上代
-                {sortColumn === "ancient_time" &&
+                {sortColumn === "max_cost" &&
                   (sortDirection === "asc"
                     ? <img className='sort-icon' src={upArrow} />
                     : <img className='sort-icon' src={downArrow} />
                   )
                 }
               </th>
-              <th onClick={() => handleSort('price')}>
+              <th onClick={() => handleSort('min_cost')}>
                 原価
-                {sortColumn === "price" &&
+                {sortColumn === "min_cost" &&
                   (sortDirection === "asc"
                     ? <img className='sort-icon' src={upArrow} />
                     : <img className='sort-icon' src={downArrow} />
@@ -383,8 +384,8 @@ const ProductRegister: React.FC = () => {
                 <td>{row.code}</td>
                 <td>{row.part_number}</td>
                 <td>{row.name}</td>
-                <td>{row.ancient_time}</td>
-                <td>{row.price}</td>
+                <td>{row.max_cost}</td>
+                <td>{row.min_cost}</td>
                 <td className='row_action'>
                   <button className='edit_button' onClick={() => handleEditRow(row.id)}>
                     編集

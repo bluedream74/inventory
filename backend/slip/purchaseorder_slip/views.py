@@ -7,9 +7,11 @@ from .models import Purchaseorder, PurchaseorderItem
 from rest_framework.decorators import  permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view
-from datetime import datetime
+from size_register.models import Size
+from color_register.models import Color
+from product_register.models import Product
 from product_inventory.models import ProductInventory
-
+from django.http  import HttpResponse
 @permission_classes([AllowAny])
 class PurchaseorderView(APIView):
     
@@ -73,70 +75,33 @@ class PurchaseorderView(APIView):
         return Response(response, status=status_code)
     @api_view(['POST'])
     @permission_classes([AllowAny])
-    def save_rows(request, slip_id):
-        datas = request.data
-        print(datas)
-        for  data in datas:
+    def save_row(request, slip_id):
+        data = request.data
+        try:
             if(PurchaseorderItem.objects.filter(row_id = data['id'])):
+                
                 row = PurchaseorderItem.objects.get(row_id = data['id'])
                 row.purchaseorder = Purchaseorder.objects.get(pk=slip_id)
-                row.product_code = data['product_code']
-                row.product_name = data['product_name']
-                row.product_part_number = data['product_part_number']
-                row.size_code = data['size_code']
-                row.color_code = data['color_code']
+                row.product = Product.objects.get(pk=data['product'])
+                row.size = Size.objects.get(pk=data['size'])
+                row.color = Color.objects.get(pk=data['color'])
                 row.quantity = data['quantity']
                 row.unit = data['unit']
-                row.max_cost = data['max_cost']
-                row.max_price = data['max_price']
-                row.min_cost = data['min_cost']
-                row.min_price = data['min_price']
                 row.save()
+                print(data, row)
             else:    
                 newItem = PurchaseorderItem (
                     row_id = data['id'],
                     purchaseorder = Purchaseorder.objects.get(pk=slip_id),
-                    product_code = data['product_code'],
-                    product_name = data['product_name'],
-                    product_part_number = data['product_part_number'],
-                    size_code = data['size_code'],
-                    color_code = data['color_code'],
+                    product = Product.objects.get(pk=data['product']),
+                    size= Size.objects.get(pk=data['size']),
+                    color = Color.objects.get(pk=data['color']),
                     quantity = data['quantity'],
-                    unit = data['unit'],
-                    max_cost = data['max_cost'],
-                    max_price = data['max_price'],
-                    min_cost = data['min_cost'],
-                    min_price = data['min_price']
+                    unit = data['unit']
                 )
                 newItem.save()
-                newProductInventory = ProductInventory(
-                    product_code = data['product_code'],
-                    product_name = data['product_name'],
-                    product_part_number = data['product_part_number'],
-                    size_code = data['size_code'],
-                    color_code = data['color_code'],
-                    unit = data['unit'],
-                    max_cost = data['max_cost'],
-                    max_price = data['max_price'],
-                    min_cost = data['min_cost'],
-                    min_price = data['min_price'],
-
-                    storehouse_code = newItem.purchaseorder.storehouse_code,
-                    factory_code = newItem.purchaseorder.factory_code,
-
-                    purchaseorder_date = newItem.purchaseorder.slip_date,
-                    purcaseorder_quantity = newItem.quantity,
-                    purchaseorderitem = newItem
-                )
-                newProductInventory.save()
-        #Delete
-        slipItems = PurchaseorderItem.objects.filter(purchaseorder = Purchaseorder.objects.get(pk=slip_id))
-        if(len(datas) != len(slipItems)):
-            for item in slipItems:
-                if any(d['id'] == item.row_id for d in datas):
-                    True
-                else:
-                    item.delete()
+        except Exception as e:
+            return HttpResponse(f'An error occurred: {str(e)}')
         status_code = status.HTTP_200_OK
         response = {
             'success': 'True',
@@ -144,3 +109,20 @@ class PurchaseorderView(APIView):
             'type': 'User registered  successfully',
         }
         return Response(response, status=status_code)
+    
+    @api_view(['POST'])
+    @permission_classes([AllowAny])
+    def delete_row(request):
+        try:
+            deleteItem = PurchaseorderItem.objects.get(row_id = request.data['row_id'])
+            deleteItem.delete()
+        except Exception as e:
+            return HttpResponse(f'An error occurred: {str(e)}')
+        status_code = status.HTTP_200_OK
+        response = {
+            'success': 'True',
+            'status code': status_code,
+            'type': 'User registered  successfully',
+        }
+        return Response(response, status=status_code)
+    

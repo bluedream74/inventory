@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Sale, SaleItem
-
+from slip.order_slip.models import Order, OrderItem
 class SaleSerializer(serializers.ModelSerializer):
     items = serializers.SerializerMethodField()
     class Meta:
@@ -23,26 +23,33 @@ class SaleSerializer(serializers.ModelSerializer):
             'exhibition_code',
             'dealer_code',  
             'status',
-            'order_no',
+            'order',
             'other',
             'update_date',
             'items'
         )
     def get_items(self, obj):
-        items  = SaleItem.objects.filter(sale=obj).order_by('-id')
+        items  = OrderItem.objects.filter(order=obj.order).order_by('id')
         return SaleItemSerializer(items, many=True).data
 
 class SaleItemSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
+    product_name = serializers.SerializerMethodField()
+    max_cost = serializers.SerializerMethodField()
+    min_cost = serializers.SerializerMethodField()
+    max_price = serializers.SerializerMethodField()
+    min_price = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
+    quantity = serializers.SerializerMethodField()
+    
     class Meta:
-        model = SaleItem
+        model = OrderItem
         fields = (
             'id',
-            'product_code',
+            'product',
             'product_name',
-            'product_part_number',
-            'size_code',
-            'color_code',
+            'size',
+            'color',
             'quantity',
             'unit',
             'rate',
@@ -51,7 +58,39 @@ class SaleItemSerializer(serializers.ModelSerializer):
             'min_cost',
             'min_price',
             'cost',
-            'price'
+            'price',
+            'status'
         )
     def get_id(self, obj):
         return obj.row_id
+    def get_product_name(self, obj):
+        return obj.product.name
+    
+    def get_max_cost(self, obj):
+        return int(obj.product.max_cost) 
+    
+    def get_min_cost(self, obj):
+        return obj.product.min_cost
+    
+    def get_max_price(self, obj):
+        quantity = obj.quantity
+        if(SaleItem.objects.filter(orderItem=obj.pk)):
+            quantity = SaleItem.objects.get(orderItem=obj.pk).quantity
+        return int(obj.product.max_cost) * quantity
+    
+    def get_min_price(self, obj):
+        quantity = obj.quantity
+        if(SaleItem.objects.filter(orderItem=obj.pk)):
+            quantity = SaleItem.objects.get(orderItem=obj.pk).quantity
+        return obj.product.min_cost * quantity  
+    
+    def get_status(self, obj):
+        status = 'edit'
+        if(SaleItem.objects.filter(orderItem=obj.pk)):
+            status = 'save'
+        return status
+    def get_quantity(self, obj):
+        quantity = obj.quantity
+        if(SaleItem.objects.filter(orderItem=obj.pk)):
+            quantity = SaleItem.objects.get(orderItem=obj.pk).quantity
+        return quantity

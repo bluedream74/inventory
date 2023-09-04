@@ -10,6 +10,7 @@ export interface PaymentItemInterface {
   payment_price: number;
   payment_date: Dayjs;
   other: string;
+  status: string;
 }
 export interface PaymentSlipInterface {
   id : number;
@@ -20,7 +21,7 @@ export interface PaymentSlipInterface {
   last_payment : string;
   expected_date : string | undefined;
   remain_payment : string ;
-  purchase_no: string;
+  purchase: number;
   other: string;
   update_date: string;
   items : Array<PaymentItemInterface>;

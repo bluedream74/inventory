@@ -1,22 +1,21 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosResponse } from 'axios';
 import axiosApi from "../../utilities/axios";
-import { Dayjs } from "dayjs";
 
 
 export interface PurchaseSlipItemInterface {
   id: string;
-  product_code: string;
+  product: number;
   product_name: string;
-  product_part_number: string;
-  size_code: string;
-  color_code: string;
+  size: number;
+  color: number;
   quantity: number;
   unit: string;
   max_cost: number;
   min_cost: number;
   max_price: number;
   min_price: number;
+  status: string;
   other: string;
 }
 export interface PurchaseSlipInterface {
@@ -29,7 +28,7 @@ export interface PurchaseSlipInterface {
   factory_code : string;
   storehouse_code : string;
   charger_code : string;
-  purchaseorder_no: string;
+  purchaseorder: number;
   other: string;
   update_date: string;
   items : Array<PurchaseSlipItemInterface>;

@@ -1,5 +1,5 @@
 from django.db import models
-
+from slip.sale_slip.models import Sale, SaleItem
 # Create your models here.
 class Deposit(models.Model):
     no = models.CharField(max_length=30)
@@ -10,14 +10,14 @@ class Deposit(models.Model):
     expected_date = models.DateField()
     remain_invoice = models.CharField(max_length=30)
     other = models.CharField(max_length=200)
-    sale_no = models.CharField(max_length=20, null=True)
+    sale = models.ForeignKey(Sale, on_delete=models.CASCADE, null=True)
     update_date = models.DateField(auto_now=True, null=True)
 
 
 class DepositItem(models.Model):
     row_id = models.CharField(max_length=200, default='', null=True)
     deposit = models.ForeignKey(Deposit, on_delete=models.CASCADE, null=True)
-    deposit_category = models.CharField(max_length=30)
+    saleItem = models.ForeignKey(SaleItem, on_delete=models.CASCADE, null=True)
     deposit_price = models.CharField(max_length=30)
     deposit_date = models.DateField()
     other = models.CharField(max_length=200)
