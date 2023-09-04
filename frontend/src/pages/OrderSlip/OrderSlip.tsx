@@ -463,7 +463,7 @@ const OrderSlip = () => {
     },
     {
       field: "cost",
-      headerName: "原単価 ",
+      headerName: "下代単価 ",
       minWidth: 120,
       align: "center",
       headerAlign: "center",
@@ -472,7 +472,16 @@ const OrderSlip = () => {
     },
     {
       field: "price",
-      headerName: "原金額 ",
+      headerName: "下代金額 ",
+      minWidth: 120,
+      align: "center",
+      headerAlign: "center",
+      type: "number",
+      editable: true,
+    },
+    {
+      field: "profit",
+      headerName: "粗利金額 ",
       minWidth: 120,
       align: "center",
       headerAlign: "center",
@@ -515,15 +524,7 @@ const OrderSlip = () => {
       type: "number",
       editable: false,
     },    
-    {
-      field: "profit",
-      headerName: "粗利金額 ",
-      minWidth: 120,
-      align: "center",
-      headerAlign: "center",
-      type: "number",
-      editable: true,
-    },
+    
     {
       field: "actions",
       type: "actions",

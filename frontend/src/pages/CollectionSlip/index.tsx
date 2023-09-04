@@ -465,7 +465,7 @@ export const CollectionSlip = () => {
       axiosApi
         .post(`slip/collection_slip/`, selectedSlip)
         .then((res) => {
-          dispatch(getCollectionSlipList());
+          res && dispatch(getCollectionSlipList());
         })
         .catch((err) => {
           console.log(err);
@@ -513,7 +513,7 @@ export const CollectionSlip = () => {
     )[0]?.id;
     axiosApi
       .post(`slip/collection_slip/saveRows/${slip_id}`, rows)
-      .then((res) => dispatch(getCollectionSlipList()));
+      .then((res) => res && dispatch(getCollectionSlipList()));
   };
   const deleteSlip = () => {
     const slip_id = collectionList.filter(
@@ -522,8 +522,10 @@ export const CollectionSlip = () => {
     axiosApi
       .delete(`slip/collection_slip/${slip_id}`)
       .then((res) => {
-        dispatch(getCollectionSlipList());
-        setDeleteOpen(false);
+        if (res) {
+          dispatch(getCollectionSlipList());
+          setDeleteOpen(false);
+        }
       })
       .catch((err) => {
         console.log(err);

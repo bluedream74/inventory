@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosResponse } from 'axios';
 import axiosApi from "../../utilities/axios";
-import { Dayjs } from "dayjs";
 
 
 export interface SaleItemInterface {

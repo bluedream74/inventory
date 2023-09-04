@@ -156,7 +156,7 @@ export const DepositSlip = () => {
       ?.id;
     axiosApi
       .post(`slip/deposit_slip/saveRow/${slip_id}`, selectRow)
-      .then((res) => dispatch(getDepositSlipList()));
+      .then((res) => res && dispatch(getDepositSlipList()));
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
   };
   const handleCancelClick = (id: GridRowId) => () => {
@@ -192,7 +192,7 @@ export const DepositSlip = () => {
       ?.id;
     axiosApi
       .post(`slip/deposit_slip/saveRow/${slip_id}`, newRow)
-      .then((res) => dispatch(getDepositSlipList()));
+      .then((res) => res && dispatch(getDepositSlipList()));
     const updatedRow = { ...newRow, isNew: false };
     setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
     return updatedRow;
@@ -353,7 +353,8 @@ export const DepositSlip = () => {
       axiosApi
         .post(`slip/deposit_slip/`, selectedSlip)
         .then((res) => {
-          dispatch(getDepositSlipList());
+          if (res)
+            dispatch(getDepositSlipList());
         })
         .catch((err) => {
           console.log(err);
@@ -420,7 +421,7 @@ export const DepositSlip = () => {
     console.log(rows);
     axiosApi
       .post(`slip/deposit_slip/saveRows/${slip_id}`, rows)
-      .then((res) => dispatch(getDepositSlipList()));
+      .then((res) => res && dispatch(getDepositSlipList()));
   };
   const deleteSlip = () => {
     const slip_id = depositList.filter((item) => item.no === selectedSlip.no)[0]
@@ -428,7 +429,8 @@ export const DepositSlip = () => {
     axiosApi
       .delete(`slip/deposit_slip/${slip_id}`)
       .then((res) => {
-        dispatch(getDepositSlipList());
+        if (res)
+          dispatch(getDepositSlipList());
         setDeleteOpen(false);
       })
       .catch((err) => {
@@ -719,15 +721,6 @@ export const DepositSlip = () => {
         </div>
         {rows.length !== 0 && (
           <div className="flex flex-col w-full justify-center mt-3 px-10">
-            <div className="flex justify-end pb-3">
-              <NonBorderRadiusButton
-                variant="outlined"
-                onClick={handleSaveRows}
-                className="bg-red-300"
-              >
-                明細保存
-              </NonBorderRadiusButton>
-            </div>
             <div className="">
               <DataGrid
                 rows={rows}

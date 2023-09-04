@@ -714,15 +714,6 @@ export const PaymentSlip = () => {
         </div>
         {selectedSlip.no !== "新規登録" && (
           <div className="flex flex-col w-full justify-center mt-3 px-10">
-            <div className="flex justify-end pb-3">
-              <NonBorderRadiusButton
-                variant="outlined"
-                onClick={handleSaveRows}
-                className="bg-red-300"
-              >
-                明細保存
-              </NonBorderRadiusButton>
-            </div>
             <div className="">
               <DataGrid
                 rows={rows}
