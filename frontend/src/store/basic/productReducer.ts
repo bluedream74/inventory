@@ -16,7 +16,7 @@ const initialState: ProductStateType = {
 export const getProductList = createAsyncThunk<ProductInterface[]>(
   "product/getProductList",
   async () => {
-    const response: AxiosResponse<ProductInterface[]> = await axiosApi.get("product_register/");
+    const response: AxiosResponse<any> = await axiosApi.get("product_register/");
     return response.data.products;
   }
 )

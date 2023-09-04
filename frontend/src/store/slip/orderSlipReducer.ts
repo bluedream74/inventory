@@ -1,8 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosResponse } from 'axios';
-import { BrandInterface } from "../../pages/BrandRegister/BrandRegister";
 import axiosApi from "../../utilities/axios";
-import { resolveDateFormat } from "@mui/x-date-pickers/internals/utils/date-utils";
 import { IOrderSlip } from "../../pages/OrderSlip/OrderSlip";
 
 export interface OrderSlipInterface {

@@ -1,14 +1,12 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosResponse } from 'axios';
 import axiosApi from "../../utilities/axios";
-import { Dayjs } from "dayjs";
 
 
 export interface SaleItemInterface {
   id: string;
   product_code: string;
   product_name: string;
-  product_part_number: string;
   size_code: string;
   color_code: string;
   quantity: number;
@@ -38,7 +36,7 @@ export interface SaleSlipInterface {
   maker_code: string;
   exhibition_code : string;
   dealer_code : string;
-  order_no: string;
+  order: number;
   status : string;
   other: string;
   update_date: string;

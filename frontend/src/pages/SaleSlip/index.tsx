@@ -128,7 +128,7 @@ export const SaleSlip = () => {
     maker_code: "",
     exhibition_code: "",
     dealer_code: "",
-    order_no: "",
+    order: 0,
     status: "",
     other: "",
     update_date: formattedDate,
@@ -136,10 +136,15 @@ export const SaleSlip = () => {
   });
 
   const dispatch = useAppDispatch();
-  const proList: string[] = useAppSelector((state) => {
-    const lists = state.product.productList.map((item) => item.code ?? "");
+  const productList = useAppSelector((state) => state.product.productList);
+  const proList = useMemo(() => {
+    const lists = productList.map((item) =>
+      item.code
+        ? { value: item.id, label: `${item.code}/${item.part_number}` }
+        : { value: "", label: "" }
+    );
     return lists;
-  });
+  }, [productList]);
   const deliveryList = useAppSelector((state) => state.delivery.deliveryList);
   const deliveryCodeList: string[] = useMemo(() => {
     const lists = deliveryList.map((item) => item.code ?? "");
@@ -164,19 +169,25 @@ export const SaleSlip = () => {
     const shl = storehouseList.map((item) => item.code ?? "");
     return shl;
   }, [storehouseList]);
-  const dealerList = useAppSelector(
-    (state) => state.dealer.dealerList
-  );
+  const dealerList = useAppSelector((state) => state.dealer.dealerList);
   const dealerCodeList: string[] = useMemo(() => {
     const shl = dealerList.map((item) => item.code ?? "");
     return shl;
   }, [dealerList]);
-  const colorList: string[] = useAppSelector((state) => {
-    const lists = state.color.colorList.map((item) => item.code ?? "");
+  const colorList = useAppSelector((state) => {
+    const lists = state.color.colorList.map((item) =>
+      item.code
+        ? { value: item.id, label: `${item.code}/${item.name}` }
+        : { value: "", label: "" }
+    );
     return lists;
   });
-  const sizeList: string[] = useAppSelector((state) => {
-    const lists = state.size.sizeList.map((item) => item.code ?? "");
+  const sizeList = useAppSelector((state) => {
+    const lists = state.size.sizeList.map((item) =>
+      item.code
+        ? { value: item.id, label: `${item.code}/${item.name}` }
+        : { value: "", label: "" }
+    );
     return lists;
   });
   const saleList = useAppSelector((state) => state.saleSlip.slips);
@@ -184,11 +195,13 @@ export const SaleSlip = () => {
     const ret = state.saleSlip.slips.map((slip) => slip.no ?? "");
     return ["新規登録", ...ret];
   });
-  const orderList = useAppSelector((state)=>state.orderSlip.slips)
-  const orderNoList = useMemo(()=>{
-    const lists = orderList.map(item => item.no ?? '');
+  const orderList = useAppSelector((state) => state.orderSlip.slips);
+  const orderNoList = useMemo(() => {
+    const lists = orderList.map((item) =>
+      item.no ? { value: item.id, label: item.no } : { value: 0, label: "" }
+    );
     return lists;
-  },[orderList])
+  }, [orderList]);
   useEffect(() => {
     dispatch(getSlipList());
     dispatch(getSaleSlipList());
@@ -218,6 +231,17 @@ export const SaleSlip = () => {
     handleNoChange(noList[noList.length - 1]);
   }, [saleList.length]);
   const handleSaveClick = (id: GridRowId) => () => {
+    if (!rowModesModel[id] || rowModesModel[id].mode !== GridRowModes.Edit) {
+      console.log("sdfsdfsdfsdfsdf");
+      const selectRow = rows.filter((item) => item.id === id)[0];
+      const slip_id = saleList.filter((item) => item.no === selectedSlip.no)[0]
+        ?.id;
+      axiosApi
+        .post(`slip/sale_slip/saveRow/${slip_id}`, selectRow)
+        .then((res) => {
+          dispatch(getSaleSlipList());
+        });
+    }
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
   };
   const handleCancelClick = (id: GridRowId) => () => {
@@ -235,7 +259,14 @@ export const SaleSlip = () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
   };
   const handleDeleteClick = (id: GridRowId) => () => {
-    setRows(rows.filter((row) => row.id !== id));
+    axiosApi
+      .post(`slip/sale_slip/deleteRow`, { row_id: id })
+      .then((res) => {
+        if (res) {
+          dispatch(getSaleSlipList());
+          setRows(rows.filter((row) => row.id !== id));
+        }
+      });
   };
   const handleRowModesModelChange = (newRowModesModel: GridRowModesModel) => {
     setRowModesModel(newRowModesModel);
@@ -250,6 +281,12 @@ export const SaleSlip = () => {
   };
   const processRowUpdate = (newRow: GridRowModel) => {
     const updatedRow = { ...newRow, isNew: false };
+    const slip_id = saleList.filter(
+      (item) => item.no === selectedSlip.no
+    )[0]?.id;
+    axiosApi
+      .post(`slip/sale_slip/saveRow/${slip_id}`, newRow)
+      .then((res) => dispatch(getSaleSlipList()));
     setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
     return updatedRow;
   };
@@ -275,54 +312,46 @@ export const SaleSlip = () => {
   };
   const columns: GridColDef[] = [
     {
-      field: "product_code",
+      field: "product",
       headerName: "商品コード ",
       minWidth: 150,
       align: "center",
       type: "singleSelect",
       valueOptions: proList,
-      editable: true,
+      editable: false,
     },
     {
       field: "product_name",
       headerName: "商品名",
       minWidth: 150,
-      align: "left",
-      headerAlign: "left",
-      editable: true,
+      align: "center",
+      headerAlign: "center",
+      editable: false,
     },
     {
-      field: "product_part_number",
-      headerName: "仮品番",
-      minWidth: 100,
-      align: "left",
-      headerAlign: "left",
-      editable: true,
-    },
-    {
-      field: "size_code",
+      field: "size",
       headerName: "サイズ",
       minWidth: 100,
-      align: "left",
+      align: "center",
       type: "singleSelect",
       valueOptions: sizeList,
-      editable: true,
+      editable: false,
     },
     {
-      field: "color_code",
+      field: "color",
       headerName: "色",
       minWidth: 100,
-      align: "left",
+      align: "center",
       type: "singleSelect",
       valueOptions: colorList,
-      editable: true,
+      editable: false,
     },
     {
       field: "quantity",
       headerName: "数量",
       minWidth: 120,
-      align: "right",
-      headerAlign: "left",
+      align: "center",
+      headerAlign: "center",
       editable: true,
       type: "number",
     },
@@ -330,72 +359,72 @@ export const SaleSlip = () => {
       field: "unit",
       headerName: "単位",
       minWidth: 80,
-      align: "left",
-      headerAlign: "left",
-      editable: true,
+      align: "center",
+      headerAlign: "center",
+      editable: false,
     },
     {
       field: "rate",
       headerName: "掛率",
       minWidth: 120,
-      align: "right",
-      headerAlign: "left",
+      align: "center",
+      headerAlign: "center",
       type: "number",
-      editable: true,
+      editable: false,
     },
     {
       field: "max_cost",
       headerName: "上代単価",
       minWidth: 120,
-      align: "right",
-      headerAlign: "left",
+      align: "center",
+      headerAlign: "center",
       type: "number",
-      editable: true,
+      editable: false,
     },
     {
       field: "min_cost",
       headerName: "下代単価 ",
       minWidth: 120,
-      align: "right",
-      headerAlign: "left",
+      align: "center",
+      headerAlign: "center",
       type: "number",
-      editable: true,
+      editable: false,
     },
     {
       field: "cost",
       headerName: "原単価 ",
       minWidth: 120,
-      align: "right",
-      headerAlign: "left",
+      align: "center",
+      headerAlign: "center",
       type: "number",
-      editable: true,
+      editable: false,
     },
     {
       field: "max_price",
       headerName: "上代金額",
       minWidth: 120,
-      align: "right",
-      headerAlign: "left",
+      align: "center",
+      headerAlign: "center",
       type: "number",
-      editable: true,
+      editable: false,
     },
     {
       field: "min_price",
       headerName: "下代金額 ",
       minWidth: 120,
-      align: "right",
-      headerAlign: "left",
+      align: "center",
+      headerAlign: "center",
       type: "number",
-      editable: true,
+      editable: false,
     },
     {
       field: "price",
       headerName: "原価金額  ",
       minWidth: 120,
-      align: "right",
-      headerAlign: "left",
+      align: "center",
+      headerAlign: "center",
       type: "number",
-      editable: true,
+      editable: false,
     },
     {
       field: "actions",
@@ -405,8 +434,8 @@ export const SaleSlip = () => {
       cellClassName: "actions",
       getActions: ({ id }) => {
         const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
-
-        if (isInEditMode) {
+        const selectRow = rows.filter((item) => item.id === id)[0];
+        if (isInEditMode || selectRow.status === "edit") {
           return [
             <GridActionsCellItem
               icon={<SaveIcon />}
@@ -482,7 +511,7 @@ export const SaleSlip = () => {
       maker_code: "",
       exhibition_code: "",
       dealer_code: "",
-      order_no: "",
+      order: 0,
       status: "",
       other: "",
       update_date: formattedDate,
@@ -521,11 +550,11 @@ export const SaleSlip = () => {
         });
     }
   };
-  const handleOrderNoChange = (orderNo: string| null) => {
-    
-    const orderSlip = orderList.filter( item=>item.no === orderNo )[0];
-    setSelectedSlip({...selectedSlip, 
-      order_no: orderNo??'',
+  const handleOrderNoChange = (orderNo: number) => {
+    const orderSlip = orderList.filter((item) => item.id === orderNo)[0];
+    setSelectedSlip({
+      ...selectedSlip,
+      order: orderNo ?? 0,
       delivery_code: orderSlip.delivery_place_code,
       storehouse_code: orderSlip.storehouse_code,
       global_rate: orderSlip.global_rate,
@@ -533,11 +562,10 @@ export const SaleSlip = () => {
       maker_code: orderSlip.receiver_code,
       exhibition_code: orderSlip.exhibition_code,
       dealer_code: orderSlip.dealer_code,
-    })
-    const orderItem = orderSlip.items?.map((item : any)=> item ??null)
+    });
+    const orderItem = orderSlip.items?.map((item: any) => item ?? null);
     orderItem && setRows(orderItem);
-    
-  }
+  };
   const handleNoChange = (noValue: string | null) => {
     if (noValue && noValue !== "新規登録") {
       const index = noList.indexOf(noValue) - 1;
@@ -710,9 +738,13 @@ export const SaleSlip = () => {
                     disablePortal
                     id="no"
                     size="small"
-                    value={selectedSlip.order_no}
-                    onChange={(event: any, noValue: string | null) =>
-                      handleOrderNoChange(noValue)
+                    value={
+                      orderNoList.filter(
+                        (item) => item.value === selectedSlip.order
+                      )[0] ?? { value: 0, label: "" }
+                    }
+                    onChange={(event: any, val) =>
+                      handleOrderNoChange(val ? val.value : 0)
                     }
                     options={orderNoList}
                     className="w-40"
@@ -958,7 +990,7 @@ export const SaleSlip = () => {
                 </div>
                 <div className="flex flex-row">
                   <div className="flex flex-col">
-                  <div className="flex items-center mt-2">
+                    <div className="flex items-center mt-2">
                       <p className="w-40">得意先コード </p>
                       <Autocomplete
                         disablePortal

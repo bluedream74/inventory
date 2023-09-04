@@ -49,8 +49,6 @@ import {
   getPaymentSlipList,
 } from "../../store/slip/paymentSlipReducer";
 import axiosApi from "../../utilities/axios";
-import { getDealerList } from "../../store/basic/dealerReducer";
-import { getIncomingDepartmentList } from "../../store/basic/incomingDepartmentReducer";
 import { getPurchaseSlipList } from "../../store/slip/purchaseSlipReducer";
 import { getFactoryList } from "../../store/basic/factoryReducer";
 export interface BtnStatusInterface {
@@ -109,7 +107,7 @@ export const PaymentSlip = () => {
     last_payment: "",
     expected_date: formattedDate,
     remain_payment: "",
-    purchase_no: "",
+    purchase: 0,
     other: "",
     update_date: formattedDate,
     items: [],
@@ -117,24 +115,25 @@ export const PaymentSlip = () => {
 
   const dispatch = useAppDispatch();
 
-  const suplierList = useAppSelector(
-    (state) => state.factory.factoryList
-  );
+  const suplierList = useAppSelector((state) => state.factory.factoryList);
   const supplierCodeList: string[] = useMemo(() => {
     const lists = suplierList.map((item) => item.code ?? "");
     return lists;
   }, [suplierList]);
   const paymentList = useAppSelector((state) => state.paymentSlip.slips);
-  console.log(paymentList);
   const noList: string[] = useAppSelector((state) => {
     const ret = state.paymentSlip.slips.map((slip) => slip.no ?? "");
     return ["新規登録", ...ret];
   });
-  const prucharseList = useAppSelector(state => state.purchaseSlip.slips);
-  const purchaseNoList = useMemo(()=>{
-    const lists = prucharseList.map(item=>item.factory_code === selectedSlip.supplier_code? item.no :'');
+  const purchaseList = useAppSelector((state) => state.purchaseSlip.slips);
+  const purchaseNoList = useMemo(() => {
+    const lists = purchaseList.map((item) =>
+      item.factory_code === selectedSlip.supplier_code
+        ? { value: item.id, label: item.no }
+        : { value: 0, label: "" }
+    );
     return lists;
-  },[prucharseList, selectedSlip.supplier_code])
+  }, [purchaseList, selectedSlip.supplier_code]);
   useEffect(() => {
     handleNoChange(selectedSlip.no);
   }, [paymentList]);
@@ -147,6 +146,12 @@ export const PaymentSlip = () => {
     handleNoChange(noList[noList.length - 1]);
   }, [paymentList.length]);
   const handleSaveClick = (id: GridRowId) => () => {
+    const selectRow = rows.filter((item) => item.id === id)[0];
+    const slip_id = paymentList.filter((item) => item.no === selectedSlip.no)[0]
+      ?.id;
+    axiosApi
+      .post(`slip/payment_slip/saveRow/${slip_id}`, selectRow)
+      .then((res) => dispatch(getPaymentSlipList()));
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
   };
   const handleCancelClick = (id: GridRowId) => () => {
@@ -164,7 +169,12 @@ export const PaymentSlip = () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
   };
   const handleDeleteClick = (id: GridRowId) => () => {
-    setRows(rows.filter((row) => row.id !== id));
+    axiosApi.post(`slip/payment_slip/deleteRow`, { row_id: id }).then((res) => {
+      if (res) {
+        dispatch(getPaymentSlipList());
+        setRows(rows.filter((row) => row.id !== id));
+      }
+    });
   };
   const handleRowModesModelChange = (newRowModesModel: GridRowModesModel) => {
     setRowModesModel(newRowModesModel);
@@ -179,7 +189,11 @@ export const PaymentSlip = () => {
   };
   const processRowUpdate = (newRow: GridRowModel) => {
     const updatedRow = { ...newRow, isNew: false };
-    console.log(rows);
+    const slip_id = paymentList.filter((item) => item.no === selectedSlip.no)[0]
+      ?.id;
+    axiosApi
+      .post(`slip/payment_slip/saveRow/${slip_id}`, newRow)
+      .then((res) => dispatch(getPaymentSlipList()));
     setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
     return updatedRow;
   };
@@ -210,7 +224,7 @@ export const PaymentSlip = () => {
       width: 300,
       align: "left",
       headerAlign: "left",
-      editable: true,
+      editable: false,
     },
     {
       field: "payment_price",
@@ -251,8 +265,8 @@ export const PaymentSlip = () => {
       cellClassName: "actions",
       getActions: ({ id }) => {
         const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
-
-        if (isInEditMode) {
+        const selectRow = rows.filter((item) => item.id === id)[0];
+        if (isInEditMode || selectRow.status === "edit") {
           return [
             <GridActionsCellItem
               icon={<SaveIcon />}
@@ -320,7 +334,7 @@ export const PaymentSlip = () => {
       last_payment: "",
       expected_date: formattedDate,
       remain_payment: "",
-      purchase_no: "",
+      purchase: 0,
       other: "",
       items: [],
       update_date: formattedDate,
@@ -359,18 +373,12 @@ export const PaymentSlip = () => {
         });
     }
   };
-  const handlePurchaseNoChange = (val: string | null) => {
-    setSelectedSlip({...selectedSlip, purchase_no: val??''});
-    const purcharseItem = prucharseList.filter((item)=>item.no===val)[0];
-    const rowItem : any = purcharseItem?.items?.map( item=>item?{
-      id: item.id,
-      payment_category: `${purcharseItem.slip_date}/${item.product_code}-${item.product_name}`,
-      payment_price: '',
-      payment_date: formattedDate,
-      other: ''
-    }: null)
-    rowItem && setRows(rowItem);
-  }
+  console.log(selectedSlip, purchaseNoList)
+  const handlePurchaseNoChange = (val: number) => {
+    setSelectedSlip({ ...selectedSlip, purchase: val ?? 0 });
+    const purchaseItem = purchaseList.filter((item) => item.id === val)[0];
+    setRows(purchaseItem.items);
+  };
   const handleNoChange = (noValue: string | null) => {
     console.log("dsdfsdfsd", noValue);
     if (noValue && noValue !== "新規登録") {
@@ -576,7 +584,7 @@ export const PaymentSlip = () => {
                       setSelectedSlip({
                         ...selectedSlip,
                         supplier_code: value ?? "",
-                        purchase_no: ""
+                        purchase: 0,
                       })
                     }
                     options={supplierCodeList}
@@ -611,9 +619,13 @@ export const PaymentSlip = () => {
                     disablePortal
                     id="no"
                     size="small"
-                    value={selectedSlip.purchase_no}
-                    onChange={(event: any, noValue: string | null) =>
-                      handlePurchaseNoChange(noValue)
+                    value={
+                      purchaseNoList.filter(
+                        (item) => item.value === selectedSlip.purchase
+                      )[0] ?? { value: 0, label: "" }
+                    }
+                    onChange={(event: any, val) =>
+                      handlePurchaseNoChange(val ? val.value : 0)
                     }
                     options={purchaseNoList}
                     className="w-72"
@@ -702,15 +714,6 @@ export const PaymentSlip = () => {
         </div>
         {selectedSlip.no !== "新規登録" && (
           <div className="flex flex-col w-full justify-center mt-3 px-10">
-            <div className="flex justify-end pb-3">
-              <NonBorderRadiusButton
-                variant="outlined"
-                onClick={handleSaveRows}
-                className="bg-red-300"
-              >
-                明細保存
-              </NonBorderRadiusButton>
-            </div>
             <div className="">
               <DataGrid
                 rows={rows}

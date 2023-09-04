@@ -9,7 +9,10 @@ from rest_framework.decorators import  permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view
 from datetime import datetime
-
+from size_register.models import Size
+from color_register.models import Color
+from product_register.models import Product
+from django.http import HttpResponse
 @permission_classes([AllowAny])
 class OrderView(APIView):
     
@@ -78,103 +81,55 @@ class OrderView(APIView):
         }
         return Response(response, status=status_code)
     @api_view(['POST'])
+    @permission_classes([AllowAny]) 
+    def save_row(request, order_id):
+        data = request.data
+        if(OrderItem.objects.filter(row_id = data['id'])):
+            row = OrderItem.objects.get(row_id = data['id'])
+            row.order = Order.objects.get(pk=order_id)
+            row.product = Product.objects.get(pk=data['product'])
+            row.size = Size.objects.get(pk=data['size'])
+            row.color = Color.objects.get(pk=data['color'])
+            row.quantity = data['quantity']
+            row.unit = data['unit']
+            row.rate = data['rate']
+            row.cost = data['cost']
+            row.price = data['price']
+            row.profit = data['profit']
+            row.save()
+            
+        else:    
+            newOrderItem = OrderItem (
+                row_id = data['id'],
+                order = Order.objects.get(pk=order_id),
+                product = Product.objects.get(pk=data['product']),
+                size = Size.objects.get(pk=data['size']),
+                color = Color.objects.get(pk=data['color']),
+                quantity = data['quantity'],
+                unit = data['unit'],
+                rate = data['rate'],
+                cost = data['cost'],
+                price = data['price'],
+                profit = data['profit']
+            )
+            newOrderItem.save()
+                
+        status_code = status.HTTP_200_OK
+        response = {
+            'success': 'True',
+            'status code': status_code,
+            'type': 'User registered  successfully',
+        }
+        return Response(response, status=status_code)
+    
+    @api_view(['POST'])
     @permission_classes([AllowAny])
-    def save_rows(request, order_id):
-        datas = request.data
-        for  data in datas:
-            if(OrderItem.objects.filter(row_id = data['id'])):
-                row = OrderItem.objects.get(row_id = data['id'])
-                row.order = Order.objects.get(pk=order_id)
-                row.product_code = data['product_code']
-                row.product_name = data['product_name']
-                row.product_part_number = data['product_part_number']
-                row.size_code = data['size_code']
-                row.color_code = data['color_code']
-                row.quantity = data['quantity']
-                row.unit = data['unit']
-                row.rate = data['rate']
-                row.max_cost = data['max_cost']
-                row.max_price = data['max_price']
-                row.min_cost = data['min_cost']
-                row.min_price = data['min_price']
-                row.cost = data['cost']
-                row.price = data['price']
-                row.profit = data['profit']
-                row.save()
-                inventoryData = ProductInventory.objects.filter(orderitem = row)
-                for inventory in inventoryData:
-                    inventory.product_code = data['product_code']
-                    inventory.product_name = data['product_name']
-                    inventory.product_part_number = data['product_part_number']
-                    inventory.size_code = data['size_code']
-                    inventory.color_code = data['color_code']
-                    inventory.unit = data['unit']
-                    inventory.rate = data['rate']
-                    inventory.max_cost = data['max_cost']
-                    inventory.max_price = data['max_price']
-                    inventory.min_cost = data['min_cost']
-                    inventory.min_price = data['min_price']
-                    inventory.cost = data['cost']
-                    inventory.price = data['price']
-                    inventory.storehouse_code = row.order.storehouse_code
-                    inventory.dealer_code = row.order.dealer_code
-                    inventory.global_rate = row.order.global_rate
-
-                    inventory.order_date = row.date_created
-                    inventory.order_quantity = data['quantity']
-                    inventory.save()
-            else:    
-                newOrderItem = OrderItem (
-                    row_id = data['id'],
-                    order = Order.objects.get(pk=order_id),
-                    product_code = data['product_code'],
-                    product_name = data['product_name'],
-                    product_part_number = data['product_part_number'],
-                    size_code = data['size_code'],
-                    color_code = data['color_code'],
-                    quantity = data['quantity'],
-                    unit = data['unit'],
-                    rate = data['rate'],
-                    max_cost = data['max_cost'],
-                    max_price = data['max_price'],
-                    min_cost = data['min_cost'],
-                    min_price = data['min_price'],
-                    cost = data['cost'],
-                    price = data['price'],
-                    profit = data['profit']
-                )
-                newOrderItem.save()
-                newProductInventory = ProductInventory(
-                    product_code = data['product_code'],
-                    product_name = data['product_name'],
-                    product_part_number = data['product_part_number'],
-                    size_code = data['size_code'],
-                    color_code = data['color_code'],
-                    unit = data['unit'],
-                    rate = data['rate'],
-                    max_cost = data['max_cost'],
-                    max_price = data['max_price'],
-                    min_cost = data['min_cost'],
-                    min_price = data['min_price'],
-                    cost = data['cost'],
-                    price = data['price'],
-                    storehouse_code = newOrderItem.order.storehouse_code,
-                    dealer_code = newOrderItem.order.dealer_code,
-                    global_rate = newOrderItem.order.global_rate,
-
-                    order_date = newOrderItem.date_created,
-                    order_quantity = data['quantity'],
-                    orderitem = newOrderItem
-                )
-                newProductInventory.save()
-        #Delete
-        orderItems = OrderItem.objects.filter(order = Order.objects.get(pk=order_id))
-        if(len(datas) != len(orderItems)):
-            for item in orderItems:
-                if any(d['id'] == item.row_id for d in datas):
-                    True
-                else:
-                    item.delete()
+    def delete_row(request):
+        try:
+            deleteItem = OrderItem.objects.get(row_id = request.data['row_id'])
+            deleteItem.delete()
+        except Exception as e:
+            return HttpResponse(f'An error occurred: {str(e)}')
         status_code = status.HTTP_200_OK
         response = {
             'success': 'True',
